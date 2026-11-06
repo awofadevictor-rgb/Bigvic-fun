@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BigVic Fun Chat</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #10102b;
+      color: white;
+    }
+
+    header {
+      background: #1d1d45;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+      color: #00d9ff;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    #status {
+      text-align: center;
+      margin: 15px 0;
+      color: #66ff99;
+    }
+
+    #messages {
+      height: 400px;
+      overflow-y: auto;
+      background: #18183a;
+      border-radius: 12px;
+      padding: 15px;
+    }
+
+    .message {
+      background: #292955;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+    }
+
+    .sender {
+      color: #00d9ff;
+      font-weight: bold;
+    }
+
+    .text {
+      margin-top: 5px;
+      word-break: break-word;
+    }
+
+    .send {
+      display: flex;
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    input {
+      flex: 1;
+      min-width: 0;
+      padding: 14px;
+      border: 1px solid #555577;
+      border-radius: 8px;
+      background: #292955;
+      color: white;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 14px 18px;
+      border: 0;
+      border-radius: 8px;
+      background: #ffcc33;
+      color: #111122;
+      font-weight: bold;
+    }
+
+    .logout {
+      width: 100%;
+      margin-top: 15px;
+      background: #333355;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>BigVic Fun 💬</h1>
+</header>
+
+<div class="container">
+
+  <div id="status">
+    Connecting...
+  </div>
+
+  <div id="messages">
+    <div class="message">
+      <div class="sender">BigVic Fun</div>
+      <div class="text">
+        Welcome to the BigVic Fun chat! 🎉
+      </div>
+    </div>
+  </div>
+
+  <div class="send">
+
+    <input
+      id="messageInput"
+      type="text"
+      placeholder="Write a message..."
+    >
+
+    <button id="sendButton">
+      Send
+    </button>
+
+  </div>
+
+  <button class="logout" id="logoutButton">
+    Logout
+  </button>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../config.js"></script>
+
+<script>
+
+const status = document.getElementById("status");
+const messages = document.getElementById("messages");
+const input = document.getElementById("messageInput");
+const sendButton = document.getElementById("sendButton");
+const logoutButton = document.getElementById("logoutButton");
+
+let client;
+let user;
+
+
+async function start() {
+
+  if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+
+    status.textContent =
+      "Setup error: config.js is missing.";
+
+    return;
+  }
+
+  client = window.supabase.createClient(
+    window.SUPABASE_URL,
+    window.SUPABASE_ANON_KEY
+  );
+
+
+  const result =
+    await client.auth.getUser();
+
+
+  if (!result.data.user) {
+
+    status.textContent =
+      "Please log in first.";
+
+    setTimeout(function() {
+      window.location.href = "../auth.html";
+    }, 1200);
+
+    return;
+  }
+
+
+  user = result.data.user;
+
+  status.textContent =
+    "Logged in as " + user.email;
+
+  loadMessages();
+
+}
+
+
+async function loadMessages() {
+
+  const result =
+    await client
+      .from("messages")
+      .select("*")
+      .order("created_at", {
+        ascending: true
+      });
+
+
+  if (result.error) {
+
+    status.textContent =
+      "Chat error: " + result.error.message;
+
+    return;
+  }
+
+
+  messages.innerHTML = "";
+
+
+  result.data.forEach(function(item) {
+
+    const box =
+      document.createElement("div");
+
+    box.className = "message";
+
+
+    const sender =
+      document.createElement("div");
+
+    sender.className = "sender";
+
+    sender.textContent =
+      item.sender;
+
+
+    const text =
+      document.createElement("div");
+
+    text.className = "text";
+
+    text.textContent =
+      item.message;
+
+
+    box.appendChild(sender);
+    box.appendChild(text);
+
+    messages.appendChild(box);
+
+  });
+
+}
+
+
+async function sendMessage() {
+
+  const text =
+    input.value.trim();
+
+
+  if (!text) {
+    return;
+  }
+
+
+  const result =
+    await client
+      .from("messages")
+      .insert({
+
+        sender: user.id,
+
+        receiver: user.id,
+
+        message: text
+
+      });
+
+
+  if (result.error) {
+
+    status.textContent =
+      "Message error: " +
+      result.error.message;
+
+    return;
+  }
+
+
+  input.value = "";
+
+  status.textContent =
+    "Message sent.";
+
+  loadMessages();
+
+}
+
+
+sendButton.addEventListener(
+  "click",
+  sendMessage
+);
+
+
+input.addEventListener(
+  "keydown",
+  function(event) {
+
+    if (event.key === "Enter") {
+      sendMessage();
+    }
+
+  }
+);
+
+
+logoutButton.addEventListener(
+  "click",
+  async function() {
+
+    await client.auth.signOut();
+
+    window.location.href =
+      "../auth.html";
+
+  }
+);
+
+
+start();
+
+</script>
+
+</body>
+</html>
