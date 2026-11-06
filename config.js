@@ -1,2 +1,2 @@
-https://msoxgkgnhlzzndkbsqpw.supabase.co/rest/v1/
+https://msoxgkgnhlzzndkbsqpw.supabase.co
 sb_publishable_tfouOBiDq6AO1sygSrKVfg_ZluGQCPr
