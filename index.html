@@ -4,68 +4,448 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>BigVic Fun</title>
+  <title>BigVic Fun Chat</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #10102b;
       color: white;
+    }
+
+    header {
+      background: #1d1d45;
+      padding: 20px;
       text-align: center;
     }
 
-    .box {
-      max-width: 500px;
-      margin: 70px auto;
-      padding: 30px 20px;
-    }
-
     h1 {
+      margin: 0;
       color: #00d9ff;
-      font-size: 38px;
     }
 
-    p {
-      color: #ccccdd;
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
     }
 
-    button {
-      width: 100%;
-      max-width: 350px;
-      padding: 16px;
-      margin: 10px;
-      border: 0;
+    #status {
+      text-align: center;
+      margin: 15px 0;
+      color: #66ff99;
+    }
+
+    #messages {
+      height: 400px;
+      overflow-y: auto;
+      background: #18183a;
+      border-radius: 12px;
+      padding: 15px;
+    }
+
+    .message {
+      background: #292955;
+      padding: 12px;
+      margin-bottom: 10px;
       border-radius: 10px;
-      background: #ffcc33;
-      color: #111122;
-      font-size: 16px;
+    }
+
+    .sender {
+      color: #00d9ff;
       font-weight: bold;
     }
 
-    .chat {
-      background: #00d9ff;
+    .text {
+      margin-top: 5px;
+      word-break: break-word;
+    }
+
+    .send {
+      display: flex;
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    input {
+      flex: 1;
+      min-width: 0;
+      padding: 14px;
+      border: 1px solid #555577;
+      border-radius: 8px;
+      background: #292955;
+      color: white;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 14px 18px;
+      border: 0;
+      border-radius: 8px;
+      background: #ffcc33;
+      color: #111122;
+      font-weight: bold;
+    }
+
+    .logout {
+      width: 100%;
+      margin-top: 15px;
+      background: #333355;
+      color: white;
     }
   </style>
 </head>
 
 <body>
 
-<div class="box">
+<header>
+  <h1>BigVic Fun 💬</h1>
+</header>
 
-  <h1>BigVic Fun</h1>
+<div class="container">
 
-  <p>Chat • Games • Trending • Fun</p>
+  <div id="status">
+    Connecting...
+  </div>
 
-  <button onclick="window.location.href='auth.html'">
-    Join BigVic Fun
-  </button>
+  <div id="messages"></div>
 
-  <button class="chat" onclick="window.location.href='chat.html'">
-    Open Chat
+  <div class="send">
+
+    <input
+      id="messageInput"
+      type="text"
+      placeholder="Write a message..."
+      maxlength="500"
+    >
+
+    <button id="sendButton">
+      Send
+    </button>
+
+  </div>
+
+  <button class="logout" id="logoutButton">
+    Logout
   </button>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../config.js"></script>
+
+<script>
+
+const status = document.getElementById("status");
+const messages = document.getElementById("messages");
+const input = document.getElementById("messageInput");
+const sendButton = document.getElementById("sendButton");
+const logoutButton = document.getElementById("logoutButton");
+
+let client = null;
+let user = null;
+
+
+/*
+  Get the user's display name.
+
+  For now we use "BigVic" for the account.
+  Later we can let users choose their own username.
+*/
+function getDisplayName() {
+
+  return "BigVic";
+
+}
+
+
+/* Start the chat */
+
+async function start() {
+
+  try {
+
+    if (!window.SUPABASE_URL) {
+      status.textContent =
+        "Setup error: Supabase URL is missing.";
+      return;
+    }
+
+    if (!window.SUPABASE_ANON_KEY) {
+      status.textContent =
+        "Setup error: Supabase key is missing.";
+      return;
+    }
+
+    if (!window.supabase) {
+      status.textContent =
+        "Setup error: Supabase did not load.";
+      return;
+    }
+
+
+    client = window.supabase.createClient(
+      window.SUPABASE_URL,
+      window.SUPABASE_ANON_KEY
+    );
+
+
+    const result =
+      await client.auth.getUser();
+
+
+    if (result.error) {
+      throw result.error;
+    }
+
+
+    user = result.data.user;
+
+
+    if (!user) {
+
+      status.textContent =
+        "Please log in first.";
+
+      setTimeout(function() {
+
+        window.location.href =
+          "../auth.html";
+
+      }, 1200);
+
+      return;
+    }
+
+
+    status.textContent =
+      "Logged in as " + getDisplayName();
+
+
+    await loadMessages();
+
+
+  } catch (error) {
+
+    status.textContent =
+      "Error: " + error.message;
+
+  }
+
+}
+
+
+/* Load messages */
+
+async function loadMessages() {
+
+  const result =
+    await client
+      .from("messages")
+      .select("*")
+      .order("created_at", {
+        ascending: true
+      });
+
+
+  if (result.error) {
+
+    status.textContent =
+      "Chat error: " +
+      result.error.message;
+
+    return;
+  }
+
+
+  messages.innerHTML = "";
+
+
+  if (result.data.length === 0) {
+
+    messages.innerHTML = `
+
+      <div class="message">
+
+        <div class="sender">
+          BigVic Fun
+        </div>
+
+        <div class="text">
+          Welcome to BigVic Fun! 🎉
+        </div>
+
+      </div>
+
+    `;
+
+    return;
+  }
+
+
+  result.data.forEach(function(item) {
+
+    const box =
+      document.createElement("div");
+
+    box.className = "message";
+
+
+    const sender =
+      document.createElement("div");
+
+    sender.className =
+      "sender";
+
+    /*
+      Show BigVic instead of the
+      long Supabase user ID.
+    */
+    sender.textContent =
+      item.sender === user.id
+        ? getDisplayName()
+        : "BigVic User";
+
+
+    const text =
+      document.createElement("div");
+
+    text.className =
+      "text";
+
+    text.textContent =
+      item.message;
+
+
+    box.appendChild(sender);
+    box.appendChild(text);
+
+    messages.appendChild(box);
+
+  });
+
+
+  messages.scrollTop =
+    messages.scrollHeight;
+
+}
+
+
+/* Send a message */
+
+async function sendMessage() {
+
+  const text =
+    input.value.trim();
+
+
+  if (!text) {
+    return;
+  }
+
+
+  if (!user) {
+
+    status.textContent =
+      "Please log in first.";
+
+    return;
+  }
+
+
+  sendButton.disabled = true;
+
+
+  const result =
+    await client
+      .from("messages")
+      .insert({
+
+        sender: user.id,
+
+        receiver: user.id,
+
+        message: text
+
+      });
+
+
+  if (result.error) {
+
+    status.textContent =
+      "Message error: " +
+      result.error.message;
+
+    sendButton.disabled = false;
+
+    return;
+  }
+
+
+  input.value = "";
+
+  status.textContent =
+    "Message sent.";
+
+  await loadMessages();
+
+
+  sendButton.disabled = false;
+
+}
+
+
+/* Send button */
+
+sendButton.addEventListener(
+  "click",
+  sendMessage
+);
+
+
+/* Press Enter to send */
+
+input.addEventListener(
+  "keydown",
+  function(event) {
+
+    if (event.key === "Enter") {
+      sendMessage();
+    }
+
+  }
+);
+
+
+/* Logout */
+
+logoutButton.addEventListener(
+  "click",
+  async function() {
+
+    if (client) {
+
+      await client.auth.signOut();
+
+    }
+
+    window.location.href =
+      "../auth.html";
+
+  }
+);
+
+
+/* Start everything */
+
+start();
+
+</script>
 
 </body>
 </html>
