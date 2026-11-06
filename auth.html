@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>BigVic Fun - Login</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * {
@@ -14,10 +17,17 @@
       margin: 0;
       padding: 20px;
       min-height: 100vh;
+
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #10102b, #25256b);
+
+      background: linear-gradient(
+        135deg,
+        #10102b,
+        #25256b
+      );
+
       font-family: Arial, sans-serif;
       color: white;
     }
@@ -25,197 +35,36 @@
     .container {
       width: 100%;
       max-width: 400px;
+
       padding: 30px 22px;
+
       background: #1b1b3b;
+
       border-radius: 18px;
-      text-align: center;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     }
 
     h1 {
-      color: #ffcc33;
-      margin-bottom: 8px;
+      text-align: center;
+      color: #00d9ff;
+      margin-top: 0;
+      margin-bottom: 10px;
     }
 
-    p {
-      color: #ccccdd;
+    .subtitle {
+      text-align: center;
+      color: #aaa;
+      margin-bottom: 25px;
     }
 
     input {
       width: 100%;
-      padding: 15px;
-      margin: 10px 0;
-      border: 1px solid #555577;
-      border-radius: 9px;
-      background: #29294d;
-      color: white;
-      font-size: 16px;
-    }
+      padding: 14px;
 
-    button {
-      width: 100%;
-      padding: 15px;
-      margin-top: 12px;
+      margin-bottom: 12px;
+
       border: none;
-      border-radius: 9px;
-      background: #ffcc33;
-      color: #17172c;
+      border-radius: 8px;
+
       font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:disabled {
-      opacity: 0.6;
-    }
-
-    #message {
-      margin-top: 18px;
-      line-height: 1.5;
-      overflow-wrap: anywhere;
-    }
-
-    a {
-      color: #ffcc33;
-    }
-  </style>
-</head>
-
-<body>
-
-  <div class="container">
-    <h1>BigVic Fun</h1>
-    <p>Create your account or log in</p>
-
-    <input
-      type="email"
-      id="email"
-      placeholder="Enter your email"
-      autocomplete="email"
-    >
-
-    <input
-      type="password"
-      id="password"
-      placeholder="Enter your password"
-      autocomplete="current-password"
-    >
-
-    <button id="signup">Create Account</button>
-    <button id="login">Login</button>
-
-    <div id="message">Welcome to BigVic Fun!</div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
-
-  <script>
-    const message = document.getElementById("message");
-    const signupButton = document.getElementById("signup");
-    const loginButton = document.getElementById("login");
-
-    let client = null;
-
-    function showMessage(text) {
-      message.textContent = text;
-    }
-
-    // Check the Supabase settings
-    if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
-      showMessage("Setup error: Please check your config.js file.");
-    } else if (!window.supabase) {
-      showMessage("Setup error: Supabase library did not load.");
-    } else {
-      client = window.supabase.createClient(
-        window.SUPABASE_URL,
-        window.SUPABASE_ANON_KEY
-      );
-
-      showMessage("Ready! You can create an account or log in.");
-    }
-
-    // Create account
-    signupButton.addEventListener("click", async function () {
-      if (!client) {
-        showMessage("Setup error. Please check config.js.");
-        return;
-      }
-
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-
-      if (!email || !password) {
-        showMessage("Please enter your email and password.");
-        return;
-      }
-
-      if (password.length < 6) {
-        showMessage("Your password must be at least 6 characters.");
-        return;
-      }
-
-      signupButton.disabled = true;
-      showMessage("Creating account... Please wait.");
-
-      try {
-        const { data, error } = await client.auth.signUp({
-          email: email,
-          password: password
-        });
-
-        if (error) throw error;
-
-        if (data.session) {
-          showMessage("Account created successfully! Opening BigVic Fun...");
-          window.location.href = "chat.html";
-        } else {
-          showMessage("Account created! Check your email for a confirmation link if required.");
-        }
-
-      } catch (error) {
-        showMessage("Signup error: " + error.message);
-      } finally {
-        signupButton.disabled = false;
-      }
-    });
-
-    // Login
-    loginButton.addEventListener("click", async function () {
-      if (!client) {
-        showMessage("Setup error. Please check config.js.");
-        return;
-      }
-
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-
-      if (!email || !password) {
-        showMessage("Please enter your email and password.");
-        return;
-      }
-
-      loginButton.disabled = true;
-      showMessage("Logging in... Please wait.");
-
-      try {
-        const { data, error } = await client.auth.signInWithPassword({
-          email: email,
-          password: password
-        });
-
-        if (error) throw error;
-
-        showMessage("Login successful! Opening BigVic Fun...");
-        window.location.href = "chat.html";
-
-      } catch (error) {
-        showMessage("Login error: " + error.message);
-      } finally {
-        loginButton.disabled = false;
-      }
-    });
-  </script>
-
-</body>
-</html>
