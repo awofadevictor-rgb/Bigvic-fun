@@ -1,76 +1,179 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BigVic Fun</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BigVic Fun</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: #0b0b12;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+.box {
+  width: 100%;
+  max-width: 400px;
+  padding: 25px;
+  background: #171720;
+  border-radius: 18px;
+  text-align: center;
+}
+h1 { color: #00e5ff; }
+input {
+  width: 100%;
+  padding: 15px;
+  margin: 10px 0;
+  border: 0;
+  border-radius: 9px;
+  font-size: 16px;
+}
+button {
+  width: 100%;
+  padding: 15px;
+  margin-top: 12px;
+  border: 0;
+  border-radius: 9px;
+  background: #00e5ff;
+  color: #071018;
+  font-size: 16px;
+  font-weight: bold;
+}
+button:disabled { opacity: .5; }
+#result {
+  margin-top: 18px;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+</style>
 </head>
 
-<body style="background:#0b0b12;color:white;font-family:Arial;text-align:center;padding:40px;">
+<body>
+<div class="box">
+  <h1>BigVic Fun 💬</h1>
+  <p>Create your account or log in.</p>
 
-<h1 style="color:#00e5ff;">BigVic Fun</h1>
+  <input id="email" type="email"
+    placeholder="Enter your email" autocomplete="email">
 
-<input id="email" type="email" placeholder="Email"
-style="display:block;width:90%;max-width:350px;margin:15px auto;padding:15px;">
+  <input id="password" type="password"
+    placeholder="Enter password (at least 6 characters)"
+    autocomplete="current-password">
 
-<input id="password" type="password" placeholder="Password"
-style="display:block;width:90%;max-width:350px;margin:15px auto;padding:15px;">
+  <button id="signup" type="button">Create Account</button>
+  <button id="login" type="button">Login</button>
 
-<button id="signup"
-style="padding:15px 30px;background:#00e5ff;border:0;border-radius:10px;">
-Create Account
-</button>
-
-<p id="result">Ready</p>
+  <p id="result">Ready to connect!</p>
+</div>
 
 <script>
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
+(function () {
+  const result = document.getElementById("result");
+  const signup = document.getElementById("signup");
+  const login = document.getElementById("login");
 
-document.getElementById("signup").onclick = async function () {
+  function show(text) {
+    result.textContent = text;
+  }
 
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
+  function credentials() {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
 
-  if (!email || !password) {
-    document.getElementById("result").textContent =
-      "Enter your email and password.";
+    if (!email || !password) {
+      show("Please enter your email and password.");
+      return null;
+    }
+
+    if (password.length < 6) {
+      show("Password must have at least 6 characters.");
+      return null;
+    }
+
+    return { email, password };
+  }
+
+  let client;
+
+  try {
+    if (!window.supabase) {
+      throw new Error("Supabase library did not load. Refresh the page.");
+    }
+
+    if (
+      typeof SUPABASE_URL === "undefined" ||
+      typeof SUPABASE_ANON_KEY === "undefined"
+    ) {
+      throw new Error("Your config.js settings are missing.");
+    }
+
+    client = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+    show("Connection ready. You can create an account.");
+
+  } catch (error) {
+    show("Setup error: " + error.message);
     return;
   }
 
-  document.getElementById("result").textContent =
-    "Creating account...";
+  async function run(action) {
+    const details = credentials();
+    if (!details) return;
 
-  try {
+    signup.disabled = true;
+    login.disabled = true;
+    show(action === "signup" ? "Creating account..." : "Logging in...");
 
-    const { data, error } =
-      await supabaseClient.auth.signUp({
-        email: email,
-        password: password
-      });
+    try {
+      const response = action === "signup"
+        ? await client.auth.signUp(details)
+        : await client.auth.signInWithPassword(details);
 
-    if (error) {
-      document.getElementById("result").textContent =
-        "Error: " + error.message;
-      return;
+      if (response.error) {
+        show("Error: " + response.error.message);
+        return;
+      }
+
+      if (action === "signup") {
+        show(
+          response.data.session
+            ? "Account created! You can now log in."
+            : "Account created! Check your email if confirmation is required."
+        );
+      } else {
+        show("Login successful! Opening chat...");
+        window.location.href = "chat.html";
+      }
+
+    } catch (error) {
+      show("Connection error: " + error.message);
+    } finally {
+      signup.disabled = false;
+      login.disabled = false;
     }
-
-    document.getElementById("result").textContent =
-      "Account created successfully!";
-
-  } catch (error) {
-
-    document.getElementById("result").textContent =
-      "Error: " + error.message;
-
   }
-};
-</script>
 
+  signup.addEventListener("click", function () {
+    run("signup");
+  });
+
+  login.addEventListener("click", function () {
+    run("login");
+  });
+})();
+</script>
 </body>
 </html>
