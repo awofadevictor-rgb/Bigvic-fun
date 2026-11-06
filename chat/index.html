@@ -6,10 +6,7 @@
 
   <title>BigVic Fun Chat</title>
 
-  <!-- Load your Supabase settings -->
   <script src="../config.js"></script>
-
-  <!-- Load Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -48,6 +45,49 @@
       max-width: 650px;
       margin: auto;
       padding: 15px;
+    }
+
+    .profile {
+      background: #1b1b42;
+      border-radius: 15px;
+      padding: 18px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .avatar {
+      width: 85px;
+      height: 85px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #00d9ff;
+      background: #292952;
+    }
+
+    .profile-name {
+      margin: 10px 0 5px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .profile-status {
+      color: #54e88b;
+      font-size: 13px;
+    }
+
+    .profile input {
+      display: none;
+    }
+
+    .photo-button {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 10px 15px;
+      border-radius: 9px;
+      background: #00d9ff;
+      color: #061018;
+      font-weight: bold;
+      font-size: 14px;
     }
 
     .name-box {
@@ -100,7 +140,7 @@
     }
 
     #messages {
-      height: 58vh;
+      height: 55vh;
       min-height: 380px;
       overflow-y: auto;
       padding: 15px;
@@ -111,15 +151,31 @@
 
     .message {
       display: flex;
-      margin-bottom: 14px;
+      gap: 8px;
+      margin-bottom: 15px;
+      align-items: flex-end;
     }
 
     .message.me {
       justify-content: flex-end;
     }
 
+    .message.me .avatar-small {
+      order: 2;
+    }
+
+    .avatar-small {
+      width: 38px;
+      height: 38px;
+      min-width: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #292952;
+      border: 1px solid #55558a;
+    }
+
     .bubble {
-      max-width: 82%;
+      max-width: 75%;
       padding: 10px 13px;
       border-radius: 15px;
       background: #292953;
@@ -203,7 +259,42 @@
 
 <div class="container">
 
-  <div id="nameBox" class="name-box">
+  <!-- PROFILE -->
+  <div id="profileBox" class="profile hidden">
+
+    <img
+      id="profileAvatar"
+      class="avatar"
+      src=""
+      alt="Profile picture"
+    >
+
+    <div id="profileName"
+         class="profile-name">
+    </div>
+
+    <div class="profile-status">
+      ● Online
+    </div>
+
+    <label
+      for="photoInput"
+      class="photo-button">
+      Change Profile Picture
+    </label>
+
+    <input
+      id="photoInput"
+      type="file"
+      accept="image/*"
+    >
+
+  </div>
+
+
+  <!-- CHOOSE NAME -->
+  <div id="nameBox"
+       class="name-box">
 
     <h2>Choose your chat name</h2>
 
@@ -220,16 +311,25 @@
 
   </div>
 
+
   <div id="status"></div>
 
-  <div id="welcome" class="welcome"></div>
+  <div id="welcome"
+       class="welcome">
+  </div>
 
+
+  <!-- MESSAGES -->
   <div id="messages">
+
     <div class="empty">
       Loading messages...
     </div>
+
   </div>
 
+
+  <!-- SEND -->
   <div class="send-area">
 
     <input
@@ -245,281 +345,20 @@
 
   </div>
 
-  <button id="logoutBtn" class="logout">
+
+  <button
+    id="logoutBtn"
+    class="logout">
     Logout
   </button>
 
 </div>
 
-<script>
 
-  /*
-   * config.js supplies:
-   * window.SUPABASE_URL
-   * window.SUPABASE_ANON_KEY
-   */
+<script>
 
   const SUPABASE_URL =
     window.SUPABASE_URL;
 
   const SUPABASE_ANON_KEY =
-    window.SUPABASE_ANON_KEY;
-
-
-  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-
-    document.body.innerHTML = `
-      <div style="
-        padding:30px;
-        text-align:center;
-        color:white;
-        font-family:Arial;
-      ">
-        <h2>BigVic Fun Setup Error</h2>
-        <p>Supabase settings could not be loaded.</p>
-      </div>
-    `;
-
-    throw new Error(
-      "Supabase settings missing"
-    );
-  }
-
-
-  const client =
-    window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
-    );
-
-
-  let user = null;
-
-  let username =
-    localStorage.getItem(
-      "bigvic_username"
-    );
-
-
-  const nameBox =
-    document.getElementById(
-      "nameBox"
-    );
-
-  const usernameInput =
-    document.getElementById(
-      "usernameInput"
-    );
-
-  const saveNameBtn =
-    document.getElementById(
-      "saveNameBtn"
-    );
-
-  const status =
-    document.getElementById(
-      "status"
-    );
-
-  const welcome =
-    document.getElementById(
-      "welcome"
-    );
-
-  const messagesBox =
-    document.getElementById(
-      "messages"
-    );
-
-  const messageInput =
-    document.getElementById(
-      "messageInput"
-    );
-
-  const sendBtn =
-    document.getElementById(
-      "sendBtn"
-    );
-
-  const logoutBtn =
-    document.getElementById(
-      "logoutBtn"
-    );
-
-
-  function showStatus(text) {
-
-    status.textContent = text;
-
-    setTimeout(function () {
-      status.textContent = "";
-    }, 3000);
-
-  }
-
-
-  async function saveProfileName() {
-
-    const name =
-      usernameInput.value.trim();
-
-    if (name.length < 2) {
-
-      showStatus(
-        "Please choose a name."
-      );
-
-      return;
-    }
-
-
-    username = name;
-
-    localStorage.setItem(
-      "bigvic_username",
-      username
-    );
-
-
-    const result =
-      await client
-        .from("profiles")
-        .upsert({
-          id: user.id,
-          username: username,
-          email: user.email
-        });
-
-
-    if (result.error) {
-      console.log(
-        "Profile save error:",
-        result.error
-      );
-    }
-
-
-    nameBox.classList.add(
-      "hidden"
-    );
-
-    welcome.textContent =
-      "Welcome, " +
-      username +
-      " 👋";
-
-    showStatus(
-      "Chat name saved."
-    );
-
-    loadMessages();
-
-  }
-
-
-  async function getProfileName(
-    userId
-  ) {
-
-    const result =
-      await client
-        .from("profiles")
-        .select("username")
-        .eq("id", userId)
-        .maybeSingle();
-
-
-    if (
-      !result.error &&
-      result.data &&
-      result.data.username
-    ) {
-
-      return result.data.username;
-
-    }
-
-
-    return "BigVic User";
-
-  }
-
-
-  async function loadMessages() {
-
-    messagesBox.innerHTML = "";
-
-    const result =
-      await client
-        .from("messages")
-        .select("*")
-        .order(
-          "created_at",
-          {
-            ascending: true
-          }
-        );
-
-
-    if (result.error) {
-
-      messagesBox.innerHTML =
-        `
-        <div class="empty">
-          Could not load messages.
-        </div>
-        `;
-
-      console.log(
-        "Message loading error:",
-        result.error
-      );
-
-      return;
-    }
-
-
-    if (result.data.length === 0) {
-
-      messagesBox.innerHTML =
-        `
-        <div class="empty">
-          No messages yet. Say hello! 👋
-        </div>
-        `;
-
-      return;
-    }
-
-
-    for (
-      const item of result.data
-    ) {
-
-      let senderName;
-
-      if (
-        item.sender === user.id
-      ) {
-
-        senderName =
-          username || "BigVic";
-
-      } else {
-
-        senderName =
-          await getProfileName(
-            item.sender
-          );
-
-      }
-
-
-      displayMessage(
-        item,
-        senderName
-      );
-    }
-
-
-    messages
+    window
