@@ -6,6 +6,10 @@
 
   <title>BigVic Fun Chat</title>
 
+  <!-- Load your Supabase settings -->
+  <script src="../config.js"></script>
+
+  <!-- Load Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -81,11 +85,6 @@
       color: #061018;
       font-size: 15px;
       font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:active {
-      transform: scale(.98);
     }
 
     #saveNameBtn {
@@ -140,10 +139,6 @@
       font-size: 13px;
       font-weight: bold;
       margin-bottom: 5px;
-    }
-
-    .message.me .username {
-      color: #7eeeff;
     }
 
     .message-text {
@@ -258,12 +253,38 @@
 
 <script>
 
+  /*
+   * config.js supplies:
+   * window.SUPABASE_URL
+   * window.SUPABASE_ANON_KEY
+   */
+
   const SUPABASE_URL =
-    "https://msoxgkgnhlzzndkbsqpw.supabase.co";
+    window.SUPABASE_URL;
 
   const SUPABASE_ANON_KEY =
-    window.SUPABASE_ANON_KEY ||
-    "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE";
+    window.SUPABASE_ANON_KEY;
+
+
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+
+    document.body.innerHTML = `
+      <div style="
+        padding:30px;
+        text-align:center;
+        color:white;
+        font-family:Arial;
+      ">
+        <h2>BigVic Fun Setup Error</h2>
+        <p>Supabase settings could not be loaded.</p>
+      </div>
+    `;
+
+    throw new Error(
+      "Supabase settings missing"
+    );
+  }
+
 
   const client =
     window.supabase.createClient(
@@ -273,44 +294,67 @@
 
 
   let user = null;
+
   let username =
-    localStorage.getItem("bigvic_username");
+    localStorage.getItem(
+      "bigvic_username"
+    );
 
 
   const nameBox =
-    document.getElementById("nameBox");
+    document.getElementById(
+      "nameBox"
+    );
 
   const usernameInput =
-    document.getElementById("usernameInput");
+    document.getElementById(
+      "usernameInput"
+    );
 
   const saveNameBtn =
-    document.getElementById("saveNameBtn");
+    document.getElementById(
+      "saveNameBtn"
+    );
 
   const status =
-    document.getElementById("status");
+    document.getElementById(
+      "status"
+    );
 
   const welcome =
-    document.getElementById("welcome");
+    document.getElementById(
+      "welcome"
+    );
 
   const messagesBox =
-    document.getElementById("messages");
+    document.getElementById(
+      "messages"
+    );
 
   const messageInput =
-    document.getElementById("messageInput");
+    document.getElementById(
+      "messageInput"
+    );
 
   const sendBtn =
-    document.getElementById("sendBtn");
+    document.getElementById(
+      "sendBtn"
+    );
 
   const logoutBtn =
-    document.getElementById("logoutBtn");
+    document.getElementById(
+      "logoutBtn"
+    );
 
 
   function showStatus(text) {
+
     status.textContent = text;
 
     setTimeout(function () {
       status.textContent = "";
     }, 3000);
+
   }
 
 
@@ -320,9 +364,14 @@
       usernameInput.value.trim();
 
     if (name.length < 2) {
-      showStatus("Please choose a name.");
+
+      showStatus(
+        "Please choose a name."
+      );
+
       return;
     }
+
 
     username = name;
 
@@ -330,6 +379,7 @@
       "bigvic_username",
       username
     );
+
 
     const result =
       await client
@@ -340,22 +390,36 @@
           email: user.email
         });
 
+
     if (result.error) {
-      console.error(result.error);
+      console.log(
+        "Profile save error:",
+        result.error
+      );
     }
 
-    nameBox.classList.add("hidden");
+
+    nameBox.classList.add(
+      "hidden"
+    );
 
     welcome.textContent =
-      "Welcome, " + username + " 👋";
+      "Welcome, " +
+      username +
+      " 👋";
 
-    showStatus("Chat name saved.");
+    showStatus(
+      "Chat name saved."
+    );
 
     loadMessages();
+
   }
 
 
-  async function getProfileName(userId) {
+  async function getProfileName(
+    userId
+  ) {
 
     const result =
       await client
@@ -364,15 +428,20 @@
         .eq("id", userId)
         .maybeSingle();
 
+
     if (
       !result.error &&
       result.data &&
       result.data.username
     ) {
+
       return result.data.username;
+
     }
 
+
     return "BigVic User";
+
   }
 
 
@@ -384,16 +453,27 @@
       await client
         .from("messages")
         .select("*")
-        .order("created_at", {
-          ascending: true
-        });
+        .order(
+          "created_at",
+          {
+            ascending: true
+          }
+        );
+
 
     if (result.error) {
 
       messagesBox.innerHTML =
-        '<div class="empty">Could not load messages.</div>';
+        `
+        <div class="empty">
+          Could not load messages.
+        </div>
+        `;
 
-      console.error(result.error);
+      console.log(
+        "Message loading error:",
+        result.error
+      );
 
       return;
     }
@@ -402,18 +482,38 @@
     if (result.data.length === 0) {
 
       messagesBox.innerHTML =
-        '<div class="empty">No messages yet. Say hello! 👋</div>';
+        `
+        <div class="empty">
+          No messages yet. Say hello! 👋
+        </div>
+        `;
 
       return;
     }
 
 
-    for (const item of result.data) {
+    for (
+      const item of result.data
+    ) {
 
-      const senderName =
+      let senderName;
+
+      if (
         item.sender === user.id
-          ? username || "BigVic"
-          : await getProfileName(item.sender);
+      ) {
+
+        senderName =
+          username || "BigVic";
+
+      } else {
+
+        senderName =
+          await getProfileName(
+            item.sender
+          );
+
+      }
+
 
       displayMessage(
         item,
@@ -421,230 +521,5 @@
       );
     }
 
-    messagesBox.scrollTop =
-      messagesBox.scrollHeight;
-  }
 
-
-  function displayMessage(
-    item,
-    senderName
-  ) {
-
-    const wrapper =
-      document.createElement("div");
-
-    const isMe =
-      item.sender === user.id;
-
-    wrapper.className =
-      isMe
-        ? "message me"
-        : "message";
-
-
-    const bubble =
-      document.createElement("div");
-
-    bubble.className = "bubble";
-
-
-    const name =
-      document.createElement("div");
-
-    name.className = "username";
-
-    name.textContent =
-      senderName;
-
-
-    const text =
-      document.createElement("div");
-
-    text.className =
-      "message-text";
-
-    text.textContent =
-      item.message;
-
-
-    const time =
-      document.createElement("div");
-
-    time.className =
-      "time";
-
-
-    if (item.created_at) {
-
-      const date =
-        new Date(item.created_at);
-
-      time.textContent =
-        date.toLocaleTimeString(
-          [],
-          {
-            hour: "2-digit",
-            minute: "2-digit"
-          }
-        );
-    }
-
-
-    bubble.appendChild(name);
-    bubble.appendChild(text);
-    bubble.appendChild(time);
-
-    wrapper.appendChild(bubble);
-
-    messagesBox.appendChild(wrapper);
-  }
-
-
-  async function sendMessage() {
-
-    const text =
-      messageInput.value.trim();
-
-    if (!text) {
-      return;
-    }
-
-    if (!user) {
-      return;
-    }
-
-    if (!username) {
-
-      showStatus(
-        "Please choose your chat name first."
-      );
-
-      nameBox.classList.remove("hidden");
-
-      return;
-    }
-
-
-    sendBtn.disabled = true;
-
-
-    const result =
-      await client
-        .from("messages")
-        .insert({
-          sender: user.id,
-          receiver: "public",
-          message: text
-        });
-
-
-    if (result.error) {
-
-      console.error(result.error);
-
-      showStatus(
-        "Message could not be sent."
-      );
-
-      sendBtn.disabled = false;
-
-      return;
-    }
-
-
-    messageInput.value = "";
-
-    showStatus("Message sent.");
-
-    sendBtn.disabled = false;
-
-    loadMessages();
-  }
-
-
-  async function startChat() {
-
-    const result =
-      await client.auth.getUser();
-
-    if (
-      result.error ||
-      !result.data.user
-    ) {
-
-      window.location.href =
-        "../auth.html";
-
-      return;
-    }
-
-
-    user =
-      result.data.user;
-
-
-    if (username) {
-
-      nameBox.classList.add("hidden");
-
-      welcome.textContent =
-        "Welcome, " + username + " 👋";
-
-    } else {
-
-      nameBox.classList.remove("hidden");
-
-    }
-
-
-    loadMessages();
-  }
-
-
-  saveNameBtn.addEventListener(
-    "click",
-    saveProfileName
-  );
-
-
-  sendBtn.addEventListener(
-    "click",
-    sendMessage
-  );
-
-
-  messageInput.addEventListener(
-    "keydown",
-    function(event) {
-
-      if (event.key === "Enter") {
-        sendMessage();
-      }
-
-    }
-  );
-
-
-  logoutBtn.addEventListener(
-    "click",
-    async function() {
-
-      await client.auth.signOut();
-
-      localStorage.removeItem(
-        "bigvic_username"
-      );
-
-      window.location.href =
-        "../auth.html";
-    }
-  );
-
-
-  startChat();
-
-</script>
-
-</body>
-</html>
+    messages
