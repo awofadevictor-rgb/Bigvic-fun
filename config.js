@@ -1,0 +1,2 @@
+https://msoxgkgnhlzzndkbsqpw.supabase.co/rest/v1/
+sb_publishable_tfouOBiDq6AO1sygSrKVfg_ZluGQCPr
