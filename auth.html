@@ -1,60 +1,76 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BigVic Fun Login</title>
+  <title>BigVic Fun - Login</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b0b12;
-      color: white;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #0b0b12;
+      color: white;
     }
 
     .box {
-      width: 90%;
+      width: 100%;
       max-width: 400px;
-      padding: 25px;
       background: #171720;
+      padding: 25px;
       border-radius: 18px;
     }
 
     h1 {
       text-align: center;
       color: #00e5ff;
+      margin-bottom: 25px;
     }
 
     input {
       width: 100%;
-      box-sizing: border-box;
       padding: 14px;
-      margin-top: 12px;
+      margin-bottom: 12px;
       border: 0;
       border-radius: 10px;
+      outline: none;
+      font-size: 16px;
     }
 
     button {
       width: 100%;
       padding: 14px;
-      margin-top: 12px;
+      margin-top: 8px;
       border: 0;
       border-radius: 10px;
       background: #00e5ff;
+      color: #061018;
+      font-size: 16px;
       font-weight: bold;
     }
 
+    button:disabled {
+      opacity: 0.6;
+    }
+
     #message {
+      margin-top: 18px;
       text-align: center;
-      margin-top: 15px;
+      color: #ccc;
+      line-height: 1.4;
+      word-break: break-word;
     }
   </style>
 </head>
@@ -64,80 +80,45 @@
 <div class="box">
   <h1>BigVic Fun</h1>
 
-  <input id="email" type="email" placeholder="Email">
+  <input
+    id="email"
+    type="email"
+    placeholder="Email"
+    autocomplete="email"
+  >
 
-  <input id="password" type="password" placeholder="Password">
+  <input
+    id="password"
+    type="password"
+    placeholder="Password"
+    autocomplete="new-password"
+  >
 
-  <button type="button" onclick="createAccount()">Create Account</button>
+  <button id="signupButton" type="button">
+    Create Account
+  </button>
 
-  <button type="button" onclick="login()">Login</button>
+  <button id="loginButton" type="button">
+    Login
+  </button>
 
   <div id="message"></div>
 </div>
 
 <script>
-const client = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
+const messageBox = document.getElementById("message");
+const signupButton = document.getElementById("signupButton");
+const loginButton = document.getElementById("loginButton");
 
 function showMessage(text) {
-  document.getElementById("message").textContent = text;
+  messageBox.textContent = text;
 }
 
-async function createAccount() {
-  showMessage("Creating account...");
-
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-
-  if (!email || !password) {
-    showMessage("Enter your email and password.");
-    return;
-  }
-
-  if (password.length < 6) {
-    showMessage("Password must be at least 6 characters.");
-    return;
-  }
-
-  const result = await client.auth.signUp({
-    email: email,
-    password: password
-  });
-
-  if (result.error) {
-    showMessage(result.error.message);
-    return;
-  }
-
-  showMessage("Account created successfully!");
+function getCredentials() {
+  return {
+    email: document.getElementById("email").value.trim(),
+    password: document.getElementById("password").value
+  };
 }
 
-async function login() {
-  showMessage("Logging in...");
-
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-
-  if (!email || !password) {
-    showMessage("Enter your email and password.");
-    return;
-  }
-
-  const result = await client.auth.signInWithPassword({
-    email: email,
-    password: password
-  });
-
-  if (result.error) {
-    showMessage(result.error.message);
-    return;
-  }
-
-  window.location.href = "chat.html";
-}
-</script>
-
-</body>
-</html>
+function validate(email, password
