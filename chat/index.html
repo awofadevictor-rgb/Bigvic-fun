@@ -3,14 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>BigVic Fun Chat</title>
+  <title>BigVic Fun</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -22,125 +17,41 @@
       margin: auto;
       min-height: 100vh;
       background: white;
-      display: flex;
-      flex-direction: column;
     }
 
     header {
       background: #111827;
       color: white;
       padding: 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
 
-    header h2 {
+    h2 {
       margin: 0;
     }
 
-    #logout {
-      background: #ef4444;
-      color: white;
-      border: 0;
-      padding: 8px 12px;
-      border-radius: 8px;
-    }
-
-    .user {
-      padding: 12px 15px;
-      background: #f8fafc;
-      border-bottom: 1px solid #ddd;
-    }
-
-    .user strong {
-      color: #2563eb;
-    }
-
     #status {
-      padding: 10px 15px;
-      color: #666;
-      font-size: 13px;
-    }
-
-    #messages {
-      flex: 1;
-      min-height: 400px;
-      padding: 15px;
-      overflow-y: auto;
-    }
-
-    .msg {
-      margin-bottom: 14px;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .msg.mine {
-      align-items: flex-end;
-    }
-
-    .name {
-      font-size: 12px;
-      color: #777;
-      margin-bottom: 4px;
-    }
-
-    .bubble {
-      max-width: 80%;
-      padding: 11px 14px;
-      border-radius: 15px;
-      background: #e5e7eb;
-      word-wrap: break-word;
-    }
-
-    .mine .bubble {
-      background: #2563eb;
-      color: white;
-    }
-
-    .time {
-      font-size: 10px;
-      color: #999;
-      margin-top: 3px;
-    }
-
-    .send {
-      display: flex;
-      gap: 8px;
-      padding: 12px;
-      border-top: 1px solid #ddd;
-    }
-
-    #message {
-      flex: 1;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 22px;
-      font-size: 15px;
-      outline: none;
-    }
-
-    #send {
-      background: #2563eb;
-      color: white;
-      border: 0;
-      border-radius: 22px;
-      padding: 0 18px;
+      padding: 20px;
       font-weight: bold;
     }
 
-    .empty {
-      text-align: center;
-      color: #888;
-      margin-top: 50px;
+    #messages {
+      padding: 20px;
     }
 
-    .error {
-      color: red;
-      padding: 15px;
-      text-align: center;
+    .message {
+      background: #e5e7eb;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+    }
+
+    #message {
+      width: 70%;
+      padding: 12px;
+    }
+
+    #send {
+      padding: 12px;
     }
   </style>
 </head>
@@ -151,35 +62,21 @@
 
   <header>
     <h2>BigVic Fun 💬</h2>
-    <button id="logout">Logout</button>
   </header>
 
-  <div class="user">
-    Logged in as:
-    <strong id="username">BigVic</strong>
-  </div>
-
   <div id="status">
-    Loading messages...
+    Connecting to BigVic...
   </div>
 
   <div id="messages"></div>
 
-  <div class="send">
-
-    <input
-      id="message"
-      type="text"
-      placeholder="Write a message..."
-    >
-
-    <button id="send">
-      Send
-    </button>
-
+  <div style="padding:20px;">
+    <input id="message" placeholder="Write a message">
+    <button id="send">Send</button>
   </div>
 
 </div>
+
 
 <script src="../config.js"></script>
 
@@ -187,48 +84,145 @@
 
 <script>
 
-  const supabaseUrl =
-    window.SUPABASE_URL;
+console.log("STEP 1: Page loaded");
 
-  const supabaseKey =
-    window.SUPABASE_ANON_KEY;
+const status = document.getElementById("status");
 
 
-  if (!supabaseUrl || !supabaseKey) {
+if (!window.SUPABASE_URL) {
 
-    document.getElementById("status").innerHTML =
-      "<div class='error'>Supabase configuration is missing.</div>";
+  status.textContent =
+    "ERROR: SUPABASE_URL is missing";
 
-  } else {
+} else if (!window.SUPABASE_ANON_KEY) {
 
-    const client =
-      window.supabase.createClient(
-        supabaseUrl,
-        supabaseKey
-      );
+  status.textContent =
+    "ERROR: SUPABASE_ANON_KEY is missing";
 
+} else {
 
-    let currentUser = null;
+  status.textContent =
+    "STEP 2: Supabase settings found";
 
-
-    let username =
-      localStorage.getItem("bigvic_username");
+}
 
 
-    if (!username) {
+if (
+  window.SUPABASE_URL &&
+  window.SUPABASE_ANON_KEY
+) {
 
-      username = "BigVic";
+  const client =
+    window.supabase.createClient(
+      window.SUPABASE_URL,
+      window.SUPABASE_ANON_KEY
+    );
+
+
+  async function testConnection() {
+
+    status.textContent =
+      "STEP 3: Checking login...";
+
+
+    const userResult =
+      await client.auth.getUser();
+
+
+    if (userResult.error) {
+
+      status.textContent =
+        "LOGIN ERROR: " +
+        userResult.error.message;
+
+      return;
 
     }
 
 
-    document.getElementById("username").textContent =
-      username;
+    if (!userResult.data.user) {
+
+      status.textContent =
+        "No logged-in user. Redirecting...";
+
+      window.location.href =
+        "../auth.html";
+
+      return;
+
+    }
 
 
-    async function start() {
+    status.textContent =
+      "STEP 4: Login OK. Checking messages...";
 
-      try {
 
-        const result =
-          await client.auth.getUser();
+    const messageResult =
+      await client
+        .from("messages")
+        .select("*")
+        .limit(20);
+
+
+    if (messageResult.error) {
+
+      status.textContent =
+        "DATABASE ERROR: " +
+        messageResult.error.message;
+
+      console.error(
+        messageResult.error
+      );
+
+      return;
+
+    }
+
+
+    status.textContent =
+      "SUCCESS: Messages database is working!";
+
+
+    const messages =
+      document.getElementById("messages");
+
+
+    if (
+      !messageResult.data ||
+      messageResult.data.length === 0
+    ) {
+
+      messages.innerHTML =
+        "<p>No messages yet.</p>";
+
+      return;
+
+    }
+
+
+    messageResult.data.forEach(function(item) {
+
+      const div =
+        document.createElement("div");
+
+      div.className =
+        "message";
+
+      div.textContent =
+        item.message;
+
+      messages.appendChild(div);
+
+    });
+
+  }
+
+
+  testConnection();
+
+}
+
+</script>
+
+</body>
+</html>
