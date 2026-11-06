@@ -16,62 +16,635 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #10102b;
+      background: #0d0d25;
       color: white;
     }
 
     header {
-      background: #1d1d45;
-      padding: 18px;
+      background: #1f1f50;
+      padding: 18px 15px;
       text-align: center;
-      border-bottom: 1px solid #33335f;
+      border-bottom: 1px solid #353568;
     }
 
-    h1 {
+    header h1 {
       margin: 0;
       color: #00d9ff;
-      font-size: 26px;
+      font-size: 27px;
+    }
+
+    .online {
+      margin-top: 6px;
+      color: #54e88b;
+      font-size: 13px;
     }
 
     .container {
-      max-width: 600px;
+      width: 100%;
+      max-width: 650px;
       margin: auto;
       padding: 15px;
     }
 
-    .username-box {
-      background: #1d1d45;
-      padding: 15px;
-      border-radius: 12px;
+    .name-box {
+      background: #1b1b42;
+      padding: 18px;
+      border-radius: 15px;
       margin-bottom: 15px;
     }
 
-    .username-box input {
+    .name-box h2 {
+      margin-top: 0;
+      font-size: 19px;
+    }
+
+    input {
       width: 100%;
-      padding: 13px;
-      border: 0;
-      border-radius: 8px;
-      margin-top: 10px;
+      padding: 14px;
+      border: 1px solid #44447a;
+      border-radius: 10px;
+      background: #292952;
+      color: white;
       font-size: 16px;
       outline: none;
     }
 
+    input::placeholder {
+      color: #aaa;
+    }
+
     button {
-      border: 0;
-      border-radius: 8px;
-      padding: 12px 18px;
+      border: none;
+      border-radius: 10px;
+      padding: 13px 18px;
       background: #00d9ff;
-      color: #071018;
-      font-weight: bold;
+      color: #061018;
       font-size: 15px;
-      margin-top: 10px;
+      font-weight: bold;
+      cursor: pointer;
     }
 
     button:active {
-      transform: scale(0.98);
+      transform: scale(.98);
+    }
+
+    #saveNameBtn {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    #status {
+      text-align: center;
+      color: #54e88b;
+      margin: 10px 0;
+      font-size: 14px;
     }
 
     #messages {
-      height: 55vh;
-      min-height: 350px;
-      overflow-y
+      height: 58vh;
+      min-height: 380px;
+      overflow-y: auto;
+      padding: 15px;
+      background: #151535;
+      border-radius: 15px;
+      border: 1px solid #292953;
+    }
+
+    .message {
+      display: flex;
+      margin-bottom: 14px;
+    }
+
+    .message.me {
+      justify-content: flex-end;
+    }
+
+    .bubble {
+      max-width: 82%;
+      padding: 10px 13px;
+      border-radius: 15px;
+      background: #292953;
+    }
+
+    .message.me .bubble {
+      background: #07536a;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message:not(.me) .bubble {
+      border-bottom-left-radius: 4px;
+    }
+
+    .username {
+      color: #00d9ff;
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .message.me .username {
+      color: #7eeeff;
+    }
+
+    .message-text {
+      font-size: 16px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .time {
+      margin-top: 5px;
+      color: #aaa;
+      font-size: 10px;
+    }
+
+    .send-area {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    #messageInput {
+      flex: 1;
+    }
+
+    #sendBtn {
+      width: 90px;
+      background: #ffd21c;
+      color: #111;
+    }
+
+    .logout {
+      width: 100%;
+      margin-top: 12px;
+      background: #353555;
+      color: white;
+    }
+
+    .welcome {
+      text-align: center;
+      color: #bbb;
+      margin: 10px 0;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .empty {
+      text-align: center;
+      color: #888;
+      padding: 30px 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>BigVic Fun 💬</h1>
+  <div class="online">● Chat is online</div>
+</header>
+
+<div class="container">
+
+  <div id="nameBox" class="name-box">
+
+    <h2>Choose your chat name</h2>
+
+    <input
+      id="usernameInput"
+      type="text"
+      maxlength="20"
+      placeholder="Example: BigVic"
+    >
+
+    <button id="saveNameBtn">
+      Continue
+    </button>
+
+  </div>
+
+  <div id="status"></div>
+
+  <div id="welcome" class="welcome"></div>
+
+  <div id="messages">
+    <div class="empty">
+      Loading messages...
+    </div>
+  </div>
+
+  <div class="send-area">
+
+    <input
+      id="messageInput"
+      type="text"
+      placeholder="Write a message..."
+      autocomplete="off"
+    >
+
+    <button id="sendBtn">
+      Send
+    </button>
+
+  </div>
+
+  <button id="logoutBtn" class="logout">
+    Logout
+  </button>
+
+</div>
+
+<script>
+
+  const SUPABASE_URL =
+    "https://msoxgkgnhlzzndkbsqpw.supabase.co";
+
+  const SUPABASE_ANON_KEY =
+    window.SUPABASE_ANON_KEY ||
+    "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE";
+
+  const client =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+
+  let user = null;
+  let username =
+    localStorage.getItem("bigvic_username");
+
+
+  const nameBox =
+    document.getElementById("nameBox");
+
+  const usernameInput =
+    document.getElementById("usernameInput");
+
+  const saveNameBtn =
+    document.getElementById("saveNameBtn");
+
+  const status =
+    document.getElementById("status");
+
+  const welcome =
+    document.getElementById("welcome");
+
+  const messagesBox =
+    document.getElementById("messages");
+
+  const messageInput =
+    document.getElementById("messageInput");
+
+  const sendBtn =
+    document.getElementById("sendBtn");
+
+  const logoutBtn =
+    document.getElementById("logoutBtn");
+
+
+  function showStatus(text) {
+    status.textContent = text;
+
+    setTimeout(function () {
+      status.textContent = "";
+    }, 3000);
+  }
+
+
+  async function saveProfileName() {
+
+    const name =
+      usernameInput.value.trim();
+
+    if (name.length < 2) {
+      showStatus("Please choose a name.");
+      return;
+    }
+
+    username = name;
+
+    localStorage.setItem(
+      "bigvic_username",
+      username
+    );
+
+    const result =
+      await client
+        .from("profiles")
+        .upsert({
+          id: user.id,
+          username: username,
+          email: user.email
+        });
+
+    if (result.error) {
+      console.error(result.error);
+    }
+
+    nameBox.classList.add("hidden");
+
+    welcome.textContent =
+      "Welcome, " + username + " 👋";
+
+    showStatus("Chat name saved.");
+
+    loadMessages();
+  }
+
+
+  async function getProfileName(userId) {
+
+    const result =
+      await client
+        .from("profiles")
+        .select("username")
+        .eq("id", userId)
+        .maybeSingle();
+
+    if (
+      !result.error &&
+      result.data &&
+      result.data.username
+    ) {
+      return result.data.username;
+    }
+
+    return "BigVic User";
+  }
+
+
+  async function loadMessages() {
+
+    messagesBox.innerHTML = "";
+
+    const result =
+      await client
+        .from("messages")
+        .select("*")
+        .order("created_at", {
+          ascending: true
+        });
+
+    if (result.error) {
+
+      messagesBox.innerHTML =
+        '<div class="empty">Could not load messages.</div>';
+
+      console.error(result.error);
+
+      return;
+    }
+
+
+    if (result.data.length === 0) {
+
+      messagesBox.innerHTML =
+        '<div class="empty">No messages yet. Say hello! 👋</div>';
+
+      return;
+    }
+
+
+    for (const item of result.data) {
+
+      const senderName =
+        item.sender === user.id
+          ? username || "BigVic"
+          : await getProfileName(item.sender);
+
+      displayMessage(
+        item,
+        senderName
+      );
+    }
+
+    messagesBox.scrollTop =
+      messagesBox.scrollHeight;
+  }
+
+
+  function displayMessage(
+    item,
+    senderName
+  ) {
+
+    const wrapper =
+      document.createElement("div");
+
+    const isMe =
+      item.sender === user.id;
+
+    wrapper.className =
+      isMe
+        ? "message me"
+        : "message";
+
+
+    const bubble =
+      document.createElement("div");
+
+    bubble.className = "bubble";
+
+
+    const name =
+      document.createElement("div");
+
+    name.className = "username";
+
+    name.textContent =
+      senderName;
+
+
+    const text =
+      document.createElement("div");
+
+    text.className =
+      "message-text";
+
+    text.textContent =
+      item.message;
+
+
+    const time =
+      document.createElement("div");
+
+    time.className =
+      "time";
+
+
+    if (item.created_at) {
+
+      const date =
+        new Date(item.created_at);
+
+      time.textContent =
+        date.toLocaleTimeString(
+          [],
+          {
+            hour: "2-digit",
+            minute: "2-digit"
+          }
+        );
+    }
+
+
+    bubble.appendChild(name);
+    bubble.appendChild(text);
+    bubble.appendChild(time);
+
+    wrapper.appendChild(bubble);
+
+    messagesBox.appendChild(wrapper);
+  }
+
+
+  async function sendMessage() {
+
+    const text =
+      messageInput.value.trim();
+
+    if (!text) {
+      return;
+    }
+
+    if (!user) {
+      return;
+    }
+
+    if (!username) {
+
+      showStatus(
+        "Please choose your chat name first."
+      );
+
+      nameBox.classList.remove("hidden");
+
+      return;
+    }
+
+
+    sendBtn.disabled = true;
+
+
+    const result =
+      await client
+        .from("messages")
+        .insert({
+          sender: user.id,
+          receiver: "public",
+          message: text
+        });
+
+
+    if (result.error) {
+
+      console.error(result.error);
+
+      showStatus(
+        "Message could not be sent."
+      );
+
+      sendBtn.disabled = false;
+
+      return;
+    }
+
+
+    messageInput.value = "";
+
+    showStatus("Message sent.");
+
+    sendBtn.disabled = false;
+
+    loadMessages();
+  }
+
+
+  async function startChat() {
+
+    const result =
+      await client.auth.getUser();
+
+    if (
+      result.error ||
+      !result.data.user
+    ) {
+
+      window.location.href =
+        "../auth.html";
+
+      return;
+    }
+
+
+    user =
+      result.data.user;
+
+
+    if (username) {
+
+      nameBox.classList.add("hidden");
+
+      welcome.textContent =
+        "Welcome, " + username + " 👋";
+
+    } else {
+
+      nameBox.classList.remove("hidden");
+
+    }
+
+
+    loadMessages();
+  }
+
+
+  saveNameBtn.addEventListener(
+    "click",
+    saveProfileName
+  );
+
+
+  sendBtn.addEventListener(
+    "click",
+    sendMessage
+  );
+
+
+  messageInput.addEventListener(
+    "keydown",
+    function(event) {
+
+      if (event.key === "Enter") {
+        sendMessage();
+      }
+
+    }
+  );
+
+
+  logoutBtn.addEventListener(
+    "click",
+    async function() {
+
+      await client.auth.signOut();
+
+      localStorage.removeItem(
+        "bigvic_username"
+      );
+
+      window.location.href =
+        "../auth.html";
+    }
+  );
+
+
+  startChat();
+
+</script>
+
+</body>
+</html>
