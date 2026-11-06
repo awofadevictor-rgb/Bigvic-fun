@@ -1,68 +1,78 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BigVic Fun - Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BigVic Fun Login</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
 
-<style>
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#0b0b12;
-  color:white;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  min-height:100vh;
-}
-.box{
-  width:90%;
-  max-width:400px;
-  background:#171720;
-  padding:25px;
-  border-radius:18px;
-}
-h1{
-  text-align:center;
-  color:#00e5ff;
-}
-input,button{
-  width:100%;
-  box-sizing:border-box;
-  padding:14px;
-  margin-top:12px;
-  border-radius:10px;
-  border:0;
-}
-button{
-  background:#00e5ff;
-  color:#061018;
-  font-weight:bold;
-}
-#message{
-  text-align:center;
-  margin-top:15px;
-  color:#ccc;
-}
-</style>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0b0b12;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .box {
+      width: 90%;
+      max-width: 400px;
+      padding: 25px;
+      background: #171720;
+      border-radius: 18px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #00e5ff;
+    }
+
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 14px;
+      margin-top: 12px;
+      border: 0;
+      border-radius: 10px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+      border: 0;
+      border-radius: 10px;
+      background: #00e5ff;
+      font-weight: bold;
+    }
+
+    #message {
+      text-align: center;
+      margin-top: 15px;
+    }
+  </style>
 </head>
 
 <body>
 
 <div class="box">
-<h1>BigVic Fun</h1>
+  <h1>BigVic Fun</h1>
 
-<input id="email" type="email" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
+  <input id="email" type="email" placeholder="Email">
 
-<button id="signup">Create Account</button>
-<button id="login">Login</button>
+  <input id="password" type="password" placeholder="Password">
 
-<div id="message"></div>
+  <button type="button" onclick="createAccount()">Create Account</button>
+
+  <button type="button" onclick="login()">Login</button>
+
+  <div id="message"></div>
 </div>
 
 <script>
@@ -71,41 +81,62 @@ const client = window.supabase.createClient(
   SUPABASE_ANON_KEY
 );
 
-document.getElementById("signup").addEventListener("click", async () => {
+function showMessage(text) {
+  document.getElementById("message").textContent = text;
+}
+
+async function createAccount() {
+  showMessage("Creating account...");
+
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
 
   if (!email || !password) {
-    document.getElementById("message").textContent =
-      "Enter your email and password.";
+    showMessage("Enter your email and password.");
     return;
   }
 
-  const { error } = await client.auth.signUp({
+  if (password.length < 6) {
+    showMessage("Password must be at least 6 characters.");
+    return;
+  }
+
+  const result = await client.auth.signUp({
     email: email,
     password: password
   });
 
-  document.getElementById("message").textContent =
-    error ? error.message :
-    "Account created. Check your email if confirmation is enabled.";
-});
+  if (result.error) {
+    showMessage(result.error.message);
+    return;
+  }
 
-document.getElementById("login").addEventListener("click", async () => {
+  showMessage("Account created successfully!");
+}
+
+async function login() {
+  showMessage("Logging in...");
+
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
 
-  const { error } = await client.auth.signInWithPassword({
+  if (!email || !password) {
+    showMessage("Enter your email and password.");
+    return;
+  }
+
+  const result = await client.auth.signInWithPassword({
     email: email,
     password: password
   });
 
-  if (error) {
-    document.getElementById("message").textContent = error.message;
-  } else {
-    window.location.href = "chat.html";
+  if (result.error) {
+    showMessage(result.error.message);
+    return;
   }
-});
+
+  window.location.href = "chat.html";
+}
 </script>
 
 </body>
