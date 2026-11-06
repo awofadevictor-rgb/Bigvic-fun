@@ -1,169 +1,338 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BigVic Fun Chat</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BigVic Fun Chat</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-<style>
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#0b0b12;
-  color:white;
-}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #10102b;
+      color: white;
+      min-height: 100vh;
+    }
 
-header{
-  padding:18px;
-  background:#171720;
-  text-align:center;
-}
+    header {
+      background: #1b1b3b;
+      padding: 18px;
+      text-align: center;
+      border-bottom: 1px solid #444466;
+    }
 
-header h1{
-  margin:0;
-  color:#00e5ff;
-}
+    header h1 {
+      margin: 0;
+      color: #ffcc33;
+    }
 
-#messages{
-  height:65vh;
-  overflow-y:auto;
-  padding:20px;
-}
+    .container {
+      max-width: 700px;
+      margin: auto;
+      padding: 20px;
+    }
 
-.message{
-  background:#191923;
-  padding:12px;
-  margin:10px 0;
-  border-radius:12px;
-}
+    #messages {
+      min-height: 400px;
+      background: #191936;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      overflow-y: auto;
+    }
 
-.me{
-  border-left:4px solid #00e5ff;
-}
+    .message {
+      background: #29294d;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+    }
 
-form{
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  display:flex;
-  padding:12px;
-  background:#171720;
-}
+    .sender {
+      color: #ffcc33;
+      font-weight: bold;
+    }
 
-input{
-  flex:1;
-  padding:14px;
-  border:0;
-  border-radius:10px;
-}
+    .time {
+      color: #9999aa;
+      font-size: 12px;
+    }
 
-button{
-  margin-left:8px;
-  padding:14px 20px;
-  border:0;
-  border-radius:10px;
-  background:#00e5ff;
-  font-weight:bold;
-}
-</style>
+    .send-area {
+      display: flex;
+      gap: 8px;
+    }
+
+    input {
+      flex: 1;
+      padding: 14px;
+      border: 1px solid #555577;
+      border-radius: 8px;
+      background: #29294d;
+      color: white;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 14px 18px;
+      border: none;
+      border-radius: 8px;
+      background: #ffcc33;
+      color: #15152d;
+      font-weight: bold;
+    }
+
+    #status {
+      text-align: center;
+      color: #ccccdd;
+      margin: 12px 0;
+    }
+
+    .logout {
+      margin-top: 15px;
+      width: 100%;
+      background: #444466;
+      color: white;
+    }
+  </style>
 </head>
 
 <body>
 
 <header>
-<h1>BigVic Fun 💬</h1>
+  <h1>BigVic Fun 💬</h1>
 </header>
 
-<div id="messages">
-<p>Loading messages...</p>
+<div class="container">
+
+  <div id="status">
+    Checking your account...
+  </div>
+
+  <div id="messages">
+  </div>
+
+  <div class="send-area">
+    <input
+      type="text"
+      id="messageInput"
+      placeholder="Type your message..."
+    >
+
+    <button id="sendButton">
+      Send
+    </button>
+  </div>
+
+  <button class="logout" id="logoutButton">
+    Logout
+  </button>
+
 </div>
 
-<form id="chatForm">
-<input id="messageInput" placeholder="Type a message..." autocomplete="off">
-<button type="submit">Send</button>
-</form>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
 
 <script>
-const client = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
 
-let currentUser = null;
+  const statusText = document.getElementById("status");
+  const messagesBox = document.getElementById("messages");
+  const messageInput = document.getElementById("messageInput");
+  const sendButton = document.getElementById("sendButton");
+  const logoutButton = document.getElementById("logoutButton");
 
-async function startChat() {
-  const { data, error } = await client.auth.getUser();
+  let client = null;
+  let currentUser = null;
 
-  if (error || !data.user) {
-    window.location.href = "auth.html";
-    return;
+  function showStatus(text) {
+    statusText.textContent = text;
   }
 
-  currentUser = data.user;
-  await loadMessages();
-}
+  // Check Supabase
+  if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
 
-async function loadMessages() {
-  const { data, error } = await client
-    .from("messages")
-    .select("*")
-    .order("created_at", { ascending:true });
+    showStatus("Setup error: config.js is missing.");
 
-  const box = document.getElementById("messages");
+  } else if (!window.supabase) {
 
-  if (error) {
-    box.innerHTML = "<p>Unable to load messages.</p>";
-    console.error(error);
-    return;
+    showStatus("Setup error: Supabase did not load.");
+
+  } else {
+
+    client = window.supabase.createClient(
+      window.SUPABASE_URL,
+      window.SUPABASE_ANON_KEY
+    );
+
+    startChat();
   }
 
-  box.innerHTML = "";
 
-  data.forEach(msg => {
-    const div = document.createElement("div");
-    div.className = "message";
+  async function startChat() {
 
-    if (msg.sender === currentUser.id) {
-      div.classList.add("me");
+    try {
+
+      const { data, error } = await client.auth.getUser();
+
+      if (error || !data.user) {
+
+        showStatus("You are not logged in.");
+
+        setTimeout(function() {
+          window.location.href = "auth.html";
+        }, 1500);
+
+        return;
+      }
+
+      currentUser = data.user;
+
+      showStatus(
+        "Logged in as " + currentUser.email
+      );
+
+      await loadMessages();
+
+    } catch (error) {
+
+      showStatus(
+        "Error: " + error.message
+      );
+
+    }
+  }
+
+
+  async function loadMessages() {
+
+    const { data, error } = await client
+      .from("messages")
+      .select("*")
+      .order("created_at", { ascending: true });
+
+    if (error) {
+
+      showStatus(
+        "Could not load messages: " + error.message
+      );
+
+      return;
     }
 
-    div.textContent = msg.message;
-    box.appendChild(div);
-  });
+    messagesBox.innerHTML = "";
 
-  box.scrollTop = box.scrollHeight;
-}
+    data.forEach(function(msg) {
 
-document.getElementById("chatForm").addEventListener("submit", async function(e) {
-  e.preventDefault();
+      const div = document.createElement("div");
 
-  const input = document.getElementById("messageInput");
-  const text = input.value.trim();
+      div.className = "message";
 
-  if (!text || !currentUser) return;
+      div.innerHTML =
+        '<div class="sender">' +
+        escapeHtml(msg.sender) +
+        '</div>' +
+        '<div>' +
+        escapeHtml(msg.message) +
+        '</div>' +
+        '<div class="time">' +
+        new Date(msg.created_at).toLocaleString() +
+        '</div>';
 
-  const { error } = await client
-    .from("messages")
-    .insert({
-      sender: currentUser.id,
-      receiver: currentUser.id,
-      message: text
+      messagesBox.appendChild(div);
+
     });
 
-  if (error) {
-    alert(error.message);
-    return;
+    messagesBox.scrollTop = messagesBox.scrollHeight;
   }
 
-  input.value = "";
-  await loadMessages();
-});
 
-startChat();
+  async function sendMessage() {
+
+    const text = messageInput.value.trim();
+
+    if (!text) {
+      return;
+    }
+
+    if (!currentUser) {
+
+      showStatus("You are not logged in.");
+
+      return;
+    }
+
+    sendButton.disabled = true;
+
+    const { error } = await client
+      .from("messages")
+      .insert({
+        sender: currentUser.id,
+        receiver: currentUser.id,
+        message: text
+      });
+
+    if (error) {
+
+      showStatus(
+        "Message error: " + error.message
+      );
+
+      sendButton.disabled = false;
+
+      return;
+    }
+
+    messageInput.value = "";
+
+    await loadMessages();
+
+    sendButton.disabled = false;
+  }
+
+
+  sendButton.addEventListener(
+    "click",
+    sendMessage
+  );
+
+
+  messageInput.addEventListener(
+    "keydown",
+    function(event) {
+
+      if (event.key === "Enter") {
+        sendMessage();
+      }
+
+    }
+  );
+
+
+  logoutButton.addEventListener(
+    "click",
+    async function() {
+
+      await client.auth.signOut();
+
+      window.location.href = "auth.html";
+
+    }
+  );
+
+
+  function escapeHtml(text) {
+
+    const div = document.createElement("div");
+
+    div.textContent = text;
+
+    return div.innerHTML;
+  }
+
 </script>
 
 </body>
