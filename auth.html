@@ -4,30 +4,72 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BigVic Fun</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
 </head>
 
 <body style="background:#0b0b12;color:white;font-family:Arial;text-align:center;padding:40px;">
 
-  <h1 style="color:#00e5ff;">BigVic Fun</h1>
+<h1 style="color:#00e5ff;">BigVic Fun</h1>
 
-  <input id="email" type="email" placeholder="Email"
-    style="display:block;width:90%;max-width:350px;margin:15px auto;padding:15px;">
+<input id="email" type="email" placeholder="Email"
+style="display:block;width:90%;max-width:350px;margin:15px auto;padding:15px;">
 
-  <input id="password" type="password" placeholder="Password"
-    style="display:block;width:90%;max-width:350px;margin:15px auto;padding:15px;">
+<input id="password" type="password" placeholder="Password"
+style="display:block;width:90%;max-width:350px;margin:15px auto;padding:15px;">
 
-  <button onclick="test()"
-    style="padding:15px 30px;background:#00e5ff;border:0;border-radius:10px;">
-    Create Account
-  </button>
+<button id="signup"
+style="padding:15px 30px;background:#00e5ff;border:0;border-radius:10px;">
+Create Account
+</button>
 
-  <p id="result">BigVic Fun is working.</p>
+<p id="result">Ready</p>
 
 <script>
-function test() {
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+document.getElementById("signup").onclick = async function () {
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  if (!email || !password) {
+    document.getElementById("result").textContent =
+      "Enter your email and password.";
+    return;
+  }
+
   document.getElementById("result").textContent =
-    "Button is working!";
-}
+    "Creating account...";
+
+  try {
+
+    const { data, error } =
+      await supabaseClient.auth.signUp({
+        email: email,
+        password: password
+      });
+
+    if (error) {
+      document.getElementById("result").textContent =
+        "Error: " + error.message;
+      return;
+    }
+
+    document.getElementById("result").textContent =
+      "Account created successfully!";
+
+  } catch (error) {
+
+    document.getElementById("result").textContent =
+      "Error: " + error.message;
+
+  }
+};
 </script>
 
 </body>
