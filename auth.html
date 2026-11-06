@@ -1,124 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BigVic Fun - Login</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      font-family: Arial, sans-serif;
-      background: #0b0b12;
-      color: white;
-    }
-
-    .box {
-      width: 100%;
-      max-width: 400px;
-      background: #171720;
-      padding: 25px;
-      border-radius: 18px;
-    }
-
-    h1 {
-      text-align: center;
-      color: #00e5ff;
-      margin-bottom: 25px;
-    }
-
-    input {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 12px;
-      border: 0;
-      border-radius: 10px;
-      outline: none;
-      font-size: 16px;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 8px;
-      border: 0;
-      border-radius: 10px;
-      background: #00e5ff;
-      color: #061018;
-      font-size: 16px;
-      font-weight: bold;
-    }
-
-    button:disabled {
-      opacity: 0.6;
-    }
-
-    #message {
-      margin-top: 18px;
-      text-align: center;
-      color: #ccc;
-      line-height: 1.4;
-      word-break: break-word;
-    }
-  </style>
+  <title>BigVic Fun</title>
 </head>
 
-<body>
+<body style="background:#0b0b12;color:white;font-family:Arial;text-align:center;padding:40px;">
 
-<div class="box">
-  <h1>BigVic Fun</h1>
+  <h1 style="color:#00e5ff;">BigVic Fun</h1>
 
-  <input
-    id="email"
-    type="email"
-    placeholder="Email"
-    autocomplete="email"
-  >
+  <input id="email" type="email" placeholder="Email"
+    style="display:block;width:90%;max-width:350px;margin:15px auto;padding:15px;">
 
-  <input
-    id="password"
-    type="password"
-    placeholder="Password"
-    autocomplete="new-password"
-  >
+  <input id="password" type="password" placeholder="Password"
+    style="display:block;width:90%;max-width:350px;margin:15px auto;padding:15px;">
 
-  <button id="signupButton" type="button">
+  <button onclick="test()"
+    style="padding:15px 30px;background:#00e5ff;border:0;border-radius:10px;">
     Create Account
   </button>
 
-  <button id="loginButton" type="button">
-    Login
-  </button>
-
-  <div id="message"></div>
-</div>
+  <p id="result">BigVic Fun is working.</p>
 
 <script>
-const messageBox = document.getElementById("message");
-const signupButton = document.getElementById("signupButton");
-const loginButton = document.getElementById("loginButton");
-
-function showMessage(text) {
-  messageBox.textContent = text;
+function test() {
+  document.getElementById("result").textContent =
+    "Button is working!";
 }
+</script>
 
-function getCredentials() {
-  return {
-    email: document.getElementById("email").value.trim(),
-    password: document.getElementById("password").value
-  };
-}
-
-function validate(email, password
+</body>
+</html>
