@@ -200,6 +200,30 @@ function newGame() {
   secretNumber = Math.floor(Math.random() * 10) + 1;
   document.getElementById("guess").value = "";
   document.getElementById("result").textContent = "New game! Good luck 🎯";
+}function playRPS(playerChoice) {
+  const choices = ["Rock", "Paper", "Scissors"];
+
+  const computerChoice =
+    choices[Math.floor(Math.random() * 3)];
+
+  let result = "";
+
+  if (playerChoice === computerChoice) {
+    result = "🤝 It's a tie!";
+  } else if (
+    (playerChoice === "Rock" && computerChoice === "Scissors") ||
+    (playerChoice === "Paper" && computerChoice === "Rock") ||
+    (playerChoice === "Scissors" && computerChoice === "Paper")
+  ) {
+    result = "🎉 You win!";
+  } else {
+    result = "😄 BigVic wins!";
+  }
+
+  document.getElementById("rpsResult").textContent =
+    "You: " + playerChoice +
+    " | BigVic: " + computerChoice +
+    " — " + result;
 }
 </script>
 
