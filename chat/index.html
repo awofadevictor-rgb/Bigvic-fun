@@ -204,6 +204,19 @@ document.getElementById("photoInput")
 
       document.getElementById("profileAvatar").src =
         e.target.result;
+supabaseClient
+  .from("profiles")
+  .upsert({
+    id: currentUser.id,
+    avatar: e.target.result
+  })
+  .then(function(result) {
+
+    if (result.error) {
+      console.error(result.error);
+    }
+
+  });
     };
 
     reader.readAsDataURL(file);
