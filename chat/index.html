@@ -413,7 +413,21 @@ function showMessage(item) {
       ? username
       : "BigVic User";
 
+const avatar =
+  document.createElement("img");
 
+avatar.src =
+  item.sender === currentUser.id
+    ? (localStorage.getItem("bigvic_avatar") ||
+       "https://ui-avatars.com/api/?name=BigVic")
+    : "https://ui-avatars.com/api/?name=BigVic";
+
+avatar.style.width = "30px";
+avatar.style.height = "30px";
+avatar.style.borderRadius = "50%";
+avatar.style.objectFit = "cover";
+avatar.style.verticalAlign = "middle";
+avatar.style.marginRight = "6px";
   const bubble =
     document.createElement("div");
 
@@ -425,7 +439,7 @@ function showMessage(item) {
 
 
   wrapper.appendChild(name);
-
+wrapper.appendChild(avatar);
   wrapper.appendChild(bubble);
 
   messagesBox.appendChild(wrapper);
