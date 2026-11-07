@@ -66,7 +66,8 @@ nav button {
   background: #2563eb;
   color: white;
   border: 0;
-  padding: 12px 20px;
+  padding: 12px 15px;
+  margin: 4px;
   border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
@@ -80,7 +81,7 @@ input {
   font-size: 16px;
 }
 
-#result {
+#result, #rpsResult {
   font-weight: bold;
   margin-top: 18px;
 }
@@ -110,7 +111,7 @@ input {
 
   <div class="card">
     <h3>🎮 Games</h3>
-    <p>Play fun games with BigVic Fun.</p>
+    <p>Enjoy fun games on BigVic Fun.</p>
     <button class="action" onclick="showPage('games')">Play Games</button>
   </div>
 
@@ -122,18 +123,13 @@ input {
 </section>
 
 <section id="games" class="page">
+
   <div class="card">
-    <h2>🎮 BigVic Games</h2>
-    <h3>🎯 Guess the Number</h3>
+    <h2>🎯 Guess the Number</h2>
     <p>I'm thinking of a number between 1 and 10.</p>
 
-    <input
-      type="number"
-      id="guess"
-      min="1"
-      max="10"
-      placeholder="Enter 1-10"
-    >
+    <input type="number" id="guess" min="1" max="10"
+      placeholder="Enter 1-10">
 
     <br><br>
 
@@ -142,16 +138,18 @@ input {
 
     <p id="result">Good luck! 🎉</p>
   </div>
-<div class="card">
-  <h2>✊ Rock, Paper, Scissors</h2>
-  <p>Choose your move and challenge BigVic!</p>
 
-  <button class="action" onclick="playRPS('Rock')">✊ Rock</button>
-  <button class="action" onclick="playRPS('Paper')">✋ Paper</button>
-  <button class="action" onclick="playRPS('Scissors')">✌️ Scissors</button>
+  <div class="card">
+    <h2>✊ Rock, Paper, Scissors</h2>
+    <p>Choose your move and challenge BigVic!</p>
 
-  <h3 id="rpsResult">Ready to play?</h3>
-</div>
+    <button class="action" onclick="playRPS('Rock')">✊ Rock</button>
+    <button class="action" onclick="playRPS('Paper')">✋ Paper</button>
+    <button class="action" onclick="playRPS('Scissors')">✌️ Scissors</button>
+
+    <h3 id="rpsResult">Ready to play?</h3>
+  </div>
+
 </section>
 
 <section id="trending" class="page">
@@ -162,6 +160,7 @@ input {
 </section>
 
 <script>
+
 let secretNumber = Math.floor(Math.random() * 10) + 1;
 
 function showPage(page) {
@@ -200,7 +199,9 @@ function newGame() {
   secretNumber = Math.floor(Math.random() * 10) + 1;
   document.getElementById("guess").value = "";
   document.getElementById("result").textContent = "New game! Good luck 🎯";
-}function playRPS(playerChoice) {
+}
+
+function playRPS(playerChoice) {
   const choices = ["Rock", "Paper", "Scissors"];
 
   const computerChoice =
@@ -225,6 +226,7 @@ function newGame() {
     " | BigVic: " + computerChoice +
     " — " + result;
 }
+
 </script>
 
 </body>
