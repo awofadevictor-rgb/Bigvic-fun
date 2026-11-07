@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>BigVic Fun</title>
 
   <style>
@@ -21,8 +20,8 @@
     .header {
       background: #111827;
       color: white;
-      padding: 20px;
       text-align: center;
+      padding: 22px 15px;
     }
 
     .header h1 {
@@ -31,7 +30,7 @@
     }
 
     .header p {
-      margin: 7px 0 0;
+      margin: 8px 0 0;
       color: #d1d5db;
     }
 
@@ -41,27 +40,26 @@
       align-items: center;
       background: white;
       border-bottom: 1px solid #ddd;
-      padding: 12px 5px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+      padding: 12px 4px;
     }
 
-    .nav a {
-      text-decoration: none;
+    .nav button {
+      border: 0;
+      background: transparent;
       color: #111827;
       font-weight: bold;
       font-size: 14px;
-      padding: 8px 6px;
+      padding: 8px 5px;
+      cursor: pointer;
     }
 
-    .nav a:hover {
+    .nav button:active {
       color: #2563eb;
     }
 
     .container {
       max-width: 700px;
-      margin: 0 auto;
+      margin: auto;
       padding: 20px;
     }
 
@@ -78,10 +76,10 @@
       margin-top: 0;
     }
 
-    .button {
+    .chat-button {
       display: inline-block;
       margin-top: 15px;
-      padding: 12px 20px;
+      padding: 12px 22px;
       background: #2563eb;
       color: white;
       text-decoration: none;
@@ -114,7 +112,7 @@
     }
 
     @media (max-width: 500px) {
-      .nav a {
+      .nav button {
         font-size: 12px;
       }
 
@@ -132,14 +130,105 @@
     <p>Connect, chat, play and discover</p>
   </div>
 
+  <!-- NAVIGATION -->
   <div class="nav">
 
-    <a href="index.html">
+    <button onclick="showHome()">
       🏠 Home
-    </a>
+    </button>
 
-    <a href="chat/">
+    <button onclick="openChat()">
       💬 Chat
-    </a>
+    </button>
 
-    <a href="games
+    <button onclick="showGames()">
+      🎮 Games
+    </button>
+
+    <button onclick="showTrending()">
+      🔥 Trending
+    </button>
+
+  </div>
+
+  <!-- HOME -->
+  <div id="homePage" class="container">
+
+    <div class="welcome">
+      <h2>Welcome to BigVic Fun 👋</h2>
+
+      <p>
+        Have fun, connect with people and explore BigVic Fun.
+      </p>
+
+      <a class="chat-button" href="chat/">
+        Start Chatting 💬
+      </a>
+    </div>
+
+    <div class="cards">
+
+      <div class="card">
+        <div style="font-size:35px;">💬</div>
+        <h3>Chat</h3>
+        <p>Talk and connect with other people.</p>
+      </div>
+
+      <div class="card">
+        <div style="font-size:35px;">🎮</div>
+        <h3>Games</h3>
+        <p>Games are coming soon.</p>
+      </div>
+
+      <div class="card">
+        <div style="font-size:35px;">🔥</div>
+        <h3>Trending</h3>
+        <p>See what's trending on BigVic Fun.</p>
+      </div>
+
+      <div class="card">
+        <div style="font-size:35px;">👤</div>
+        <h3>Community</h3>
+        <p>Connect with the BigVic Fun community.</p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- GAMES -->
+  <div id="gamesPage" class="container" style="display:none;">
+
+    <div class="welcome">
+      <h2>🎮 Games</h2>
+      <p>Games are coming soon to BigVic Fun.</p>
+    </div>
+
+  </div>
+
+  <!-- TRENDING -->
+  <div id="trendingPage" class="container" style="display:none;">
+
+    <div class="welcome">
+      <h2>🔥 Trending</h2>
+      <p>Trending content is coming soon to BigVic Fun.</p>
+    </div>
+
+  </div>
+
+  <script>
+
+    function showHome() {
+      document.getElementById("homePage").style.display = "block";
+      document.getElementById("gamesPage").style.display = "none";
+      document.getElementById("trendingPage").style.display = "none";
+    }
+
+    function showGames() {
+      document.getElementById("homePage").style.display = "none";
+      document.getElementById("gamesPage").style.display = "block";
+      document.getElementById("trendingPage").style.display = "none";
+    }
+
+    function showTrending() {
+      document.getElementById("home
