@@ -304,7 +304,36 @@ async function startChat() {
 
     currentUser =
       result.data.user;
+const savedAvatar =
+  localStorage.getItem("bigvic_avatar");
 
+if (savedAvatar) {
+  document.getElementById("profileAvatar").src =
+    savedAvatar;
+}
+
+supabaseClient
+  .from("profiles")
+  .select("avatar")
+  .eq("id", currentUser.id)
+  .single()
+  .then(function(result) {
+
+    if (
+      !result.error &&
+      result.data &&
+      result.data.avatar
+    ) {
+      localStorage.setItem(
+        "bigvic_avatar",
+        result.data.avatar
+      );
+
+      document.getElementById("profileAvatar").src =
+        result.data.avatar;
+    }
+
+  });
 
     if (!currentUser) {
 
