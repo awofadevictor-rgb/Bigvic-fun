@@ -407,10 +407,31 @@ async function loadMessages() {
       "</p>";
 
   } else {
+const senders = [
+  ...new Set(
+    result.data.map(function(item) {
+      return item.sender;
+    })
+  )
+];
 
+const profileResult =
+  await supabaseClient
+    .from("profiles")
+    .select("id, avatar")
+    .in("id", senders);
+
+const profileMap = {};
+
+if (!profileResult.error && profileResult.data) {
+  profileResult.data.forEach(function(profile) {
+    profileMap[profile.id] =
+      profile.avatar;
+  });
+}
     result.data.forEach(function(item) {
 
-      showMessage(item);
+      showMessage(item, profileMap);
 
     });
 
