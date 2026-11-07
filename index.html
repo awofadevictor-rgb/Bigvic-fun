@@ -90,8 +90,19 @@ input {
 .score-row {
   display: flex;
   justify-content: space-between;
+  gap: 10px;
   padding: 12px;
   border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+#leaderboardList {
+  text-align: left;
+}
+
+.small {
+  color: #64748b;
+  font-size: 13px;
 }
 </style>
 </head>
@@ -126,7 +137,7 @@ input {
 
   <div class="card">
     <h3>🏆 Leaderboard</h3>
-    <p>Check your game scores.</p>
+    <p>Compete with other BigVic Fun players.</p>
     <button class="action" onclick="showPage('leaderboard')">View Scores</button>
   </div>
 </section>
@@ -171,35 +182,50 @@ input {
 <section id="leaderboard" class="page">
   <div class="card">
     <h2>🏆 BigVic Fun Leaderboard</h2>
-    <p>Your saved game scores appear here.</p>
+    <p>See how players are doing!</p>
+
+    <p id="loginNotice" class="small">
+      Checking your account...
+    </p>
 
     <div class="score-row">
-      <strong>🎯 Number Game Wins</strong>
+      <strong>🎯 Your Number Wins</strong>
       <strong id="numberWins">0</strong>
     </div>
 
     <div class="score-row">
-      <strong>✊ RPS Wins</strong>
+      <strong>✊ Your RPS Wins</strong>
       <strong id="rpsWins">0</strong>
     </div>
 
     <div class="score-row">
-      <strong>⭐ Total Wins</strong>
+      <strong>⭐ Your Total Wins</strong>
       <strong id="totalWins">0</strong>
     </div>
 
-    <button class="action" onclick="updateScores()">
+    <h3>🌍 All Players</h3>
+    <div id="leaderboardList">
+      Loading scores...
+    </div>
+
+    <button class="action" onclick="loadLeaderboard()">
       Refresh Scores
     </button>
   </div>
 </section>
 
-<script>
+<!-- Supabase connection -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
 
+<script>
 let secretNumber = Math.floor(Math.random() * 10) + 1;
 
 let numberWins = Number(localStorage.getItem("bigvic_number_wins") || 0);
 let rpsWins = Number(localStorage.getItem("bigvic_rps_wins") || 0);
+
+let supabaseClient = null;
+let currentUser = null;
 
 function showPage(page) {
   document.querySelectorAll(".page").forEach(function(section) {
@@ -207,7 +233,11 @@ function showPage(page) {
   });
 
   document.getElementById(page).classList.add("active");
-  if (page === "leaderboard") updateScores();
+
+  if (page === "leaderboard") {
+    loadLeaderboard();
+  }
+
   window.scrollTo(0, 0);
 }
 
@@ -236,9 +266,13 @@ function checkGuess() {
 
   if (guess === secretNumber) {
     result.textContent = "🎉 Congratulations! You won!";
+
     numberWins++;
     localStorage.setItem("bigvic_number_wins", numberWins);
+
     updateScores();
+    saveOnlineScore();
+
   } else if (guess < secretNumber) {
     result.textContent = "⬆️ Try a higher number!";
   } else {
@@ -267,7 +301,10 @@ function playRPS(playerChoice) {
   ) {
     result = "🎉 You win!";
     rpsWins++;
+
     localStorage.setItem("bigvic_rps_wins", rpsWins);
+    saveOnlineScore();
+
   } else {
     result = "😄 BigVic wins!";
   }
@@ -280,7 +317,157 @@ function playRPS(playerChoice) {
   updateScores();
 }
 
-updateScores();
+function getUsername() {
+  return (
+    localStorage.getItem("bigvic_username") ||
+    currentUser?.user_metadata?.username ||
+    currentUser?.email?.split("@")[0] ||
+    "Player"
+  );
+}
+
+async function saveOnlineScore() {
+  if (!supabaseClient || !currentUser) {
+    document.getElementById("loginNotice").textContent =
+      "Log in to save your scores to the shared leaderboard.";
+    return;
+  }
+
+  const username = getUsername();
+
+  const { error } = await supabaseClient
+    .from("leaderboard")
+    .upsert({
+      user_id: currentUser.id,
+      username: username,
+      number_wins: numberWins,
+      rps_wins: rpsWins,
+      updated_at: new Date().toISOString()
+    }, {
+      onConflict: "user_id"
+    });
+
+  if (error) {
+    console.error("Score saving error:", error);
+    document.getElementById("loginNotice").textContent =
+      "Could not save scores: " + error.message;
+    return;
+  }
+
+  document.getElementById("loginNotice").textContent =
+    "Your scores are saved online! ✅";
+
+  loadLeaderboard();
+}
+
+async function loadLeaderboard() {
+  updateScores();
+
+  const list = document.getElementById("leaderboardList");
+  const notice = document.getElementById("loginNotice");
+
+  if (!supabaseClient) {
+    list.textContent = "Supabase connection is not ready. Check config.js.";
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("leaderboard")
+    .select("username, number_wins, rps_wins");
+
+  if (error) {
+    list.textContent = "Could not load scores: " + error.message;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    list.textContent = "No player scores yet. Play a game to get started!";
+    return;
+  }
+
+  const sorted = data.sort(function(a, b) {
+    const totalA = Number(a.number_wins) + Number(a.rps_wins);
+    const totalB = Number(b.number_wins) + Number(b.rps_wins);
+    return totalB - totalA;
+  });
+
+  list.innerHTML = "";
+
+  sorted.forEach(function(player, index) {
+    const total = Number(player.number_wins) + Number(player.rps_wins);
+
+    const row = document.createElement("div");
+    row.className = "score-row";
+
+    const name = document.createElement("strong");
+    name.textContent = (index + 1) + ". " + player.username;
+
+    const score = document.createElement("span");
+    score.textContent = total + " wins";
+
+    row.appendChild(name);
+    row.appendChild(score);
+    list.appendChild(row);
+  });
+
+  if (currentUser) {
+    notice.textContent = "You're logged in. Your scores can be shared! ✅";
+  } else {
+    notice.textContent = "Log in to save your scores to the shared leaderboard.";
+  }
+}
+
+async function startApp() {
+  if (
+    !window.supabase ||
+    !window.SUPABASE_URL ||
+    !window.SUPABASE_ANON_KEY
+  ) {
+    document.getElementById("loginNotice").textContent =
+      "Supabase settings are missing. Check config.js.";
+    return;
+  }
+
+  supabaseClient = window.supabase.createClient(
+    window.SUPABASE_URL,
+    window.SUPABASE_ANON_KEY
+  );
+
+  const { data, error } = await supabaseClient.auth.getSession();
+
+  if (error) {
+    console.error(error);
+  }
+
+  currentUser = data?.session?.user || null;
+
+  if (currentUser) {
+    const { data: savedScore, error: scoreError } = await supabaseClient
+      .from("leaderboard")
+      .select("number_wins, rps_wins")
+      .eq("user_id", currentUser.id)
+      .maybeSingle();
+
+    if (scoreError) {
+      console.error(scoreError);
+    }
+
+    if (savedScore) {
+      numberWins = Number(savedScore.number_wins);
+      rpsWins = Number(savedScore.rps_wins);
+
+      localStorage.setItem("bigvic_number_wins", numberWins);
+      localStorage.setItem("bigvic_rps_wins", rpsWins);
+    } else {
+      await saveOnlineScore();
+    }
+  }
+
+  updateScores();
+  loadLeaderboard();
+}
+
+startApp();
 
 </script>
 
