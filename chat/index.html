@@ -1,156 +1,208 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>BigVic Fun Chat</title>
+<title>BigVic Fun Chat</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f2f2f2;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f2f2f2;
+}
 
-    .app {
-      max-width: 600px;
-      margin: auto;
-      height: 100vh;
-      background: white;
-      display: flex;
-      flex-direction: column;
-    }
+.app {
+  max-width: 600px;
+  margin: auto;
+  height: 100vh;
+  background: white;
+  display: flex;
+  flex-direction: column;
+}
 
-    .header {
-      background: #111827;
-      color: white;
-      padding: 18px;
-      text-align: center;
-    }
+.profile {
+  padding: 15px;
+  background: #f8fafc;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
-    .header h2 {
-      margin: 0;
-    }
+.profile img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
 
-    .status {
-      padding: 10px;
-      text-align: center;
-      font-size: 13px;
-      color: #666;
-    }
+.profile-name {
+  font-weight: bold;
+}
 
-    #messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 15px;
-    }
+.photo-button {
+  display: inline-block;
+  margin-top: 5px;
+  background: #2563eb;
+  color: white;
+  padding: 6px 9px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
 
-    .message {
-      margin-bottom: 12px;
-    }
+.header {
+  background: #111827;
+  color: white;
+  padding: 18px;
+  text-align: center;
+}
 
-    .message.mine {
-      text-align: right;
-    }
+.header h2 {
+  margin: 0;
+}
 
-    .name {
-      font-size: 12px;
-      color: #777;
-      margin-bottom: 3px;
-    }
+.status {
+  padding: 10px;
+  text-align: center;
+  font-size: 13px;
+  color: #666;
+}
 
-    .bubble {
-      display: inline-block;
-      max-width: 75%;
-      padding: 10px 14px;
-      border-radius: 16px;
-      background: #e5e7eb;
-      word-break: break-word;
-    }
+#messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px;
+}
 
-    .mine .bubble {
-      background: #2563eb;
-      color: white;
-    }
+.message {
+  margin-bottom: 12px;
+}
 
-    .send-box {
-      display: flex;
-      padding: 12px;
-      border-top: 1px solid #ddd;
-      gap: 8px;
-    }
+.message.mine {
+  text-align: right;
+}
 
-    #messageInput {
-      flex: 1;
-      border: 1px solid #ccc;
-      border-radius: 25px;
-      padding: 12px;
-      font-size: 15px;
-    }
+.name {
+  font-size: 12px;
+  color: #777;
+  margin-bottom: 3px;
+}
 
-    #sendButton {
-      border: 0;
-      border-radius: 25px;
-      padding: 0 18px;
-      background: #2563eb;
-      color: white;
-      font-weight: bold;
-    }
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  vertical-align: middle;
+  margin-right: 6px;
+}
 
-    #logoutButton {
-      margin-top: 8px;
-      border: 0;
-      background: #ef4444;
-      color: white;
-      padding: 7px 12px;
-      border-radius: 7px;
-    }
-  </style>
+.bubble {
+  display: inline-block;
+  max-width: 75%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: #e5e7eb;
+  word-break: break-word;
+}
+
+.mine .bubble {
+  background: #2563eb;
+  color: white;
+}
+
+.send-box {
+  display: flex;
+  padding: 12px;
+  border-top: 1px solid #ddd;
+  gap: 8px;
+}
+
+#messageInput {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  padding: 12px;
+  font-size: 15px;
+}
+
+#sendButton {
+  border: 0;
+  border-radius: 25px;
+  padding: 0 18px;
+  background: #2563eb;
+  color: white;
+  font-weight: bold;
+}
+
+#logoutButton {
+  margin-top: 8px;
+  border: 0;
+  background: #ef4444;
+  color: white;
+  padding: 7px 12px;
+  border-radius: 7px;
+}
+</style>
 </head>
 
 <body>
 
 <div class="app">
-<div style="padding:15px; background:#f8fafc; border-bottom:1px solid #ddd; display:flex; align-items:center; gap:12px;">
 
-  <img
-    id="profileAvatar"
-    src="https://ui-avatars.com/api/?name=BigVic&background=random"
-    style="width:50px;height:50px;border-radius:50%;object-fit:cover;"
-  >
+  <div class="profile">
 
-  <div>
-    <div id="profileName" style="font-weight:bold;">
-      BigVic
+    <img
+      id="profileAvatar"
+      src="https://ui-avatars.com/api/?name=BigVic"
+    >
+
+    <div>
+
+      <div id="profileName" class="profile-name">
+        BigVic
+      </div>
+
+      <label
+        for="photoInput"
+        class="photo-button"
+      >
+        Change photo
+      </label>
+
+      <input
+        id="photoInput"
+        type="file"
+        accept="image/*"
+        style="display:none;"
+      >
+
     </div>
 
-    <label
-      for="photoInput"
-      style="display:inline-block;margin-top:5px;background:#2563eb;color:white;padding:6px 9px;border-radius:6px;font-size:12px;cursor:pointer;"
-    >
-      Change photo
-    </label>
-
-    <input
-      id="photoInput"
-      type="file"
-      accept="image/*"
-      style="display:none;"
-    >
   </div>
 
-</div>
+
   <div class="header">
+
     <h2>BigVic Fun 💬</h2>
-    <button id="logoutButton">Logout</button>
+
+    <button id="logoutButton">
+      Logout
+    </button>
+
   </div>
+
 
   <div id="status" class="status">
     Starting BigVic Chat...
   </div>
 
+
   <div id="messages"></div>
+
 
   <div class="send-box">
 
@@ -170,59 +222,9 @@
 
 
 <script src="../config.js"></script>
-<script>
-const savedAvatar =
-  localStorage.getItem("bigvic_avatar");
 
-const savedUsername =
-  localStorage.getItem("bigvic_username") ||
-  "BigVic";
-
-if (savedAvatar) {
-  document.getElementById("profileAvatar").src =
-    savedAvatar;
-}
-
-document.getElementById("profileName").textContent =
-  savedUsername;
-
-document.getElementById("photoInput")
-  .addEventListener("change", function(event) {
-
-    const file = event.target.files[0];
-
-    if (!file) return;
-
-    const reader = new FileReader();
-
-    reader.onload = function(e) {
-
-      localStorage.setItem(
-        "bigvic_avatar",
-        e.target.result
-      );
-
-      document.getElementById("profileAvatar").src =
-        e.target.result;
-supabaseClient
-  .from("profiles")
-  .upsert({
-    id: currentUser.id,
-    avatar: e.target.result
-  })
-  .then(function(result) {
-
-    if (result.error) {
-      console.error(result.error);
-    }
-
-  });
-    };
-
-    reader.readAsDataURL(file);
-  });
-</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 
 <script>
 
@@ -241,15 +243,35 @@ const sendButton =
 const logoutButton =
   document.getElementById("logoutButton");
 
+const profileAvatar =
+  document.getElementById("profileAvatar");
+
+const profileName =
+  document.getElementById("profileName");
+
+const photoInput =
+  document.getElementById("photoInput");
+
 
 let supabaseClient;
-
 let currentUser;
 
 
 let username =
   localStorage.getItem("bigvic_username") ||
   "BigVic";
+
+profileName.textContent =
+  username;
+
+
+const savedAvatar =
+  localStorage.getItem("bigvic_avatar");
+
+if (savedAvatar) {
+  profileAvatar.src =
+    savedAvatar;
+}
 
 
 /*
@@ -277,7 +299,7 @@ if (
 
 
 /*
-  Get logged-in user
+  Start chat
 */
 
 async function startChat() {
@@ -287,13 +309,14 @@ async function startChat() {
     statusBox.textContent =
       "Checking login...";
 
+
     const result =
       await supabaseClient.auth.getUser();
 
 
     if (result.error) {
 
-      console.log(result.error);
+      console.error(result.error);
 
       statusBox.textContent =
         "Login check failed.";
@@ -304,36 +327,7 @@ async function startChat() {
 
     currentUser =
       result.data.user;
-const savedAvatar =
-  localStorage.getItem("bigvic_avatar");
 
-if (savedAvatar) {
-  document.getElementById("profileAvatar").src =
-    savedAvatar;
-}
-
-supabaseClient
-  .from("profiles")
-  .select("avatar")
-  .eq("id", currentUser.id)
-  .single()
-  .then(function(result) {
-
-    if (
-      !result.error &&
-      result.data &&
-      result.data.avatar
-    ) {
-      localStorage.setItem(
-        "bigvic_avatar",
-        result.data.avatar
-      );
-
-      document.getElementById("profileAvatar").src =
-        result.data.avatar;
-    }
-
-  });
 
     if (!currentUser) {
 
@@ -348,7 +342,11 @@ supabaseClient
       "Connected to BigVic Chat";
 
 
+    await loadProfile();
+
+
     await loadMessages();
+
 
   } catch (error) {
 
@@ -358,276 +356,29 @@ supabaseClient
       "Connection error.";
 
   }
+
 }
 
 
 /*
-  Load messages
+  Load profile
 */
 
-async function loadMessages() {
+async function loadProfile() {
 
-  statusBox.textContent =
-    "Loading messages...";
+  try {
 
+    const result =
+      await supabaseClient
+        .from("profiles")
+        .select("username, avatar")
+        .eq("id", currentUser.id)
+        .maybeSingle();
 
-  const result =
-    await supabaseClient
-      .from("messages")
-      .select("*")
-      .order("created_at", {
-        ascending: true
-      });
 
+    if (
+      !result.error &&
+      result.data
+    ) {
 
-  if (result.error) {
-
-    console.error(result.error);
-
-    statusBox.textContent =
-      "Messages error: " +
-      result.error.message;
-
-    return;
-  }
-
-
-  messagesBox.innerHTML =
-    "";
-
-
-  if (
-    !result.data ||
-    result.data.length === 0
-  ) {
-
-    messagesBox.innerHTML =
-      "<p style='text-align:center;color:#888'>" +
-      "No messages yet. Say hello! 👋" +
-      "</p>";
-
-  } else {
-const senders = [
-  ...new Set(
-    result.data.map(function(item) {
-      return item.sender;
-    })
-  )
-];
-
-const profileResult =
-  await supabaseClient
-    .from("profiles")
-    .select("id, avatar")
-    .in("id", senders);
-
-const profileMap = {};
-
-if (!profileResult.error && profileResult.data) {
-  profileResult.data.forEach(function(profile) {
-    profileMap[profile.id] =
-      profile.avatar;
-  });
-}
-    result.data.forEach(function(item) {
-
-      showMessage(item, profileMap);
-
-    });
-
-  }
-
-
-  statusBox.textContent =
-    "BigVic Fun Chat";
-
-  messagesBox.scrollTop =
-    messagesBox.scrollHeight;
-}
-
-
-/*
-  Display one message
-*/
-
-function showMessage(item profileMap) {
-
-  const mine =
-    item.sender === currentUser.id;
-
-
-  const wrapper =
-    document.createElement("div");
-
-  wrapper.className =
-    mine
-      ? "message mine"
-      : "message";
-
-
-  const name =
-    document.createElement("div");
-
-  name.className =
-    "name";
-
-  name.textContent =
-    mine
-      ? username
-      : "BigVic User";
-
-const avatar =
-  document.createElement("img");
-
-avatar.src =
-  item.sender === currentUser.id
-    ? (localStorage.getItem("bigvic_avatar") ||
-       "https://ui-avatars.com/api/?name=BigVic")
-    : (profileMap[item.sender] ||
-       "https://ui-avatars.com/api/?name=BigVic");
-avatar.style.width = "30px";
-avatar.style.height = "30px";
-avatar.style.borderRadius = "50%";
-avatar.style.objectFit = "cover";
-avatar.style.verticalAlign = "middle";
-avatar.style.marginRight = "6px";
-  const bubble =
-    document.createElement("div");
-
-  bubble.className =
-    "bubble";
-
-  bubble.textContent =
-    item.message;
-
-
-  wrapper.appendChild(name);
-wrapper.appendChild(avatar);
-  wrapper.appendChild(bubble);
-
-  messagesBox.appendChild(wrapper);
-}
-
-
-/*
-  Send message
-*/
-
-async function sendMessage() {
-
-  const text =
-    messageInput.value.trim();
-
-
-  if (!text) {
-
-    return;
-  }
-
-
-  if (!currentUser) {
-
-    alert("You are not logged in.");
-
-    return;
-  }
-
-
-  sendButton.disabled =
-    true;
-
-  sendButton.textContent =
-    "Sending...";
-
-
-  const result =
-    await supabaseClient
-      .from("messages")
-      .insert({
-        sender: currentUser.id,
-        receiver: "public",
-        message: text
-      });
-
-
-  if (result.error) {
-
-    console.error(result.error);
-
-    alert(
-      "Message failed: " +
-      result.error.message
-    );
-
-  } else {
-
-    messageInput.value =
-      "";
-
-    await loadMessages();
-
-  }
-
-
-  sendButton.disabled =
-    false;
-
-  sendButton.textContent =
-    "Send";
-}
-
-
-/*
-  Send button
-*/
-
-sendButton.addEventListener(
-  "click",
-  sendMessage
-);
-
-
-/*
-  Enter key
-*/
-
-messageInput.addEventListener(
-  "keydown",
-  function(event) {
-
-    if (event.key === "Enter") {
-
-      event.preventDefault();
-
-      sendMessage();
-
-    }
-
-  }
-);
-
-
-/*
-  Logout
-*/
-
-logoutButton.addEventListener(
-  "click",
-  async function() {
-
-    await supabaseClient.auth.signOut();
-
-    localStorage.removeItem(
-      "bigvic_username"
-    );
-
-    window.location.href =
-      "../auth.html";
-
-  }
-);
-
-</script>
-
-</body>
-</html>
+      if (result
