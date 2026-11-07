@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BigVic Fun</title>
 
 <style>
@@ -28,8 +28,9 @@ header h1 { margin: 0; }
 nav {
   display: flex;
   justify-content: space-around;
+  flex-wrap: wrap;
   background: white;
-  padding: 12px 2px;
+  padding: 10px 3px;
   position: sticky;
   top: 0;
   z-index: 5;
@@ -38,9 +39,9 @@ nav {
 nav button {
   border: 0;
   background: transparent;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: bold;
-  padding: 8px 4px;
+  padding: 9px 5px;
   cursor: pointer;
 }
 
@@ -85,6 +86,13 @@ input {
   font-weight: bold;
   margin-top: 18px;
 }
+
+.score-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
 </style>
 </head>
 
@@ -100,6 +108,7 @@ input {
   <button onclick="openChat()">💬 Chat</button>
   <button onclick="showPage('games')">🎮 Games</button>
   <button onclick="showPage('trending')">🔥 Trending</button>
+  <button onclick="showPage('leaderboard')">🏆 Scores</button>
 </nav>
 
 <section id="home" class="page active">
@@ -116,9 +125,9 @@ input {
   </div>
 
   <div class="card">
-    <h3>🔥 Trending</h3>
-    <p>Discover what's happening.</p>
-    <button class="action" onclick="showPage('trending')">Explore Trending</button>
+    <h3>🏆 Leaderboard</h3>
+    <p>Check your game scores.</p>
+    <button class="action" onclick="showPage('leaderboard')">View Scores</button>
   </div>
 </section>
 
@@ -159,9 +168,38 @@ input {
   </div>
 </section>
 
+<section id="leaderboard" class="page">
+  <div class="card">
+    <h2>🏆 BigVic Fun Leaderboard</h2>
+    <p>Your saved game scores appear here.</p>
+
+    <div class="score-row">
+      <strong>🎯 Number Game Wins</strong>
+      <strong id="numberWins">0</strong>
+    </div>
+
+    <div class="score-row">
+      <strong>✊ RPS Wins</strong>
+      <strong id="rpsWins">0</strong>
+    </div>
+
+    <div class="score-row">
+      <strong>⭐ Total Wins</strong>
+      <strong id="totalWins">0</strong>
+    </div>
+
+    <button class="action" onclick="updateScores()">
+      Refresh Scores
+    </button>
+  </div>
+</section>
+
 <script>
 
 let secretNumber = Math.floor(Math.random() * 10) + 1;
+
+let numberWins = Number(localStorage.getItem("bigvic_number_wins") || 0);
+let rpsWins = Number(localStorage.getItem("bigvic_rps_wins") || 0);
 
 function showPage(page) {
   document.querySelectorAll(".page").forEach(function(section) {
@@ -169,11 +207,21 @@ function showPage(page) {
   });
 
   document.getElementById(page).classList.add("active");
+  if (page === "leaderboard") updateScores();
   window.scrollTo(0, 0);
 }
 
 function openChat() {
   window.location.href = "/chat/";
+}
+
+function updateScores() {
+  numberWins = Number(localStorage.getItem("bigvic_number_wins") || 0);
+  rpsWins = Number(localStorage.getItem("bigvic_rps_wins") || 0);
+
+  document.getElementById("numberWins").textContent = numberWins;
+  document.getElementById("rpsWins").textContent = rpsWins;
+  document.getElementById("totalWins").textContent = numberWins + rpsWins;
 }
 
 function checkGuess() {
@@ -188,6 +236,9 @@ function checkGuess() {
 
   if (guess === secretNumber) {
     result.textContent = "🎉 Congratulations! You won!";
+    numberWins++;
+    localStorage.setItem("bigvic_number_wins", numberWins);
+    updateScores();
   } else if (guess < secretNumber) {
     result.textContent = "⬆️ Try a higher number!";
   } else {
@@ -203,9 +254,7 @@ function newGame() {
 
 function playRPS(playerChoice) {
   const choices = ["Rock", "Paper", "Scissors"];
-
-  const computerChoice =
-    choices[Math.floor(Math.random() * 3)];
+  const computerChoice = choices[Math.floor(Math.random() * 3)];
 
   let result = "";
 
@@ -217,6 +266,8 @@ function playRPS(playerChoice) {
     (playerChoice === "Scissors" && computerChoice === "Paper")
   ) {
     result = "🎉 You win!";
+    rpsWins++;
+    localStorage.setItem("bigvic_rps_wins", rpsWins);
   } else {
     result = "😄 BigVic wins!";
   }
@@ -225,7 +276,11 @@ function playRPS(playerChoice) {
     "You: " + playerChoice +
     " | BigVic: " + computerChoice +
     " — " + result;
+
+  updateScores();
 }
+
+updateScores();
 
 </script>
 
