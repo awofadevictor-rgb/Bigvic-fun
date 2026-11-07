@@ -254,7 +254,73 @@ let username =
   localStorage.getItem("bigvic_username") ||
   "BigVic";
 
+const changeNameButton =
+  document.createElement("button");
 
+changeNameButton.textContent =
+  "Change name";
+
+changeNameButton.style.marginTop =
+  "6px";
+
+changeNameButton.style.marginLeft =
+  "6px";
+
+changeNameButton.style.padding =
+  "6px 9px";
+
+changeNameButton.style.border =
+  "0";
+
+changeNameButton.style.borderRadius =
+  "6px";
+
+changeNameButton.style.background =
+  "#111827";
+
+changeNameButton.style.color =
+  "white";
+
+changeNameButton.style.fontSize =
+  "12px";
+
+changeNameButton.onclick =
+  function() {
+
+    const newName =
+      prompt(
+        "Enter your BigVic name:",
+        username
+      );
+
+    if (
+      newName &&
+      newName.trim()
+    ) {
+
+      username =
+        newName.trim();
+
+      localStorage.setItem(
+        "bigvic_username",
+        username
+      );
+
+      document.getElementById(
+        "profileName"
+      ).textContent =
+        username;
+
+    }
+
+  };
+
+document
+  .getElementById("profileName")
+  .parentElement
+  .appendChild(
+    changeNameButton
+  );
 profileName.textContent =
   username;
 
