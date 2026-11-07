@@ -450,7 +450,7 @@ if (!profileResult.error && profileResult.data) {
   Display one message
 */
 
-function showMessage(item) {
+function showMessage(item profileMap) {
 
   const mine =
     item.sender === currentUser.id;
@@ -483,8 +483,8 @@ avatar.src =
   item.sender === currentUser.id
     ? (localStorage.getItem("bigvic_avatar") ||
        "https://ui-avatars.com/api/?name=BigVic")
-    : "https://ui-avatars.com/api/?name=BigVic";
-
+    : (profileMap[item.sender] ||
+       "https://ui-avatars.com/api/?name=BigVic");
 avatar.style.width = "30px";
 avatar.style.height = "30px";
 avatar.style.borderRadius = "50%";
