@@ -1,228 +1,176 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BigVic Fun</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BigVic Fun Chat</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f1f3f6;
-    }
+<style>
+* {
+  box-sizing: border-box;
+}
 
-    .app {
-      max-width: 600px;
-      margin: auto;
-      min-height: 100vh;
-      background: white;
-    }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f1f3f6;
+}
 
-    header {
-      background: #111827;
-      color: white;
-      padding: 18px;
-    }
+.app {
+  max-width: 600px;
+  margin: auto;
+  min-height: 100vh;
+  background: white;
+  display: flex;
+  flex-direction: column;
+}
 
-    h2 {
-      margin: 0;
-    }
+header {
+  background: #111827;
+  color: white;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    #status {
-      padding: 20px;
-      font-weight: bold;
-    }
+header h2 {
+  margin: 0;
+  font-size: 21px;
+}
 
-    #messages {
-      padding: 20px;
-    }
+#logout {
+  background: #ef4444;
+  border: 0;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 7px;
+}
 
-    .message {
-      background: #e5e7eb;
-      padding: 12px;
-      margin-bottom: 10px;
-      border-radius: 12px;
-    }
+#status {
+  padding: 10px 15px;
+  font-size: 13px;
+  color: #666;
+}
 
-    #message {
-      width: 70%;
-      padding: 12px;
-    }
+#messages {
+  flex: 1;
+  min-height: 400px;
+  padding: 15px;
+  overflow-y: auto;
+}
 
-    #send {
-      padding: 12px;
-    }
-  </style>
+.message {
+  margin-bottom: 14px;
+}
+
+.message.mine {
+  text-align: right;
+}
+
+.name {
+  font-size: 12px;
+  color: #777;
+  margin-bottom: 4px;
+}
+
+.bubble {
+  display: inline-block;
+  max-width: 80%;
+  background: #e5e7eb;
+  padding: 10px 13px;
+  border-radius: 15px;
+  text-align: left;
+  word-break: break-word;
+}
+
+.message.mine .bubble {
+  background: #2563eb;
+  color: white;
+}
+
+.time {
+  font-size: 10px;
+  color: #999;
+  margin-top: 3px;
+}
+
+.send-area {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid #ddd;
+}
+
+#messageInput {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 22px;
+  font-size: 15px;
+  outline: none;
+}
+
+#sendButton {
+  background: #2563eb;
+  border: 0;
+  color: white;
+  border-radius: 22px;
+  padding: 0 18px;
+  font-weight: bold;
+}
+
+.error {
+  color: #dc2626;
+  padding: 10px;
+}
+</style>
 </head>
 
 <body>
 
 <div class="app">
 
-  <header>
-    <h2>BigVic Fun 💬</h2>
-  </header>
+<header>
+  <h2>BigVic Fun 💬</h2>
+  <button id="logout">Logout</button>
+</header>
 
-  <div id="status">
-    Connecting to BigVic...
-  </div>
+<div id="status">
+  Connecting...
+</div>
 
-  <div id="messages"></div>
+<div id="messages"></div>
 
-  <div style="padding:20px;">
-    <input id="message" placeholder="Write a message">
-    <button id="send">Send</button>
-  </div>
+<div class="send-area">
+
+  <input
+    id="messageInput"
+    type="text"
+    placeholder="Write a message..."
+  >
+
+  <button id="sendButton">
+    Send
+  </button>
+
+</div>
 
 </div>
 
 
 <script src="../config.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 
-console.log("STEP 1: Page loaded");
-
-const status = document.getElementById("status");
-
-
-if (!window.SUPABASE_URL) {
-
-  status.textContent =
-    "ERROR: SUPABASE_URL is missing";
-
-} else if (!window.SUPABASE_ANON_KEY) {
-
-  status.textContent =
-    "ERROR: SUPABASE_ANON_KEY is missing";
-
-} else {
-
-  status.textContent =
-    "STEP 2: Supabase settings found";
-
-}
+const client =
+  window.supabase.createClient(
+    window.SUPABASE_URL,
+    window.SUPABASE_ANON_KEY
+  );
 
 
-if (
-  window.SUPABASE_URL &&
-  window.SUPABASE_ANON_KEY
-) {
+let user = null;
 
-  const client =
-    window.supabase.createClient(
-      window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
-    );
-
-
-  async function testConnection() {
-
-    status.textContent =
-      "STEP 3: Checking login...";
-
-
-    const userResult =
-      await client.auth.getUser();
-
-
-    if (userResult.error) {
-
-      status.textContent =
-        "LOGIN ERROR: " +
-        userResult.error.message;
-
-      return;
-
-    }
-
-
-    if (!userResult.data.user) {
-
-      status.textContent =
-        "No logged-in user. Redirecting...";
-
-      window.location.href =
-        "../auth.html";
-
-      return;
-
-    }
-
-
-    status.textContent =
-      "STEP 4: Login OK. Checking messages...";
-
-
-    const messageResult =
-      await client
-        .from("messages")
-        .select("*")
-        .limit(20);
-
-
-    if (messageResult.error) {
-
-      status.textContent =
-        "DATABASE ERROR: " +
-        messageResult.error.message;
-
-      console.error(
-        messageResult.error
-      );
-
-      return;
-
-    }
-
-
-    status.textContent =
-      "SUCCESS: Messages database is working!";
-
-
-    const messages =
-      document.getElementById("messages");
-
-
-    if (
-      !messageResult.data ||
-      messageResult.data.length === 0
-    ) {
-
-      messages.innerHTML =
-        "<p>No messages yet.</p>";
-
-      return;
-
-    }
-
-
-    messageResult.data.forEach(function(item) {
-
-      const div =
-        document.createElement("div");
-
-      div.className =
-        "message";
-
-      div.textContent =
-        item.message;
-
-      messages.appendChild(div);
-
-    });
-
-  }
-
-
-  testConnection();
-
-}
-
-</script>
-
-</body>
-</html>
+let
