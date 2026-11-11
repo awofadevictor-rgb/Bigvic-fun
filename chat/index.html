@@ -19,9 +19,18 @@ body{margin:0;font-family:Arial,sans-serif;background:#101322;color:white}
 .profile-name{font-weight:bold;color:#ffca28}
 .photo-button{display:inline-block;margin-top:5px;background:#ffca28;color:#101322;padding:8px 10px;border-radius:6px;font-size:13px;cursor:pointer;font-weight:bold}
 .header{background:#19233b;color:#ffca28;padding:15px;text-align:center;border-bottom:1px solid #303957}
-.header h2{margin:0 0 8px}
-#logoutButton{border:0;background:#ffca28;color:#101322;padding:9px 14px;border-radius:7px;font-weight:bold}
+.header h2{margin:0 0 10px}
+.header-actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.header-actions button{border:0;background:#ffca28;color:#101322;padding:9px 12px;border-radius:7px;font-weight:bold;cursor:pointer}
+#notificationButton{position:relative}
+#notificationCount{background:#dc2626;color:white;border-radius:20px;padding:2px 6px;font-size:11px}
 .status{padding:10px;text-align:center;font-size:13px;color:#c0c8dc}
+#notificationsPanel{padding:12px;background:#19233b;border-bottom:1px solid #303957}
+.notification-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;color:#ffca28;font-weight:bold}
+.notification-item{padding:11px;margin-top:9px;background:#101322;border:1px solid #46506d;border-radius:9px;cursor:pointer}
+.notification-item.unread{border-left:4px solid #ffca28}
+.notification-item p{margin:5px 0;color:white;font-size:13px;overflow-wrap:anywhere}
+.notification-item small{color:#aeb8d0}
 .chat-switch{display:flex;gap:8px;padding:10px;background:#19233b}
 .chat-switch button{flex:1;padding:12px 5px;border:1px solid #46506d;border-radius:9px;background:#101322;color:#ffca28;font-weight:bold}
 .chat-switch button.active{background:#ffca28;color:#101322;border-color:#ffca28}
@@ -101,7 +110,18 @@ button:disabled{opacity:.5;cursor:not-allowed}
 
 <div class="header">
 <h2>BigVic Fun 💬</h2>
+<div class="header-actions">
+<button id="notificationButton">🔔 Notifications <span id="notificationCount">0</span></button>
 <button id="logoutButton">Logout</button>
+</div>
+</div>
+
+<div id="notificationsPanel" hidden>
+<div class="notification-heading">
+<span>🔔 My Notifications</span>
+<button id="markNotificationsRead" class="small-button">Mark all read</button>
+</div>
+<div id="notificationsList">Loading notifications...</div>
 </div>
 
 <div id="status" class="status">Starting BigVic Chat...</div>
@@ -114,9 +134,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 
 <div id="contactsPanel" hidden>
 <div class="panel-title">👥 Choose someone to chat with</div>
-<div id="contactsList">
-<span class="name">Loading contacts...</span>
-</div>
+<div id="contactsList"><span class="name">Loading contacts...</span></div>
 </div>
 
 <div id="groupsPanel" hidden>
@@ -183,6 +201,12 @@ const stopRecordButton=document.getElementById("stopRecordButton");
 const mediaPreview=document.getElementById("mediaPreview");
 const mediaStatus=document.getElementById("mediaStatus");
 
+const notificationButton=document.getElementById("notificationButton");
+const notificationCount=document.getElementById("notificationCount");
+const notificationsPanel=document.getElementById("notificationsPanel");
+const notificationsList=document.getElementById("notificationsList");
+const markNotificationsRead=document.getElementById("markNotificationsRead");
+
 let supabaseClient;
 let currentUser;
 let contacts=[];
@@ -200,6 +224,7 @@ let refreshTimer=null;
 let typingSendTimer=null;
 let unreadCounts={};
 let lastTypingUpdate=0;
+let notifications=[];
 
 let username=localStorage.getItem("bigvic_username")||"BigVic";
 
@@ -290,6 +315,7 @@ await updatePresence();
 await loadContacts();
 await loadGroups();
 await loadMessages();
+await loadNotifications();
 
 statusBox.textContent="Connected to BigVic Chat";
 
@@ -298,7 +324,9 @@ if(refreshTimer)clearInterval(refreshTimer);
 refreshTimer=setInterval(async function(){
 await updatePresence();
 await loadUnreadCounts();
+renderContacts();
 await refreshTypingIndicator();
+await loadNotifications();
 
 if(chatMode==="private"&&activeContact){
 await loadMessages();
@@ -311,7 +339,6 @@ await loadMessages();
 if(chatMode==="group"){
 await loadGroups();
 }
-
 },4000);
 
 }catch(error){
@@ -411,7 +438,7 @@ contactsList.appendChild(button);
 updateContactSelection();
 }
 
-/* UNREAD COUNTS */
+/* UNREAD PRIVATE MESSAGE COUNTS */
 
 async function loadUnreadCounts(){
 if(!currentUser)return;
@@ -434,6 +461,171 @@ counts[item.sender]=(counts[item.sender]||0)+1;
 });
 
 unreadCounts=counts;
+}
+
+/* NOTIFICATIONS */
+
+notificationButton.addEventListener("click",async function(){
+notificationsPanel.hidden=!notificationsPanel.hidden;
+
+if(!notificationsPanel.hidden){
+await loadNotifications();
+}
+});
+
+/* Load notifications belonging to this user */
+
+async function loadNotifications(){
+if(!currentUser)return;
+
+const result=await supabaseClient
+.from("notifications")
+.select("*")
+.eq("user_id",currentUser.id)
+.order("created_at",{ascending:false})
+.limit(50);
+
+if(result.error){
+console.error("Notification loading error:",result.error);
+notificationsList.textContent="Could not load notifications: "+result.error.message;
+return;
+}
+
+notifications=result.data||[];
+
+const unread=notifications.filter(function(item){
+return !item.is_read;
+}).length;
+
+notificationCount.textContent=unread>99?"99+":unread;
+
+renderNotifications();
+}
+
+/* Display notifications */
+
+function renderNotifications(){
+notificationsList.innerHTML="";
+
+if(!notifications.length){
+notificationsList.textContent="No notifications yet. 🔔";
+return;
+}
+
+notifications.forEach(function(item){
+const card=document.createElement("div");
+card.className="notification-item"+(item.is_read?"":" unread");
+
+const title=document.createElement("strong");
+title.textContent=item.type==="group_message"
+?"👥 Group message"
+:"💬 New private message";
+
+const message=document.createElement("p");
+message.textContent=item.message||"You have a new message.";
+
+const time=document.createElement("small");
+time.textContent=new Date(item.created_at).toLocaleString();
+
+card.append(title,message,time);
+
+card.addEventListener("click",function(){
+openNotification(item);
+});
+
+notificationsList.appendChild(card);
+});
+}
+
+/* Open a notification */
+
+async function openNotification(item){
+if(!item.is_read){
+const result=await supabaseClient
+.from("notifications")
+.update({is_read:true})
+.eq("id",item.id)
+.eq("user_id",currentUser.id);
+
+if(result.error){
+console.error("Could not mark notification read:",result.error);
+}
+}
+
+await loadNotifications();
+
+if(item.type==="private_message"&&item.actor_id){
+const person=contacts.find(function(c){
+return c.id===item.actor_id;
+});
+
+if(person){
+await selectContact(person);
+}
+}
+
+if(item.type==="group_message"&&item.related_id){
+const group=myGroups.find(function(g){
+return g.id===item.related_id;
+});
+
+if(group){
+await selectGroup(group);
+}else{
+await loadGroups();
+const found=myGroups.find(function(g){
+return g.id===item.related_id;
+});
+if(found)await selectGroup(found);
+}
+}
+
+notificationsPanel.hidden=true;
+}
+
+/* Mark all notifications read */
+
+markNotificationsRead.addEventListener("click",async function(){
+if(!currentUser)return;
+
+markNotificationsRead.disabled=true;
+
+try{
+const result=await supabaseClient
+.from("notifications")
+.update({is_read:true})
+.eq("user_id",currentUser.id)
+.eq("is_read",false);
+
+if(result.error)throw result.error;
+
+await loadNotifications();
+}catch(error){
+console.error(error);
+alert("Could not mark notifications as read: "+error.message);
+}finally{
+markNotificationsRead.disabled=false;
+}
+});
+
+/* CREATE A NOTIFICATION */
+
+async function createNotification(userId,type,message,relatedId){
+if(!userId||userId===currentUser.id)return;
+
+const result=await supabaseClient
+.from("notifications")
+.insert({
+user_id:userId,
+actor_id:currentUser.id,
+type:type,
+message:message,
+related_id:relatedId||null
+});
+
+if(result.error){
+console.error("Notification insert error:",result.error);
+}
 }
 
 /* SELECT CONTACT */
@@ -512,12 +704,7 @@ conversationTitle.textContent=activeContact
 if(!activeContact){
 messagesBox.innerHTML="";
 typingIndicator.textContent="";
-
-const info=document.createElement("p");
-info.style.textAlign="center";
-info.style.color="#aeb8d0";
-info.textContent="Choose someone above to start a private conversation.";
-messagesBox.appendChild(info);
+showEmptyMessage("Choose someone above to start a private conversation.");
 }else{
 await loadMessages();
 await refreshTypingIndicator();
@@ -525,6 +712,7 @@ await refreshTypingIndicator();
 
 updateContactSelection();
 await loadUnreadCounts();
+renderContacts();
 });
 
 /* GROUP CHAT MODE */
@@ -554,7 +742,7 @@ showEmptyMessage("Choose a group or create a new one.");
 }
 });
 
-/* GROUPS: LOAD MY GROUPS */
+/* LOAD GROUPS */
 
 async function loadGroups(){
 if(!currentUser)return;
@@ -669,7 +857,6 @@ async function createGroup(){
 if(!currentUser)return;
 
 const name=prompt("Enter a name for your group:");
-
 if(!name||!name.trim())return;
 
 const description=prompt("Enter a short group description (optional):")||"";
@@ -724,7 +911,7 @@ createGroupButton.textContent="＋ Create Group";
 }
 }
 
-/* ADD A GROUP MEMBER */
+/* ADD GROUP MEMBER */
 
 addGroupMemberButton.addEventListener("click",addGroupMember);
 
@@ -742,7 +929,7 @@ return;
 }
 
 const available=contacts.map(function(person){
-return person.username+" ("+person.email+")";
+return person.username||"BigVic User";
 });
 
 const choice=prompt(
@@ -786,8 +973,16 @@ role:"member"
 
 if(result.error)throw result.error;
 
+await createNotification(
+person.id,
+"group_message",
+username+" added you to the group "+activeGroup.name,
+activeGroup.id
+);
+
 alert(person.username+" was added to the group! 🎉");
 await showGroupMembers();
+
 }catch(error){
 console.error("Add member error:",error);
 alert("Could not add member: "+error.message);
@@ -822,7 +1017,7 @@ return person?.username||"BigVic User";
 alert("Members of "+activeGroup.name+":\n\n"+names.join("\n"));
 }
 
-/* GROUP MESSAGE READ/WRITE */
+/* GROUP MESSAGES */
 
 async function loadGroupMessages(){
 if(!activeGroup)return;
@@ -852,7 +1047,7 @@ messagesBox.scrollTop=messagesBox.scrollHeight;
 statusBox.textContent="BigVic Fun Chat";
 }
 
-/* EMPTY CHAT MESSAGE */
+/* EMPTY CHAT */
 
 function showEmptyMessage(text){
 messagesBox.innerHTML="";
@@ -929,7 +1124,7 @@ showEmptyMessage(chatMode==="public"
 result.data.forEach(showMessage);
 }
 
-statusBox.textContent="BigVic Fun Chat";
+statusBox.textContent="BigVic Chat";
 messagesBox.scrollTop=messagesBox.scrollHeight;
 
 if(chatMode==="private"){
@@ -937,7 +1132,7 @@ await markConversationAsRead();
 }
 }
 
-/* DISPLAY MESSAGES, RECEIPTS, EDIT AND DELETE */
+/* DISPLAY MESSAGES */
 
 function showMessage(item){
 const mine=item.sender===currentUser.id;
@@ -1038,7 +1233,6 @@ messagesBox.appendChild(wrapper);
 
 async function editMessage(item){
 const updated=prompt("Edit your message:",item.message||"");
-
 if(updated===null)return;
 
 if(!updated.trim()){
@@ -1206,7 +1400,7 @@ typingIndicator.textContent="";
 }
 }
 
-/* SAVE MESSAGE */
+/* SAVE MESSAGE AND CREATE NOTIFICATION */
 
 async function saveChatMessage(text,media){
 if(chatMode==="private"&&!activeContact){
@@ -1229,6 +1423,34 @@ media_type:media?media.type:null
 });
 
 if(result.error)throw result.error;
+
+/* Notify other members of this group */
+const members=await supabaseClient
+.from("group_members")
+.select("user_id")
+.eq("group_id",activeGroup.id);
+
+if(members.error){
+console.error("Could not load group members for notifications:",members.error);
+}else{
+const preview=text||(
+media?.type==="image"?"📷 Photo":
+media?.type==="video"?"🎥 Video":
+media?.type==="audio"?"🎤 Voice note":"New message"
+);
+
+for(const member of members.data||[]){
+if(member.user_id!==currentUser.id){
+await createNotification(
+member.user_id,
+"group_message",
+username+" in "+activeGroup.name+": "+preview.slice(0,120),
+activeGroup.id
+);
+}
+}
+}
+
 return;
 }
 
@@ -1247,6 +1469,22 @@ media_type:media?media.type:null
 });
 
 if(result.error)throw result.error;
+
+/* Notify the private-message recipient */
+if(chatMode==="private"){
+const preview=text||(
+media?.type==="image"?"📷 Sent you a photo":
+media?.type==="video"?"🎥 Sent you a video":
+media?.type==="audio"?"🎤 Sent you a voice note":"New message"
+);
+
+await createNotification(
+activeContact.id,
+"private_message",
+username+": "+preview.slice(0,120),
+null
+);
+}
 }
 
 /* SEND TEXT */
