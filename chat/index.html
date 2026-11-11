@@ -99,6 +99,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <button onclick="goGames()">🎮 Games</button>
 <button onclick="goTrending()">🔥 Trending</button>
 <button onclick="goScores()">🏆 Scores</button>
+<button onclick="window.location.href='/profile.html'">👤 Profile</button>
 </div>
 
 <div class="app">
@@ -644,8 +645,6 @@ meta.appendChild(ticks);
 }
 
 wrapper.appendChild(meta);
-
-/* ONLY YOUR OWN MESSAGES CAN BE EDITED OR DELETED */
 
 if(mine){
 const actions=document.createElement("div");
