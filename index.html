@@ -7,7 +7,6 @@
 <title>BigVic Fun</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/config.js"></script>
-
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#101322;color:white;font-family:Arial,sans-serif}
@@ -29,9 +28,16 @@ textarea{min-height:90px}
 .small{color:#b9c2d8;font-size:13px}
 footer{text-align:center;color:#929bb2;padding:25px}
 .score-row{display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid #39415c}
+.post-actions{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0}
+.post-actions button{background:#414d70;color:white}
+.post-actions button.liked{background:#ffca28;color:#171717}
+.comment-box{border-top:1px solid #46506d;margin-top:14px;padding-top:10px}
+.comment{background:#202944;padding:9px;border-radius:8px;margin:7px 0}
+.comment-form{display:flex;gap:7px;align-items:center}
+.comment-form textarea{min-height:45px;flex:1;margin:5px 0}
+.comment-form button{padding:10px}
 </style>
 </head>
-
 <body>
 
 <header>
@@ -56,25 +62,21 @@ footer{text-align:center;color:#929bb2;padding:25px}
 <h3 id="welcomeName">Welcome, Player!</h3>
 <p class="small" id="accountStatus">Checking account...</p>
 </div>
-
 <div class="card">
 <h3>💬 Chat with friends</h3>
 <p>Join the BigVic community and start chatting.</p>
 <button onclick="openChat()">Open Chat</button>
 </div>
-
 <div class="card">
 <h3>🎮 Play Games</h3>
 <p>Play fun games and earn wins.</p>
 <button onclick="showPage('games')">Explore Games</button>
 </div>
-
 <div class="card">
 <h3>🔥 Trending</h3>
 <p>Share what's happening with the community.</p>
 <button onclick="showPage('trending')">Open Trending</button>
 </div>
-
 <div class="card">
 <h3>🏆 Leaderboard</h3>
 <p>See the players with the most wins.</p>
@@ -84,7 +86,6 @@ footer{text-align:center;color:#929bb2;padding:25px}
 
 <section id="games" class="page">
 <h2>🎮 Games Zone</h2>
-
 <div class="card">
 <h3>🔢 Guess the Number</h3>
 <p>Guess a number between 1 and 10.</p>
@@ -92,7 +93,6 @@ footer{text-align:center;color:#929bb2;padding:25px}
 <button onclick="guessNumber()">Check Answer</button>
 <p id="guessResult"></p>
 </div>
-
 <div class="card">
 <h3>✊ Rock Paper Scissors</h3>
 <p>Choose your move.</p>
@@ -107,14 +107,12 @@ footer{text-align:center;color:#929bb2;padding:25px}
 
 <section id="trending" class="page">
 <h2>🔥 Trending Posts</h2>
-
 <div class="card">
 <h3>Share something</h3>
 <textarea id="postText" placeholder="What's happening?"></textarea>
 <button onclick="addPost()">Publish Post</button>
 <p id="postMessage" class="small"></p>
 </div>
-
 <div id="posts"></div>
 </section>
 
@@ -128,7 +126,6 @@ footer{text-align:center;color:#929bb2;padding:25px}
 </section>
 
 </main>
-
 <footer>BigVic Fun © 2026</footer>
 
 <script>
@@ -203,7 +200,6 @@ async function checkLogin() {
       "You are logged in.";
 
     await loadPlayerScore();
-
   } catch (error) {
     document.getElementById("accountStatus").textContent =
       "Could not check your login. Please refresh.";
@@ -343,7 +339,7 @@ async function playRPS(player) {
   }
 }
 
-/* SHARED TRENDING POSTS */
+/* PUBLISH SHARED POSTS */
 
 async function addPost() {
   const input = document.getElementById("postText");
@@ -362,25 +358,23 @@ async function addPost() {
 
   message.textContent = "Publishing...";
 
-  const { error } = await db
-    .from("posts")
-    .insert({
-      user_id: currentUser.id,
-      username: username,
-      content: text
-    });
+  const { error } = await db.from("posts").insert({
+    user_id: currentUser.id,
+    username: username,
+    content: text
+  });
 
   if (error) {
-    console.log("Post error:", error.message);
     message.textContent = "Post failed: " + error.message;
     return;
   }
 
   input.value = "";
   message.textContent = "Posted successfully! 🎉";
-
   await loadPosts();
 }
+
+/* LOAD POSTS, LIKES AND COMMENTS */
 
 async function loadPosts() {
   const container = document.getElementById("posts");
@@ -392,26 +386,60 @@ async function loadPosts() {
 
   container.textContent = "Loading community posts...";
 
-  const { data, error } = await db
+  const { data: posts, error } = await db
     .from("posts")
     .select("id,username,content,created_at")
     .order("created_at", { ascending: false })
     .limit(100);
 
   if (error) {
-    console.log("Posts loading error:", error.message);
     container.textContent = "Could not load posts: " + error.message;
     return;
   }
 
   container.innerHTML = "";
 
-  if (!data || data.length === 0) {
+  if (!posts || posts.length === 0) {
     container.textContent = "No posts yet. Be the first to post! 🔥";
     return;
   }
 
-  data.forEach(function(post) {
+  const ids = posts.map(post => post.id);
+
+  const [likesResult, commentsResult] = await Promise.all([
+    db.from("post_likes")
+      .select("post_id,user_id")
+      .in("post_id", ids),
+
+    db.from("post_comments")
+      .select("id,post_id,user_id,username,content,created_at")
+      .in("post_id", ids)
+      .order("created_at", { ascending: true })
+  ]);
+
+  if (likesResult.error) {
+    container.textContent = "Could not load likes: " + likesResult.error.message;
+    return;
+  }
+
+  if (commentsResult.error) {
+    container.textContent = "Could not load comments: " + commentsResult.error.message;
+    return;
+  }
+
+  const likes = likesResult.data || [];
+  const comments = commentsResult.data || [];
+
+  posts.forEach(function(post) {
+    const postLikes = likes.filter(like => like.post_id === post.id);
+    const likedByMe = postLikes.some(
+      like => like.user_id === currentUser.id
+    );
+
+    const postComments = comments.filter(
+      comment => comment.post_id === post.id
+    );
+
     const box = document.createElement("div");
     box.className = "post";
 
@@ -423,17 +451,141 @@ async function loadPosts() {
 
     const time = document.createElement("small");
     time.className = "small";
+    time.textContent = new Date(post.created_at).toLocaleString();
 
-    time.textContent = post.created_at
-      ? new Date(post.created_at).toLocaleString()
-      : "";
+    const actions = document.createElement("div");
+    actions.className = "post-actions";
+
+    const likeButton = document.createElement("button");
+    likeButton.className = likedByMe ? "liked" : "";
+    likeButton.textContent =
+      (likedByMe ? "❤️ Liked" : "🤍 Like") +
+      " (" + postLikes.length + ")";
+
+    likeButton.onclick = function() {
+      toggleLike(post.id, likedByMe);
+    };
+
+    actions.appendChild(likeButton);
+
+    const commentTitle = document.createElement("strong");
+    commentTitle.textContent =
+      "💬 Comments (" + postComments.length + ")";
+
+    const commentBox = document.createElement("div");
+    commentBox.className = "comment-box";
+
+    commentBox.appendChild(commentTitle);
+
+    postComments.forEach(function(comment) {
+      const item = document.createElement("div");
+      item.className = "comment";
+
+      const commentName = document.createElement("strong");
+      commentName.textContent = comment.username || "Player";
+
+      const commentText = document.createElement("p");
+      commentText.textContent = comment.content;
+
+      const commentTime = document.createElement("small");
+      commentTime.className = "small";
+      commentTime.textContent =
+        new Date(comment.created_at).toLocaleString();
+
+      item.appendChild(commentName);
+      item.appendChild(commentText);
+      item.appendChild(commentTime);
+      commentBox.appendChild(item);
+    });
+
+    const form = document.createElement("div");
+    form.className = "comment-form";
+
+    const commentInput = document.createElement("textarea");
+    commentInput.placeholder = "Write a comment...";
+    commentInput.maxLength = 1000;
+
+    const sendButton = document.createElement("button");
+    sendButton.textContent = "Send";
+
+    sendButton.onclick = function() {
+      addComment(post.id, commentInput.value);
+    };
+
+    form.appendChild(commentInput);
+    form.appendChild(sendButton);
+    commentBox.appendChild(form);
 
     box.appendChild(name);
     box.appendChild(content);
     box.appendChild(time);
+    box.appendChild(actions);
+    box.appendChild(commentBox);
 
     container.appendChild(box);
   });
+}
+
+/* LIKE OR UNLIKE A POST */
+
+async function toggleLike(postId, alreadyLiked) {
+  if (!db || !currentUser) return;
+
+  if (alreadyLiked) {
+    const { error } = await db
+      .from("post_likes")
+      .delete()
+      .eq("post_id", postId)
+      .eq("user_id", currentUser.id);
+
+    if (error) {
+      alert("Could not remove like: " + error.message);
+      return;
+    }
+  } else {
+    const { error } = await db
+      .from("post_likes")
+      .insert({
+        post_id: postId,
+        user_id: currentUser.id
+      });
+
+    if (error) {
+      alert("Could not like post: " + error.message);
+      return;
+    }
+  }
+
+  await loadPosts();
+}
+
+/* ADD A COMMENT */
+
+async function addComment(postId, text) {
+  const content = text.trim();
+
+  if (!content) {
+    alert("Write a comment first.");
+    return;
+  }
+
+  if (!db || !currentUser) return;
+
+  const { error } = await db
+    .from("post_comments")
+    .insert({
+      post_id: postId,
+      user_id: currentUser.id,
+      username: username,
+      content: content
+    });
+
+  if (error) {
+    alert("Could not send comment: " + error.message);
+    return;
+  }
+
+  await loadPosts();
 }
 
 checkLogin();
