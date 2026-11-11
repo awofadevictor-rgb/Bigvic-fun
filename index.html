@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BigVic Fun</title>
 
 <style>
@@ -18,15 +18,14 @@ body {
 }
 
 header {
-  background: #111827;
+  background: #2563eb;
   color: white;
+  padding: 22px 15px;
   text-align: center;
-  padding: 25px 15px;
 }
 
 header h1 {
   margin: 0;
-  font-size: 30px;
 }
 
 header p {
@@ -34,31 +33,36 @@ header p {
 }
 
 nav {
-  background: white;
   display: flex;
-  justify-content: space-around;
   flex-wrap: wrap;
-  padding: 10px 4px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  gap: 8px;
+  padding: 12px;
+  background: white;
   box-shadow: 0 2px 8px #00000015;
 }
 
 nav button {
+  flex: 1;
+  min-width: 70px;
+  padding: 11px 8px;
   border: 0;
-  background: transparent;
-  padding: 10px 7px;
-  font-size: 13px;
+  border-radius: 8px;
+  background: #e5e7eb;
   font-weight: bold;
-  cursor: pointer;
+}
+
+nav button:hover {
+  background: #dbeafe;
+}
+
+main {
+  max-width: 700px;
+  margin: auto;
+  padding: 20px;
 }
 
 .page {
   display: none;
-  max-width: 650px;
-  margin: auto;
-  padding: 20px;
 }
 
 .page.active {
@@ -67,22 +71,30 @@ nav button {
 
 .card {
   background: white;
+  padding: 20px;
+  margin-bottom: 16px;
   border-radius: 14px;
-  padding: 22px;
-  margin-bottom: 18px;
-  text-align: center;
-  box-shadow: 0 3px 10px #00000012;
+  box-shadow: 0 2px 10px #00000012;
+}
+
+h2 {
+  margin-top: 0;
 }
 
 button.action {
+  width: 100%;
+  padding: 13px;
+  margin-top: 10px;
   border: 0;
+  border-radius: 8px;
   background: #2563eb;
   color: white;
-  padding: 12px 17px;
-  margin: 5px;
-  border-radius: 8px;
+  font-size: 16px;
   font-weight: bold;
-  cursor: pointer;
+}
+
+button.green {
+  background: #16a34a;
 }
 
 button.dark {
@@ -92,7 +104,8 @@ button.dark {
 input,
 textarea {
   width: 100%;
-  padding: 12px;
+  padding: 13px;
+  margin-top: 10px;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 16px;
@@ -103,63 +116,62 @@ textarea {
   resize: vertical;
 }
 
+.number {
+  font-size: 42px;
+  font-weight: bold;
+  text-align: center;
+  margin: 15px 0;
+}
+
 .result {
+  text-align: center;
+  font-size: 18px;
   font-weight: bold;
   margin-top: 15px;
 }
 
-.score {
-  display: flex;
-  justify-content: space-between;
-  padding: 13px 5px;
-  border-bottom: 1px solid #eee;
-}
-
-.player {
-  display: flex;
-  justify-content: space-between;
-  padding: 13px 5px;
-  border-bottom: 1px solid #eee;
-}
-
 .post {
-  text-align: left;
-  background: #f8fafc;
+  background: white;
   padding: 15px;
   margin-top: 12px;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #00000012;
 }
 
 .post-name {
   font-weight: bold;
-  margin-bottom: 7px;
 }
 
 .post-text {
+  margin-top: 10px;
+  font-size: 16px;
   white-space: pre-wrap;
-  overflow-wrap: anywhere;
 }
 
 .post-time {
-  color: #64748b;
-  font-size: 12px;
   margin-top: 10px;
+  color: #6b7280;
+  font-size: 12px;
 }
 
-.small {
-  color: #64748b;
-  font-size: 13px;
+.score-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  margin-top: 8px;
+  background: #f9fafb;
+  border-radius: 8px;
 }
 
-.error {
-  color: #dc2626;
-  font-weight: bold;
+.message {
+  text-align: center;
+  margin-top: 12px;
 }
 
-.success {
-  color: #15803d;
-  font-weight: bold;
+footer {
+  text-align: center;
+  color: #6b7280;
+  padding: 30px 15px;
 }
 </style>
 </head>
@@ -167,8 +179,8 @@ textarea {
 <body>
 
 <header>
-  <h1>BigVic Fun</h1>
-  <p>Connect, chat, play and discover!</p>
+  <h1>BigVic Fun 🎉</h1>
+  <p>Chat • Games • Trending • Scores</p>
 </header>
 
 <nav>
@@ -179,208 +191,141 @@ textarea {
   <button onclick="showPage('scores')">🏆 Scores</button>
 </nav>
 
+<main>
 
 <!-- HOME -->
-
 <section id="home" class="page active">
 
   <div class="card">
     <h2>Welcome to BigVic Fun 👋</h2>
-
-    <p>
-      Your place to connect, chat, play games and have fun.
-    </p>
+    <p>Have fun, play games, chat and share what's trending.</p>
 
     <button class="action" onclick="openChat()">
-      💬 Start Chatting
+      💬 Open Chat
     </button>
 
-    <button class="action" onclick="showPage('games')">
+    <button class="action green" onclick="showPage('games')">
       🎮 Play Games
     </button>
-  </div>
 
-
-  <div class="card">
-    <h3>🔥 Trending</h3>
-
-    <p>
-      Share something with the BigVic Fun community.
-    </p>
-
-    <button class="action" onclick="showPage('trending')">
-      Explore Trending
+    <button class="action dark" onclick="showPage('trending')">
+      🔥 View Trending
     </button>
   </div>
 
-
   <div class="card">
-    <h3>🏆 Leaderboard</h3>
-
-    <p>
-      See the top BigVic Fun players.
-    </p>
-
-    <button class="action" onclick="showPage('scores')">
-      View Scores
-    </button>
+    <h2>Quick Menu</h2>
+    <p>💬 Chat with people</p>
+    <p>🎮 Play fun games</p>
+    <p>🔥 Share trending posts</p>
+    <p>🏆 Check the leaderboard</p>
   </div>
 
 </section>
 
 
 <!-- GAMES -->
-
 <section id="games" class="page">
 
   <div class="card">
+    <h2>🎮 Games</h2>
+    <p>Choose a game below.</p>
+  </div>
 
-    <h2>🎯 Guess the Number</h2>
-
-    <p>
-      Guess my number between 1 and 10.
-    </p>
+  <div class="card">
+    <h2>🔢 Guess the Number</h2>
+    <p>Guess a number between 1 and 10.</p>
 
     <input
-      id="guess"
+      id="guessInput"
       type="number"
       min="1"
       max="10"
-      placeholder="Enter 1-10"
-    >
+      placeholder="Enter your guess">
 
-    <br><br>
-
-    <button class="action" onclick="checkGuess()">
+    <button
+      class="action"
+      onclick="guessNumber()">
       Guess
     </button>
 
-    <button class="action dark" onclick="newNumberGame()">
-      New Game
-    </button>
-
-    <p id="numberResult" class="result">
-      Good luck! 🎉
-    </p>
-
+    <div id="guessResult" class="result"></div>
   </div>
 
 
   <div class="card">
+    <h2>✊ Rock Paper Scissors</h2>
 
-    <h2>✊ Rock, Paper, Scissors</h2>
-
-    <p>
-      Choose your move.
-    </p>
-
-    <button class="action" onclick="playRPS('Rock')">
+    <button
+      class="action"
+      onclick="playRPS('Rock')">
       ✊ Rock
     </button>
 
-    <button class="action" onclick="playRPS('Paper')">
+    <button
+      class="action"
+      onclick="playRPS('Paper')">
       ✋ Paper
     </button>
 
-    <button class="action" onclick="playRPS('Scissors')">
+    <button
+      class="action"
+      onclick="playRPS('Scissors')">
       ✌️ Scissors
     </button>
 
-    <p id="rpsResult" class="result">
-      Ready to play!
-    </p>
-
+    <div id="rpsResult" class="result"></div>
   </div>
 
 </section>
 
 
 <!-- TRENDING -->
-
 <section id="trending" class="page">
 
   <div class="card">
-
     <h2>🔥 Trending</h2>
-
-    <p>
-      Share something with BigVic Fun.
-    </p>
 
     <textarea
       id="postText"
-      maxlength="500"
-      placeholder="What's on your mind?"
-    ></textarea>
+      placeholder="What's on your mind?"></textarea>
 
-    <br>
-
-    <button class="action" onclick="addPost()">
-      📢 Post
+    <button
+      class="action"
+      onclick="addPost()">
+      Post 🔥
     </button>
 
-    <p id="postMessage" class="small"></p>
-
-  </div>
-
-
-  <div class="card">
-
-    <h3>🔥 Latest Posts</h3>
-
-    <div id="posts">
-      Loading posts...
+    <div
+      id="postMessage"
+      class="message">
     </div>
-
   </div>
+
+  <div id="posts"></div>
 
 </section>
 
 
 <!-- SCORES -->
-
 <section id="scores" class="page">
 
   <div class="card">
-
-    <h2>🏆 BigVic Fun Leaderboard</h2>
-
-    <p id="accountStatus" class="small">
-      Checking account...
-    </p>
-
-
-    <div class="score">
-      <strong>🎯 Your Number Wins</strong>
-      <strong id="numberWins">0</strong>
-    </div>
-
-    <div class="score">
-      <strong>✊ Your RPS Wins</strong>
-      <strong id="rpsWins">0</strong>
-    </div>
-
-    <div class="score">
-      <strong>⭐ Your Total Wins</strong>
-      <strong id="totalWins">0</strong>
-    </div>
-
-
-    <h3>🌍 All Players</h3>
+    <h2>🏆 Leaderboard</h2>
+    <p>Top players on BigVic Fun.</p>
 
     <div id="leaderboard">
-      Loading players...
+      <p>Loading scores...</p>
     </div>
-
-    <br>
-
-    <button class="action" onclick="loadLeaderboard()">
-      🔄 Refresh
-    </button>
-
   </div>
 
 </section>
+
+</main>
+
+<footer>
+  BigVic Fun © 2026
+</footer>
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -388,373 +333,99 @@ textarea {
 
 <script>
 
-let supabaseClient = null;
-let currentUser = null;
-
-let secretNumber =
-  Math.floor(Math.random() * 10) + 1;
-
-let numberWins =
-  Number(localStorage.getItem("bigvic_number_wins") || 0);
-
-let rpsWins =
-  Number(localStorage.getItem("bigvic_rps_wins") || 0);
+let client = null;
 
 
-/* HOME */
+/* -------------------------
+   SUPABASE
+------------------------- */
 
-function goHome() {
-  showPage("home");
+function setupSupabase() {
+
+  if (
+    !window.supabase ||
+    !window.SUPABASE_URL ||
+    !window.SUPABASE_ANON_KEY
+  ) {
+    return false;
+  }
+
+  if (!client) {
+
+    client =
+      window.supabase.createClient(
+        window.SUPABASE_URL,
+        window.SUPABASE_ANON_KEY
+      );
+  }
+
+  return true;
 }
 
 
-/* PAGE SWITCHING */
+/* -------------------------
+   NAVIGATION
+------------------------- */
 
 function showPage(pageName) {
 
-  document
-    .querySelectorAll(".page")
-    .forEach(function(page) {
-      page.classList.remove("active");
-    });
+  const pages =
+    document.querySelectorAll(".page");
 
-  const page =
+  pages.forEach(function(page) {
+    page.classList.remove("active");
+  });
+
+  const selected =
     document.getElementById(pageName);
 
-  if (page) {
-    page.classList.add("active");
+  if (selected) {
+    selected.classList.add("active");
   }
 
   window.scrollTo(0, 0);
 
-  if (pageName === "scores") {
-    loadLeaderboard();
-  }
-
   if (pageName === "trending") {
     loadPosts();
   }
+
+  if (pageName === "scores") {
+    loadLeaderboard();
+  }
 }
 
 
-/* CHAT */
+function goHome() {
+
+  showPage("home");
+
+}
+
 
 function openChat() {
+
   window.location.href = "/chat/";
+
 }
 
 
-/* SCORES */
-
-function updateScores() {
-
-  numberWins =
-    Number(localStorage.getItem("bigvic_number_wins") || 0);
-
-  rpsWins =
-    Number(localStorage.getItem("bigvic_rps_wins") || 0);
-
-  document.getElementById("numberWins")
-    .textContent = numberWins;
-
-  document.getElementById("rpsWins")
-    .textContent = rpsWins;
-
-  document.getElementById("totalWins")
-    .textContent =
-    numberWins + rpsWins;
-}
-
-
-/* GUESS GAME */
-
-function checkGuess() {
-
-  const guess =
-    Number(document.getElementById("guess").value);
-
-  const result =
-    document.getElementById("numberResult");
-
-  if (
-    !Number.isInteger(guess) ||
-    guess < 1 ||
-    guess > 10
-  ) {
-    result.textContent =
-      "Enter a number from 1 to 10.";
-    return;
-  }
-
-  if (guess === secretNumber) {
-
-    result.textContent =
-      "🎉 Congratulations! You won!";
-
-    numberWins++;
-
-    localStorage.setItem(
-      "bigvic_number_wins",
-      numberWins
-    );
-
-    updateScores();
-    saveOnlineScore();
-
-  } else if (guess < secretNumber) {
-
-    result.textContent =
-      "⬆️ Try a higher number!";
-
-  } else {
-
-    result.textContent =
-      "⬇️ Try a lower number!";
-
-  }
-}
-
-
-/* NEW GAME */
-
-function newNumberGame() {
-
-  secretNumber =
-    Math.floor(Math.random() * 10) + 1;
-
-  document.getElementById("guess").value = "";
-
-  document.getElementById("numberResult")
-    .textContent =
-    "New game! Good luck 🎯";
-}
-
-
-/* RPS */
-
-function playRPS(playerChoice) {
-
-  const choices =
-    ["Rock", "Paper", "Scissors"];
-
-  const computerChoice =
-    choices[
-      Math.floor(Math.random() * choices.length)
-    ];
-
-  let result = "";
-
-  if (playerChoice === computerChoice) {
-
-    result = "🤝 It's a tie!";
-
-  } else if (
-
-    (playerChoice === "Rock" &&
-      computerChoice === "Scissors")
-
-    ||
-
-    (playerChoice === "Paper" &&
-      computerChoice === "Rock")
-
-    ||
-
-    (playerChoice === "Scissors" &&
-      computerChoice === "Paper")
-
-  ) {
-
-    result = "🎉 You win!";
-
-    rpsWins++;
-
-    localStorage.setItem(
-      "bigvic_rps_wins",
-      rpsWins
-    );
-
-    saveOnlineScore();
-
-  } else {
-
-    result = "😄 BigVic wins!";
-
-  }
-
-  document.getElementById("rpsResult")
-    .textContent =
-      "You: " +
-      playerChoice +
-      " | BigVic: " +
-      computerChoice +
-      " — " +
-      result;
-
-  updateScores();
-}
-
-
-/* USERNAME */
+/* -------------------------
+   USERNAME
+------------------------- */
 
 function getUsername() {
 
   return (
-
-    localStorage.getItem(
-      "bigvic_username"
-    )
-
-    ||
-
-    currentUser?.user_metadata?.username
-
-    ||
-
-    currentUser?.email?.split("@")[0]
-
-    ||
-
-    "Player"
-
+    localStorage.getItem("bigvic_username")
+    || "Player"
   );
+
 }
 
 
-/* SAVE SCORE */
-
-async function saveOnlineScore() {
-
-  if (!supabaseClient ||
-      !currentUser) {
-    return;
-  }
-
-  const username =
-    getUsername();
-
-  const { error } =
-    await supabaseClient
-      .from("leaderboard")
-      .upsert({
-
-        user_id:
-          currentUser.id,
-
-        username:
-          username,
-
-        number_wins:
-          numberWins,
-
-        rps_wins:
-          rpsWins,
-
-        updated_at:
-          new Date().toISOString()
-
-      }, {
-
-        onConflict:
-          "user_id"
-
-      });
-
-  if (!error) {
-    loadLeaderboard();
-  }
-}
-
-
-/* LOAD SCORES */
-
-async function loadLeaderboard() {
-
-  updateScores();
-
-  const list =
-    document.getElementById("leaderboard");
-
-  if (!supabaseClient) {
-
-    list.innerHTML =
-      "<p>Supabase is not connected.</p>";
-
-    return;
-  }
-
-  const { data, error } =
-    await supabaseClient
-      .from("leaderboard")
-      .select(
-        "username, number_wins, rps_wins"
-      );
-
-  if (error) {
-
-    list.innerHTML =
-      "<p>" + error.message + "</p>";
-
-    return;
-  }
-
-  if (!data || data.length === 0) {
-
-    list.innerHTML =
-      "<p>No scores yet.</p>";
-
-    return;
-  }
-
-  data.sort(function(a, b) {
-
-    const aTotal =
-      Number(a.number_wins) +
-      Number(a.rps_wins);
-
-    const bTotal =
-      Number(b.number_wins) +
-      Number(b.rps_wins);
-
-    return bTotal - aTotal;
-  });
-
-  list.innerHTML = "";
-
-  data.forEach(function(player, index) {
-
-    const total =
-      Number(player.number_wins) +
-      Number(player.rps_wins);
-
-    const row =
-      document.createElement("div");
-
-    row.className = "player";
-
-    const name =
-      document.createElement("strong");
-
-    name.textContent =
-      (index + 1) +
-      ". " +
-      player.username;
-
-    const score =
-      document.createElement("span");
-
-    score.textContent =
-      total + " wins";
-
-    row.appendChild(name);
-    row.appendChild(score);
-
-    list.appendChild(row);
-  });
-}
-
-
-/* TRENDING POSTS */
+/* -------------------------
+   TRENDING
+------------------------- */
 
 function getPosts() {
 
@@ -771,6 +442,7 @@ function getPosts() {
     return [];
 
   }
+
 }
 
 
@@ -780,16 +452,21 @@ function savePosts(posts) {
     "bigvic_posts",
     JSON.stringify(posts)
   );
+
 }
 
 
 function addPost() {
 
   const input =
-    document.getElementById("postText");
+    document.getElementById(
+      "postText"
+    );
 
   const message =
-    document.getElementById("postMessage");
+    document.getElementById(
+      "postMessage"
+    );
 
   const text =
     input.value.trim();
@@ -800,6 +477,7 @@ function addPost() {
       "Write something first.";
 
     return;
+
   }
 
   const posts =
@@ -826,13 +504,16 @@ function addPost() {
     "Posted successfully! 🎉";
 
   loadPosts();
+
 }
 
 
 function loadPosts() {
 
   const container =
-    document.getElementById("posts");
+    document.getElementById(
+      "posts"
+    );
 
   if (!container) {
     return;
@@ -844,9 +525,10 @@ function loadPosts() {
   if (posts.length === 0) {
 
     container.innerHTML =
-      "<p>No posts yet. Be the first to post! 🔥</p>";
+      "<div class='card'><p>No posts yet. Be the first to post! 🔥</p></div>";
 
     return;
+
   }
 
   container.innerHTML = "";
@@ -854,22 +536,29 @@ function loadPosts() {
   posts.forEach(function(post) {
 
     const box =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
     box.className =
       "post";
 
     const name =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
     name.className =
       "post-name";
 
     name.textContent =
-      "👤 " + post.username;
+      "👤 " +
+      post.username;
 
     const text =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
     text.className =
       "post-text";
@@ -878,7 +567,9 @@ function loadPosts() {
       post.content;
 
     const time =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
     time.className =
       "post-time";
@@ -893,111 +584,33 @@ function loadPosts() {
     container.appendChild(box);
 
   });
+
 }
 
 
-/* START APP */
+/* -------------------------
+   GUESS THE NUMBER
+------------------------- */
 
-async function startApp() {
+function guessNumber() {
 
-  updateScores();
-
-  loadPosts();
-
-  if (
-    !window.supabase ||
-    !window.SUPABASE_URL ||
-    !window.SUPABASE_ANON_KEY
-  ) {
-
+  const input =
     document.getElementById(
-      "accountStatus"
-    ).textContent =
-      "Supabase settings are missing.";
-
-    return;
-  }
-
-  supabaseClient =
-    window.supabase.createClient(
-      window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
+      "guessInput"
     );
 
-  const { data } =
-    await supabaseClient
-      .auth
-      .getSession();
-
-  currentUser =
-    data?.session?.user || null;
-
-  if (currentUser) {
-
+  const result =
     document.getElementById(
-      "accountStatus"
-    ).textContent =
-      "Logged in as " +
-      getUsername() +
-      " ✅";
+      "guessResult"
+    );
 
-    const { data: savedScore } =
-      await supabaseClient
-        .from("leaderboard")
-        .select(
-          "number_wins, rps_wins"
-        )
-        .eq(
-          "user_id",
-          currentUser.id
-        )
-        .maybeSingle();
+  const guess =
+    Number(input.value);
 
-    if (savedScore) {
+  if (
+    guess < 1 ||
+    guess > 10
+  ) {
 
-      numberWins =
-        Number(
-          savedScore.number_wins
-        );
-
-      rpsWins =
-        Number(
-          savedScore.rps_wins
-        );
-
-      localStorage.setItem(
-        "bigvic_number_wins",
-        numberWins
-      );
-
-      localStorage.setItem(
-        "bigvic_rps_wins",
-        rpsWins
-      );
-
-    } else {
-
-      await saveOnlineScore();
-
-    }
-
-  } else {
-
-    document.getElementById(
-      "accountStatus"
-    ).textContent =
-      "Not logged in.";
-
-  }
-
-  updateScores();
-
-  loadLeaderboard();
-}
-
-startApp();
-
-</script>
-
-</body>
-</html>
+    result.textContent =
+      "Choose
