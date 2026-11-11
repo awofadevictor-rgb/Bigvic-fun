@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>BigVic Fun</title>
 
 <style>
@@ -90,13 +89,18 @@ button.dark {
   background: #111827;
 }
 
-input {
+input,
+textarea {
   width: 100%;
-  max-width: 220px;
   padding: 12px;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 16px;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
 }
 
 .result {
@@ -116,6 +120,31 @@ input {
   justify-content: space-between;
   padding: 13px 5px;
   border-bottom: 1px solid #eee;
+}
+
+.post {
+  text-align: left;
+  background: #f8fafc;
+  padding: 15px;
+  margin-top: 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+}
+
+.post-name {
+  font-weight: bold;
+  margin-bottom: 7px;
+}
+
+.post-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.post-time {
+  color: #64748b;
+  font-size: 12px;
+  margin-top: 10px;
 }
 
 .small {
@@ -176,7 +205,7 @@ input {
     <h3>🔥 Trending</h3>
 
     <p>
-      Discover what's happening on BigVic Fun.
+      Share something with the BigVic Fun community.
     </p>
 
     <button class="action" onclick="showPage('trending')">
@@ -275,12 +304,33 @@ input {
     <h2>🔥 Trending</h2>
 
     <p>
-      Trending content is coming soon to BigVic Fun.
+      Share something with BigVic Fun.
     </p>
 
-    <button class="action" onclick="goHome()">
-      🏠 Back Home
+    <textarea
+      id="postText"
+      maxlength="500"
+      placeholder="What's on your mind?"
+    ></textarea>
+
+    <br>
+
+    <button class="action" onclick="addPost()">
+      📢 Post
     </button>
+
+    <p id="postMessage" class="small"></p>
+
+  </div>
+
+
+  <div class="card">
+
+    <h3>🔥 Latest Posts</h3>
+
+    <div id="posts">
+      Loading posts...
+    </div>
 
   </div>
 
@@ -333,12 +383,8 @@ input {
 </section>
 
 
-<!-- SUPABASE -->
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script src="/config.js"></script>
-
 
 <script>
 
@@ -348,7 +394,6 @@ let currentUser = null;
 let secretNumber =
   Math.floor(Math.random() * 10) + 1;
 
-
 let numberWins =
   Number(localStorage.getItem("bigvic_number_wins") || 0);
 
@@ -356,15 +401,11 @@ let rpsWins =
   Number(localStorage.getItem("bigvic_rps_wins") || 0);
 
 
-
 /* HOME */
 
 function goHome() {
-
   showPage("home");
-
 }
-
 
 
 /* PAGE SWITCHING */
@@ -374,46 +415,36 @@ function showPage(pageName) {
   document
     .querySelectorAll(".page")
     .forEach(function(page) {
-
       page.classList.remove("active");
-
     });
-
 
   const page =
     document.getElementById(pageName);
 
   if (page) {
-
     page.classList.add("active");
-
   }
-
 
   window.scrollTo(0, 0);
 
-
   if (pageName === "scores") {
-
     loadLeaderboard();
-
   }
 
+  if (pageName === "trending") {
+    loadPosts();
+  }
 }
-
 
 
 /* CHAT */
 
 function openChat() {
-
   window.location.href = "/chat/";
-
 }
 
 
-
-/* UPDATE LOCAL SCORE */
+/* SCORES */
 
 function updateScores() {
 
@@ -422,7 +453,6 @@ function updateScores() {
 
   rpsWins =
     Number(localStorage.getItem("bigvic_rps_wins") || 0);
-
 
   document.getElementById("numberWins")
     .textContent = numberWins;
@@ -433,9 +463,7 @@ function updateScores() {
   document.getElementById("totalWins")
     .textContent =
     numberWins + rpsWins;
-
 }
-
 
 
 /* GUESS GAME */
@@ -448,20 +476,15 @@ function checkGuess() {
   const result =
     document.getElementById("numberResult");
 
-
   if (
     !Number.isInteger(guess) ||
     guess < 1 ||
     guess > 10
   ) {
-
     result.textContent =
       "Enter a number from 1 to 10.";
-
     return;
-
   }
-
 
   if (guess === secretNumber) {
 
@@ -476,48 +499,38 @@ function checkGuess() {
     );
 
     updateScores();
-
     saveOnlineScore();
 
-  }
-
-  else if (guess < secretNumber) {
+  } else if (guess < secretNumber) {
 
     result.textContent =
       "⬆️ Try a higher number!";
 
-  }
-
-  else {
+  } else {
 
     result.textContent =
       "⬇️ Try a lower number!";
 
   }
-
 }
 
 
-
-/* NEW NUMBER GAME */
+/* NEW GAME */
 
 function newNumberGame() {
 
   secretNumber =
     Math.floor(Math.random() * 10) + 1;
 
-  document.getElementById("guess").value =
-    "";
+  document.getElementById("guess").value = "";
 
   document.getElementById("numberResult")
     .textContent =
     "New game! Good luck 🎯";
-
 }
 
 
-
-/* ROCK PAPER SCISSORS */
+/* RPS */
 
 function playRPS(playerChoice) {
 
@@ -529,19 +542,13 @@ function playRPS(playerChoice) {
       Math.floor(Math.random() * choices.length)
     ];
 
-
   let result = "";
 
-
-  if (
-    playerChoice === computerChoice
-  ) {
+  if (playerChoice === computerChoice) {
 
     result = "🤝 It's a tie!";
 
-  }
-
-  else if (
+  } else if (
 
     (playerChoice === "Rock" &&
       computerChoice === "Scissors")
@@ -569,14 +576,11 @@ function playRPS(playerChoice) {
 
     saveOnlineScore();
 
-  }
-
-  else {
+  } else {
 
     result = "😄 BigVic wins!";
 
   }
-
 
   document.getElementById("rpsResult")
     .textContent =
@@ -587,11 +591,8 @@ function playRPS(playerChoice) {
       " — " +
       result;
 
-
   updateScores();
-
 }
-
 
 
 /* USERNAME */
@@ -617,26 +618,20 @@ function getUsername() {
     "Player"
 
   );
-
 }
 
 
-
-/* SAVE ONLINE SCORE */
+/* SAVE SCORE */
 
 async function saveOnlineScore() {
 
   if (!supabaseClient ||
       !currentUser) {
-
     return;
-
   }
-
 
   const username =
     getUsername();
-
 
   const { error } =
     await supabaseClient
@@ -665,48 +660,28 @@ async function saveOnlineScore() {
 
       });
 
-
-  if (error) {
-
-    console.error(
-      "Score save error:",
-      error
-    );
-
-  }
-
-  else {
-
+  if (!error) {
     loadLeaderboard();
-
   }
-
 }
 
 
-
-/* LOAD LEADERBOARD */
+/* LOAD SCORES */
 
 async function loadLeaderboard() {
 
   updateScores();
 
-
   const list =
-    document.getElementById(
-      "leaderboard"
-    );
-
+    document.getElementById("leaderboard");
 
   if (!supabaseClient) {
 
     list.innerHTML =
-      '<p class="error">Supabase is not connected.</p>';
+      "<p>Supabase is not connected.</p>";
 
     return;
-
   }
-
 
   const { data, error } =
     await supabaseClient
@@ -715,29 +690,21 @@ async function loadLeaderboard() {
         "username, number_wins, rps_wins"
       );
 
-
   if (error) {
 
     list.innerHTML =
-      '<p class="error">' +
-      error.message +
-      '</p>';
+      "<p>" + error.message + "</p>";
 
     return;
-
   }
 
-
-  if (!data ||
-      data.length === 0) {
+  if (!data || data.length === 0) {
 
     list.innerHTML =
-      "<p>No scores yet. Play a game!</p>";
+      "<p>No scores yet.</p>";
 
     return;
-
   }
-
 
   data.sort(function(a, b) {
 
@@ -750,12 +717,9 @@ async function loadLeaderboard() {
       Number(b.rps_wins);
 
     return bTotal - aTotal;
-
   });
 
-
   list.innerHTML = "";
-
 
   data.forEach(function(player, index) {
 
@@ -763,13 +727,10 @@ async function loadLeaderboard() {
       Number(player.number_wins) +
       Number(player.rps_wins);
 
-
     const row =
       document.createElement("div");
 
-    row.className =
-      "player";
-
+    row.className = "player";
 
     const name =
       document.createElement("strong");
@@ -779,33 +740,169 @@ async function loadLeaderboard() {
       ". " +
       player.username;
 
-
     const score =
       document.createElement("span");
 
     score.textContent =
-      total +
-      " wins";
-
+      total + " wins";
 
     row.appendChild(name);
-
     row.appendChild(score);
 
     list.appendChild(row);
-
   });
-
 }
 
 
+/* TRENDING POSTS */
 
-/* START */
+function getPosts() {
+
+  try {
+
+    return JSON.parse(
+      localStorage.getItem(
+        "bigvic_posts"
+      ) || "[]"
+    );
+
+  } catch (error) {
+
+    return [];
+
+  }
+}
+
+
+function savePosts(posts) {
+
+  localStorage.setItem(
+    "bigvic_posts",
+    JSON.stringify(posts)
+  );
+}
+
+
+function addPost() {
+
+  const input =
+    document.getElementById("postText");
+
+  const message =
+    document.getElementById("postMessage");
+
+  const text =
+    input.value.trim();
+
+  if (!text) {
+
+    message.textContent =
+      "Write something first.";
+
+    return;
+  }
+
+  const posts =
+    getPosts();
+
+  posts.unshift({
+
+    username:
+      getUsername(),
+
+    content:
+      text,
+
+    time:
+      new Date().toLocaleString()
+
+  });
+
+  savePosts(posts);
+
+  input.value = "";
+
+  message.textContent =
+    "Posted successfully! 🎉";
+
+  loadPosts();
+}
+
+
+function loadPosts() {
+
+  const container =
+    document.getElementById("posts");
+
+  if (!container) {
+    return;
+  }
+
+  const posts =
+    getPosts();
+
+  if (posts.length === 0) {
+
+    container.innerHTML =
+      "<p>No posts yet. Be the first to post! 🔥</p>";
+
+    return;
+  }
+
+  container.innerHTML = "";
+
+  posts.forEach(function(post) {
+
+    const box =
+      document.createElement("div");
+
+    box.className =
+      "post";
+
+    const name =
+      document.createElement("div");
+
+    name.className =
+      "post-name";
+
+    name.textContent =
+      "👤 " + post.username;
+
+    const text =
+      document.createElement("div");
+
+    text.className =
+      "post-text";
+
+    text.textContent =
+      post.content;
+
+    const time =
+      document.createElement("div");
+
+    time.className =
+      "post-time";
+
+    time.textContent =
+      post.time;
+
+    box.appendChild(name);
+    box.appendChild(text);
+    box.appendChild(time);
+
+    container.appendChild(box);
+
+  });
+}
+
+
+/* START APP */
 
 async function startApp() {
 
   updateScores();
 
+  loadPosts();
 
   if (
     !window.supabase ||
@@ -819,29 +916,21 @@ async function startApp() {
       "Supabase settings are missing.";
 
     return;
-
   }
-
 
   supabaseClient =
     window.supabase.createClient(
-
       window.SUPABASE_URL,
-
       window.SUPABASE_ANON_KEY
-
     );
-
 
   const { data } =
     await supabaseClient
       .auth
       .getSession();
 
-
   currentUser =
     data?.session?.user || null;
-
 
   if (currentUser) {
 
@@ -851,7 +940,6 @@ async function startApp() {
       "Logged in as " +
       getUsername() +
       " ✅";
-
 
     const { data: savedScore } =
       await supabaseClient
@@ -865,7 +953,6 @@ async function startApp() {
         )
         .maybeSingle();
 
-
     if (savedScore) {
 
       numberWins =
@@ -878,7 +965,6 @@ async function startApp() {
           savedScore.rps_wins
         );
 
-
       localStorage.setItem(
         "bigvic_number_wins",
         numberWins
@@ -889,32 +975,25 @@ async function startApp() {
         rpsWins
       );
 
-    }
-
-    else {
+    } else {
 
       await saveOnlineScore();
 
     }
 
-  }
-
-  else {
+  } else {
 
     document.getElementById(
       "accountStatus"
     ).textContent =
-      "Not logged in. You can play, but log in to save shared scores.";
+      "Not logged in.";
 
   }
-
 
   updateScores();
 
   loadLeaderboard();
-
 }
-
 
 startApp();
 
