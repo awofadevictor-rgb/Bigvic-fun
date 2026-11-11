@@ -55,12 +55,11 @@ body{
   display:flex;
   align-items:center;
   gap:12px;
-  color:white;
 }
 
 .profile img{
-  width:70px;
-  height:70px;
+  width:65px;
+  height:65px;
   border-radius:50%;
   object-fit:cover;
 }
@@ -85,18 +84,109 @@ body{
 .header{
   background:#19233b;
   color:#ffca28;
-  padding:18px;
+  padding:15px;
   text-align:center;
   border-bottom:1px solid #303957;
 }
 
-.header h2{margin:0}
+.header h2{margin:0 0 8px}
+
+#logoutButton{
+  border:0;
+  background:#ffca28;
+  color:#101322;
+  padding:9px 14px;
+  border-radius:7px;
+  font-weight:bold;
+}
 
 .status{
   padding:10px;
   text-align:center;
   font-size:13px;
   color:#c0c8dc;
+}
+
+.chat-switch{
+  display:flex;
+  gap:8px;
+  padding:10px;
+  background:#19233b;
+}
+
+.chat-switch button{
+  flex:1;
+  padding:12px 7px;
+  border:1px solid #46506d;
+  border-radius:9px;
+  background:#101322;
+  color:#ffca28;
+  font-weight:bold;
+}
+
+.chat-switch button.active{
+  background:#ffca28;
+  color:#101322;
+  border-color:#ffca28;
+}
+
+#contactsPanel{
+  padding:12px;
+  background:#19233b;
+  border-bottom:1px solid #303957;
+}
+
+.panel-title{
+  color:#ffca28;
+  font-weight:bold;
+  margin-bottom:10px;
+}
+
+#contactsList{
+  display:flex;
+  gap:9px;
+  overflow-x:auto;
+  padding-bottom:5px;
+}
+
+.contact{
+  min-width:90px;
+  max-width:110px;
+  padding:9px 6px;
+  border:1px solid #46506d;
+  border-radius:10px;
+  background:#101322;
+  color:white;
+  text-align:center;
+  cursor:pointer;
+}
+
+.contact.active{
+  border:2px solid #ffca28;
+}
+
+.contact img{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  object-fit:cover;
+  display:block;
+  margin:0 auto 6px;
+}
+
+.contact span{
+  display:block;
+  font-size:12px;
+  overflow-wrap:anywhere;
+}
+
+#conversationTitle{
+  padding:11px;
+  text-align:center;
+  color:#ffca28;
+  background:#19233b;
+  font-weight:bold;
+  border-bottom:1px solid #303957;
 }
 
 #messages{
@@ -113,7 +203,7 @@ body{
 .name{
   font-size:12px;
   color:#aeb8d0;
-  margin-bottom:3px;
+  margin-bottom:4px;
 }
 
 .avatar{
@@ -162,6 +252,50 @@ body{
 
 .mine .chat-audio{margin-left:auto}
 
+.media-tools{
+  padding:12px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  border-top:1px solid #303957;
+  background:#19233b;
+}
+
+.media-tools button,
+.media-tools label{
+  border:0;
+  border-radius:9px;
+  padding:11px 13px;
+  background:#ffca28;
+  color:#101322;
+  font-weight:bold;
+  font-size:13px;
+  cursor:pointer;
+}
+
+.media-tools #stopRecordButton{
+  background:#dc2626;
+  color:white;
+}
+
+#mediaPreview{
+  padding:0 12px;
+  background:#101322;
+}
+
+#mediaPreview img,
+#mediaPreview video{
+  max-width:100%;
+  max-height:180px;
+  border-radius:10px;
+}
+
+#mediaStatus{
+  font-size:12px;
+  color:#ffca28;
+  padding:5px 12px;
+}
+
 .send-box{
   display:flex;
   padding:12px;
@@ -194,67 +328,7 @@ body{
   font-weight:bold;
 }
 
-#logoutButton{
-  margin-top:8px;
-  border:0;
-  background:#ffca28;
-  color:#101322;
-  padding:9px 14px;
-  border-radius:7px;
-  font-weight:bold;
-}
-
-.media-tools{
-  padding:12px;
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  border-top:1px solid #303957;
-  background:#19233b;
-}
-
-.media-tools button,
-.media-tools label{
-  border:0;
-  border-radius:9px;
-  padding:11px 13px;
-  background:#ffca28;
-  color:#101322;
-  font-weight:bold;
-  font-size:13px;
-  cursor:pointer;
-}
-
-.media-tools button:disabled{
-  opacity:.5;
-}
-
-.media-tools #stopRecordButton{
-  background:#dc2626;
-  color:white;
-}
-
-#mediaPreview{
-  padding:0 12px;
-  background:#101322;
-}
-
-#mediaPreview img,
-#mediaPreview video{
-  max-width:100%;
-  max-height:180px;
-  border-radius:10px;
-}
-
-#mediaStatus{
-  font-size:12px;
-  color:#ffca28;
-  padding:5px 12px;
-}
-
-#sendButton:disabled{opacity:.5}
-
-button:disabled{cursor:not-allowed}
+button:disabled{opacity:.5;cursor:not-allowed}
 
 @media(max-width:400px){
   .top-nav button{font-size:13px;padding:7px 5px}
@@ -288,7 +362,7 @@ button:disabled{cursor:not-allowed}
       </label>
 
       <input id="photoInput" type="file"
-        accept="image/*" style="display:none">
+        accept="image/*" hidden>
     </div>
   </div>
 
@@ -299,6 +373,27 @@ button:disabled{cursor:not-allowed}
 
   <div id="status" class="status">
     Starting BigVic Chat...
+  </div>
+
+  <div class="chat-switch">
+    <button id="publicButton" class="active">
+      🌍 Public Chat
+    </button>
+
+    <button id="privateButton">
+      🔒 Private Chat
+    </button>
+  </div>
+
+  <div id="contactsPanel" hidden>
+    <div class="panel-title">👥 Choose someone to chat with</div>
+    <div id="contactsList">
+      <span class="name">Loading contacts...</span>
+    </div>
+  </div>
+
+  <div id="conversationTitle">
+    🌍 Public Chat
   </div>
 
   <div id="messages"></div>
@@ -355,6 +450,12 @@ const profileAvatar=document.getElementById("profileAvatar");
 const profileName=document.getElementById("profileName");
 const photoInput=document.getElementById("photoInput");
 
+const publicButton=document.getElementById("publicButton");
+const privateButton=document.getElementById("privateButton");
+const contactsPanel=document.getElementById("contactsPanel");
+const contactsList=document.getElementById("contactsList");
+const conversationTitle=document.getElementById("conversationTitle");
+
 const chatMediaInput=document.getElementById("chatMediaInput");
 const sendMediaButton=document.getElementById("sendMediaButton");
 const startRecordButton=document.getElementById("startRecordButton");
@@ -364,37 +465,36 @@ const mediaStatus=document.getElementById("mediaStatus");
 
 let supabaseClient;
 let currentUser;
+let contacts=[];
+let activeContact=null;
+let chatMode="public";
+
 let selectedMedia=null;
 let mediaRecorder=null;
 let audioChunks=[];
 let recordingStream=null;
-let username=localStorage.getItem("bigvic_username")||"BigVic";
 let previewURL=null;
+let refreshTimer=null;
 
-function goHome(){
-  window.location.href="/";
+let username=localStorage.getItem("bigvic_username")||"BigVic";
+
+function goHome(){window.location.href="/";}
+function goChat(){window.location.href="/chat/";}
+function goGames(){window.location.href="/?page=games";}
+function goTrending(){window.location.href="/?page=trending";}
+function goScores(){window.location.href="/?page=scores";}
+
+function avatarURL(name){
+  return "https://ui-avatars.com/api/?name="+
+    encodeURIComponent(name||"BigVic")+
+    "&background=303957&color=ffca28";
 }
 
-function goChat(){
-  window.location.href="/chat/";
-}
+/* PROFILE NAME */
 
-function goGames(){
-  window.location.href="/?page=games";
-}
-
-function goTrending(){
-  window.location.href="/?page=trending";
-}
-
-function goScores(){
-  window.location.href="/?page=scores";
-}
-
-/* CHANGE NAME */
+profileName.textContent=username;
 
 const changeNameButton=document.createElement("button");
-
 changeNameButton.textContent="Change name";
 changeNameButton.style.marginTop="6px";
 changeNameButton.style.marginLeft="6px";
@@ -405,26 +505,39 @@ changeNameButton.style.background="#ffca28";
 changeNameButton.style.color="#101322";
 changeNameButton.style.fontSize="12px";
 
-changeNameButton.onclick=function(){
+changeNameButton.onclick=async function(){
   const newName=prompt("Enter your BigVic name:",username);
 
-  if(newName&&newName.trim()){
-    username=newName.trim();
-    localStorage.setItem("bigvic_username",username);
-    profileName.textContent=username;
+  if(!newName||!newName.trim())return;
+
+  username=newName.trim();
+  localStorage.setItem("bigvic_username",username);
+  profileName.textContent=username;
+
+  if(currentUser){
+    const result=await supabaseClient
+      .from("profiles")
+      .upsert({
+        id:currentUser.id,
+        username:username
+      });
+
+    if(result.error){
+      console.error(result.error);
+      alert("Name saved on this device, but profile update failed.");
+    }else{
+      await loadContacts();
+    }
   }
 };
 
 profileName.parentElement.appendChild(changeNameButton);
-profileName.textContent=username;
 
 /* SAVED PROFILE PHOTO */
 
 const savedAvatar=localStorage.getItem("bigvic_avatar");
 
-if(savedAvatar){
-  profileAvatar.src=savedAvatar;
-}
+if(savedAvatar)profileAvatar.src=savedAvatar;
 
 /* SUPABASE CONNECTION */
 
@@ -443,7 +556,7 @@ if(
   startChat();
 }
 
-/* CHECK LOGIN */
+/* START CHAT */
 
 async function startChat(){
   try{
@@ -460,23 +573,177 @@ async function startChat(){
       return;
     }
 
+    await loadContacts();
+    await loadMessages();
+
     statusBox.textContent="Connected to BigVic Chat";
 
-    await loadMessages();
+    if(refreshTimer)clearInterval(refreshTimer);
+
+    refreshTimer=setInterval(async function(){
+      await loadMessages();
+    },5000);
 
   }catch(error){
     console.error(error);
-    statusBox.textContent="Connection error. Please refresh.";
+    statusBox.textContent="Connection error: "+error.message;
   }
 }
 
-/* LOAD MESSAGES */
+/* LOAD REGISTERED USERS */
+
+async function loadContacts(){
+  contactsList.innerHTML="";
+
+  const result=await supabaseClient
+    .from("profiles")
+    .select("id,username,avatar")
+    .order("username",{ascending:true});
+
+  if(result.error){
+    console.error(result.error);
+
+    contactsList.textContent=
+      "Could not load contacts. Profile viewing permission may need updating.";
+
+    return;
+  }
+
+  contacts=(result.data||[]).filter(function(person){
+    return person.id!==currentUser.id;
+  });
+
+  if(contacts.length===0){
+    contactsList.textContent="No other registered users yet.";
+    return;
+  }
+
+  contacts.forEach(function(person){
+    const button=document.createElement("button");
+    button.className="contact";
+    button.dataset.id=person.id;
+
+    const image=document.createElement("img");
+    image.src=person.avatar||avatarURL(person.username);
+    image.alt="";
+
+    const name=document.createElement("span");
+    name.textContent=person.username||"BigVic User";
+
+    button.append(image,name);
+
+    button.addEventListener("click",function(){
+      selectContact(person);
+    });
+
+    contactsList.appendChild(button);
+  });
+
+  updateContactSelection();
+}
+
+/* SELECT PRIVATE CONTACT */
+
+function selectContact(person){
+  activeContact=person;
+  chatMode="private";
+
+  publicButton.classList.remove("active");
+  privateButton.classList.add("active");
+
+  contactsPanel.hidden=false;
+
+  conversationTitle.textContent=
+    "🔒 Private chat with "+(person.username||"BigVic User");
+
+  messageInput.placeholder=
+    "Message "+(person.username||"this user")+" privately...";
+
+  updateContactSelection();
+  loadMessages();
+}
+
+function updateContactSelection(){
+  document.querySelectorAll(".contact").forEach(function(button){
+    button.classList.toggle(
+      "active",
+      !!activeContact&&button.dataset.id===activeContact.id
+    );
+  });
+}
+
+/* SWITCH TO PUBLIC CHAT */
+
+publicButton.addEventListener("click",function(){
+  chatMode="public";
+  activeContact=null;
+
+  publicButton.classList.add("active");
+  privateButton.classList.remove("active");
+
+  contactsPanel.hidden=true;
+  conversationTitle.textContent="🌍 Public Chat";
+  messageInput.placeholder="Type a public message...";
+
+  updateContactSelection();
+  loadMessages();
+});
+
+/* OPEN PRIVATE CHAT CONTACTS */
+
+privateButton.addEventListener("click",async function(){
+  chatMode="private";
+
+  publicButton.classList.remove("active");
+  privateButton.classList.add("active");
+
+  contactsPanel.hidden=false;
+
+  conversationTitle.textContent=activeContact
+    ?"🔒 Private chat with "+activeContact.username
+    :"🔒 Choose a contact";
+
+  if(!activeContact){
+    messagesBox.innerHTML="";
+    const info=document.createElement("p");
+    info.style.textAlign="center";
+    info.style.color="#aeb8d0";
+    info.textContent="Choose someone above to start a private conversation.";
+    messagesBox.appendChild(info);
+  }else{
+    await loadMessages();
+  }
+
+  updateContactSelection();
+});
+
+/* LOAD CURRENT CONVERSATION */
 
 async function loadMessages(){
-  const result=await supabaseClient
+  if(!currentUser)return;
+
+  let query=supabaseClient
     .from("messages")
-    .select("*")
-    .order("created_at",{ascending:true});
+    .select("*");
+
+  if(chatMode==="public"){
+    query=query.eq("receiver","public");
+  }else{
+    if(!activeContact)return;
+
+    const otherId=activeContact.id;
+
+    query=query.or(
+      "and(sender.eq."+currentUser.id+
+      ",receiver.eq."+otherId+
+      "),and(sender.eq."+otherId+
+      ",receiver.eq."+currentUser.id+")"
+    );
+  }
+
+  const result=await query
+    .order("created_at",{ascending:true})
+    .limit(200);
 
   if(result.error){
     console.error(result.error);
@@ -490,14 +757,16 @@ async function loadMessages(){
     const empty=document.createElement("p");
     empty.style.textAlign="center";
     empty.style.color="#aeb8d0";
-    empty.textContent="No messages yet. Say hello! 👋";
+    empty.textContent=chatMode==="public"
+      ?"No public messages yet. Say hello! 👋"
+      :"No private messages yet. Start the conversation! 💛";
+
     messagesBox.appendChild(empty);
   }else{
     result.data.forEach(showMessage);
   }
 
   statusBox.textContent="BigVic Fun Chat";
-
   messagesBox.scrollTop=messagesBox.scrollHeight;
 }
 
@@ -509,17 +778,24 @@ function showMessage(item){
   const wrapper=document.createElement("div");
   wrapper.className=mine?"message mine":"message";
 
+  const person=contacts.find(function(contact){
+    return contact.id===item.sender;
+  });
+
+  const displayName=mine
+    ?username
+    :(person?.username||"BigVic User");
+
   const name=document.createElement("div");
   name.className="name";
-  name.textContent=mine?username:"BigVic User";
+  name.textContent=displayName;
 
   const avatar=document.createElement("img");
   avatar.className="avatar";
 
   avatar.src=mine
-    ?(localStorage.getItem("bigvic_avatar")||
-      "https://ui-avatars.com/api/?name=BigVic")
-    :"https://ui-avatars.com/api/?name=BigVic";
+    ?(localStorage.getItem("bigvic_avatar")||avatarURL(username))
+    :(person?.avatar||avatarURL(displayName));
 
   wrapper.append(name,avatar);
 
@@ -564,9 +840,9 @@ function showMessage(item){
   messagesBox.appendChild(wrapper);
 }
 
-/* UPLOAD TO SUPABASE STORAGE */
+/* UPLOAD CHAT MEDIA */
 
-async function uploadChatMedia(file,mediaType){
+async function uploadChatMedia(file){
   const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
 
   const filePath=
@@ -585,20 +861,21 @@ async function uploadChatMedia(file,mediaType){
     .from("bigvic-media")
     .getPublicUrl(filePath);
 
-  return{
-    url:publicResult.data.publicUrl,
-    type:mediaType
-  };
+  return publicResult.data.publicUrl;
 }
 
-/* SAVE CHAT MESSAGE */
+/* SAVE PUBLIC OR PRIVATE MESSAGE */
 
 async function saveChatMessage(text,media){
+  const receiver=chatMode==="private"
+    ?activeContact.id
+    :"public";
+
   const result=await supabaseClient
     .from("messages")
     .insert({
       sender:currentUser.id,
-      receiver:"public",
+      receiver:receiver,
       message:text||"",
       media_url:media?media.url:null,
       media_type:media?media.type:null
@@ -607,7 +884,7 @@ async function saveChatMessage(text,media){
   if(result.error)throw result.error;
 }
 
-/* SEND TEXT MESSAGE */
+/* SEND TEXT */
 
 async function sendMessage(){
   const text=messageInput.value.trim();
@@ -619,6 +896,11 @@ async function sendMessage(){
     return;
   }
 
+  if(chatMode==="private"&&!activeContact){
+    alert("Choose a contact first.");
+    return;
+  }
+
   sendButton.disabled=true;
   sendButton.textContent="Sending...";
 
@@ -626,7 +908,6 @@ async function sendMessage(){
     await saveChatMessage(text,null);
 
     messageInput.value="";
-
     await loadMessages();
 
   }catch(error){
@@ -704,6 +985,11 @@ chatMediaInput.addEventListener("change",function(event){
 sendMediaButton.addEventListener("click",async function(){
   if(!selectedMedia||!currentUser)return;
 
+  if(chatMode==="private"&&!activeContact){
+    alert("Choose a contact first.");
+    return;
+  }
+
   const file=selectedMedia;
 
   sendMediaButton.disabled=true;
@@ -713,7 +999,8 @@ sendMediaButton.addEventListener("click",async function(){
   try{
     const type=file.type.startsWith("image/")?"image":"video";
 
-    const media=await uploadChatMedia(file,type);
+    const url=await uploadChatMedia(file);
+    const media={url:url,type:type};
 
     const text=messageInput.value.trim();
 
@@ -747,6 +1034,11 @@ sendMediaButton.addEventListener("click",async function(){
 
 startRecordButton.addEventListener("click",async function(){
   if(!currentUser)return;
+
+  if(chatMode==="private"&&!activeContact){
+    alert("Choose a contact first.");
+    return;
+  }
 
   if(
     !navigator.mediaDevices||
@@ -789,10 +1081,12 @@ startRecordButton.addEventListener("click",async function(){
 
     mediaRecorder.onstop=async function(){
       const mime=mediaRecorder.mimeType||"audio/webm";
-
       const blob=new Blob(audioChunks,{type:mime});
 
-      recordingStream.getTracks().forEach(track=>track.stop());
+      recordingStream.getTracks().forEach(function(track){
+        track.stop();
+      });
+
       recordingStream=null;
 
       if(blob.size>50*1024*1024){
@@ -811,14 +1105,14 @@ startRecordButton.addEventListener("click",async function(){
       mediaStatus.textContent="Uploading voice note...";
 
       try{
-        const media=await uploadChatMedia(file,"audio");
+        const url=await uploadChatMedia(file);
 
-        await saveChatMessage(messageInput.value.trim(),media);
-
-        messageInput.value="";
+        await saveChatMessage("",{
+          url:url,
+          type:"audio"
+        });
 
         mediaStatus.textContent="Voice note sent successfully! 🎤";
-
         await loadMessages();
 
       }catch(error){
@@ -841,7 +1135,7 @@ startRecordButton.addEventListener("click",async function(){
   }
 });
 
-/* STOP AND SEND VOICE NOTE */
+/* STOP RECORDING */
 
 stopRecordButton.addEventListener("click",function(){
   if(mediaRecorder&&mediaRecorder.state!=="inactive"){
@@ -896,7 +1190,7 @@ logoutButton.addEventListener("click",async function(){
     logoutButton.disabled=false;
   }
 });
-</script>
 
+</script>
 </body>
 </html>
