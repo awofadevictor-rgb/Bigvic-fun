@@ -2,14 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BigVic Fun</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
-
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -20,39 +16,31 @@ body {
 header {
   background: #2563eb;
   color: white;
-  padding: 22px 15px;
   text-align: center;
+  padding: 25px 15px;
 }
 
 header h1 {
   margin: 0;
 }
 
-header p {
-  margin: 8px 0 0;
-}
-
 nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 12px;
   background: white;
+  padding: 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
   box-shadow: 0 2px 8px #00000015;
 }
 
 nav button {
   flex: 1;
   min-width: 70px;
-  padding: 11px 8px;
+  padding: 12px 8px;
   border: 0;
   border-radius: 8px;
   background: #e5e7eb;
   font-weight: bold;
-}
-
-nav button:hover {
-  background: #dbeafe;
 }
 
 main {
@@ -72,13 +60,9 @@ main {
 .card {
   background: white;
   padding: 20px;
-  margin-bottom: 16px;
+  margin-bottom: 15px;
   border-radius: 14px;
   box-shadow: 0 2px 10px #00000012;
-}
-
-h2 {
-  margin-top: 0;
 }
 
 button.action {
@@ -109,25 +93,17 @@ textarea {
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 16px;
+  box-sizing: border-box;
 }
 
 textarea {
   min-height: 100px;
-  resize: vertical;
-}
-
-.number {
-  font-size: 42px;
-  font-weight: bold;
-  text-align: center;
-  margin: 15px 0;
 }
 
 .result {
   text-align: center;
-  font-size: 18px;
-  font-weight: bold;
   margin-top: 15px;
+  font-weight: bold;
 }
 
 .post {
@@ -144,473 +120,10 @@ textarea {
 
 .post-text {
   margin-top: 10px;
-  font-size: 16px;
   white-space: pre-wrap;
 }
 
 .post-time {
-  margin-top: 10px;
-  color: #6b7280;
-  font-size: 12px;
-}
-
-.score-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 12px;
   margin-top: 8px;
-  background: #f9fafb;
-  border-radius: 8px;
-}
-
-.message {
-  text-align: center;
-  margin-top: 12px;
-}
-
-footer {
-  text-align: center;
   color: #6b7280;
-  padding: 30px 15px;
-}
-</style>
-</head>
-
-<body>
-
-<header>
-  <h1>BigVic Fun 🎉</h1>
-  <p>Chat • Games • Trending • Scores</p>
-</header>
-
-<nav>
-  <button onclick="goHome()">🏠 Home</button>
-  <button onclick="openChat()">💬 Chat</button>
-  <button onclick="showPage('games')">🎮 Games</button>
-  <button onclick="showPage('trending')">🔥 Trending</button>
-  <button onclick="showPage('scores')">🏆 Scores</button>
-</nav>
-
-<main>
-
-<!-- HOME -->
-<section id="home" class="page active">
-
-  <div class="card">
-    <h2>Welcome to BigVic Fun 👋</h2>
-    <p>Have fun, play games, chat and share what's trending.</p>
-
-    <button class="action" onclick="openChat()">
-      💬 Open Chat
-    </button>
-
-    <button class="action green" onclick="showPage('games')">
-      🎮 Play Games
-    </button>
-
-    <button class="action dark" onclick="showPage('trending')">
-      🔥 View Trending
-    </button>
-  </div>
-
-  <div class="card">
-    <h2>Quick Menu</h2>
-    <p>💬 Chat with people</p>
-    <p>🎮 Play fun games</p>
-    <p>🔥 Share trending posts</p>
-    <p>🏆 Check the leaderboard</p>
-  </div>
-
-</section>
-
-
-<!-- GAMES -->
-<section id="games" class="page">
-
-  <div class="card">
-    <h2>🎮 Games</h2>
-    <p>Choose a game below.</p>
-  </div>
-
-  <div class="card">
-    <h2>🔢 Guess the Number</h2>
-    <p>Guess a number between 1 and 10.</p>
-
-    <input
-      id="guessInput"
-      type="number"
-      min="1"
-      max="10"
-      placeholder="Enter your guess">
-
-    <button
-      class="action"
-      onclick="guessNumber()">
-      Guess
-    </button>
-
-    <div id="guessResult" class="result"></div>
-  </div>
-
-
-  <div class="card">
-    <h2>✊ Rock Paper Scissors</h2>
-
-    <button
-      class="action"
-      onclick="playRPS('Rock')">
-      ✊ Rock
-    </button>
-
-    <button
-      class="action"
-      onclick="playRPS('Paper')">
-      ✋ Paper
-    </button>
-
-    <button
-      class="action"
-      onclick="playRPS('Scissors')">
-      ✌️ Scissors
-    </button>
-
-    <div id="rpsResult" class="result"></div>
-  </div>
-
-</section>
-
-
-<!-- TRENDING -->
-<section id="trending" class="page">
-
-  <div class="card">
-    <h2>🔥 Trending</h2>
-
-    <textarea
-      id="postText"
-      placeholder="What's on your mind?"></textarea>
-
-    <button
-      class="action"
-      onclick="addPost()">
-      Post 🔥
-    </button>
-
-    <div
-      id="postMessage"
-      class="message">
-    </div>
-  </div>
-
-  <div id="posts"></div>
-
-</section>
-
-
-<!-- SCORES -->
-<section id="scores" class="page">
-
-  <div class="card">
-    <h2>🏆 Leaderboard</h2>
-    <p>Top players on BigVic Fun.</p>
-
-    <div id="leaderboard">
-      <p>Loading scores...</p>
-    </div>
-  </div>
-
-</section>
-
-</main>
-
-<footer>
-  BigVic Fun © 2026
-</footer>
-
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/config.js"></script>
-
-<script>
-
-let client = null;
-
-
-/* -------------------------
-   SUPABASE
-------------------------- */
-
-function setupSupabase() {
-
-  if (
-    !window.supabase ||
-    !window.SUPABASE_URL ||
-    !window.SUPABASE_ANON_KEY
-  ) {
-    return false;
-  }
-
-  if (!client) {
-
-    client =
-      window.supabase.createClient(
-        window.SUPABASE_URL,
-        window.SUPABASE_ANON_KEY
-      );
-  }
-
-  return true;
-}
-
-
-/* -------------------------
-   NAVIGATION
-------------------------- */
-
-function showPage(pageName) {
-
-  const pages =
-    document.querySelectorAll(".page");
-
-  pages.forEach(function(page) {
-    page.classList.remove("active");
-  });
-
-  const selected =
-    document.getElementById(pageName);
-
-  if (selected) {
-    selected.classList.add("active");
-  }
-
-  window.scrollTo(0, 0);
-
-  if (pageName === "trending") {
-    loadPosts();
-  }
-
-  if (pageName === "scores") {
-    loadLeaderboard();
-  }
-}
-
-
-function goHome() {
-
-  showPage("home");
-
-}
-
-
-function openChat() {
-
-  window.location.href = "/chat/";
-
-}
-
-
-/* -------------------------
-   USERNAME
-------------------------- */
-
-function getUsername() {
-
-  return (
-    localStorage.getItem("bigvic_username")
-    || "Player"
-  );
-
-}
-
-
-/* -------------------------
-   TRENDING
-------------------------- */
-
-function getPosts() {
-
-  try {
-
-    return JSON.parse(
-      localStorage.getItem(
-        "bigvic_posts"
-      ) || "[]"
-    );
-
-  } catch (error) {
-
-    return [];
-
-  }
-
-}
-
-
-function savePosts(posts) {
-
-  localStorage.setItem(
-    "bigvic_posts",
-    JSON.stringify(posts)
-  );
-
-}
-
-
-function addPost() {
-
-  const input =
-    document.getElementById(
-      "postText"
-    );
-
-  const message =
-    document.getElementById(
-      "postMessage"
-    );
-
-  const text =
-    input.value.trim();
-
-  if (!text) {
-
-    message.textContent =
-      "Write something first.";
-
-    return;
-
-  }
-
-  const posts =
-    getPosts();
-
-  posts.unshift({
-
-    username:
-      getUsername(),
-
-    content:
-      text,
-
-    time:
-      new Date().toLocaleString()
-
-  });
-
-  savePosts(posts);
-
-  input.value = "";
-
-  message.textContent =
-    "Posted successfully! 🎉";
-
-  loadPosts();
-
-}
-
-
-function loadPosts() {
-
-  const container =
-    document.getElementById(
-      "posts"
-    );
-
-  if (!container) {
-    return;
-  }
-
-  const posts =
-    getPosts();
-
-  if (posts.length === 0) {
-
-    container.innerHTML =
-      "<div class='card'><p>No posts yet. Be the first to post! 🔥</p></div>";
-
-    return;
-
-  }
-
-  container.innerHTML = "";
-
-  posts.forEach(function(post) {
-
-    const box =
-      document.createElement(
-        "div"
-      );
-
-    box.className =
-      "post";
-
-    const name =
-      document.createElement(
-        "div"
-      );
-
-    name.className =
-      "post-name";
-
-    name.textContent =
-      "👤 " +
-      post.username;
-
-    const text =
-      document.createElement(
-        "div"
-      );
-
-    text.className =
-      "post-text";
-
-    text.textContent =
-      post.content;
-
-    const time =
-      document.createElement(
-        "div"
-      );
-
-    time.className =
-      "post-time";
-
-    time.textContent =
-      post.time;
-
-    box.appendChild(name);
-    box.appendChild(text);
-    box.appendChild(time);
-
-    container.appendChild(box);
-
-  });
-
-}
-
-
-/* -------------------------
-   GUESS THE NUMBER
-------------------------- */
-
-function guessNumber() {
-
-  const input =
-    document.getElementById(
-      "guessInput"
-    );
-
-  const result =
-    document.getElementById(
-      "guessResult"
-    );
-
-  const guess =
-    Number(input.value);
-
-  if (
-    guess < 1 ||
-    guess > 10
-  ) {
-
-    result.textContent =
-      "Choose
+  font-size: 12
