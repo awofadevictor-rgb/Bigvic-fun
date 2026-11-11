@@ -1,172 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BigVic Fun</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BigVic Fun</title>
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f2f4f7;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-.header {
-  background: #111827;
-  color: white;
-  text-align: center;
-  padding: 25px 15px;
-}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f4f7;
+      color: #222;
+    }
 
-.header h1 {
-  margin: 0;
-}
+    .header {
+      background: #111827;
+      color: white;
+      text-align: center;
+      padding: 25px 15px;
+    }
 
-.header p {
-  margin: 8px 0 0;
-}
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
 
-.container {
-  max-width: 500px;
-  margin: 30px auto;
-  padding: 15px;
-}
+    .header p {
+      margin: 8px 0 0;
+    }
 
-.card {
-  background: white;
-  padding: 25px;
-  border-radius: 15px;
-  margin-bottom: 15px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-  text-align: center;
-}
+    .container {
+      max-width: 520px;
+      margin: 25px auto;
+      padding: 15px;
+    }
 
-button {
-  display: block;
-  width: 100%;
-  padding: 15px;
-  margin: 10px 0;
-  border: 0;
-  border-radius: 10px;
-  font-size: 16px;
-  cursor: pointer;
-}
+    .card {
+      background: white;
+      padding: 24px;
+      border-radius: 15px;
+      margin-bottom: 18px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
 
-.chat {
-  background: #2563eb;
-  color: white;
-}
+    .center {
+      text-align: center;
+    }
 
-.games {
-  background: #16a34a;
-  color: white;
-}
+    button {
+      width: 100%;
+      padding: 15px;
+      margin: 9px 0;
+      border: 0;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
 
-.game {
-  background: #0ea5e9;
-  color: white;
-}
+    .chat {
+      background: #2563eb;
+      color: white;
+    }
 
-.back {
-  background: #6b7280;
-  color: white;
-}
+    .games {
+      background: #16a34a;
+      color: white;
+    }
 
-#gamesPage {
-  display: none;
-}
+    .trending {
+      background: #f59e0b;
+      color: white;
+    }
 
-input {
-  width: 100%;
-  padding: 13px;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  font-size: 16px;
-}
+    .scores {
+      background: #7c3aed;
+      color: white;
+    }
 
-.result {
-  margin-top: 15px;
-  font-weight: bold;
-  font-size: 18px;
-}
-</style>
+    .game {
+      background: #0ea5e9;
+      color: white;
+    }
+
+    .back {
+      background: #6b7280;
+      color: white;
+    }
+
+    .page {
+      display: none;
+    }
+
+    #homePage {
+      display: block;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 16px;
+      margin-top: 8px;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .result {
+      text-align: center;
+      font-weight: bold;
+      font-size: 17px;
+      margin-top: 15px;
+    }
+
+    .post {
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 12px;
+      background: #fafafa;
+    }
+
+    .post-name {
+      font-weight: bold;
+    }
+
+    .post-text {
+      margin-top: 8px;
+      white-space: pre-wrap;
+    }
+
+    .post-time {
+      margin-top: 8px;
+      color: #777;
+      font-size: 12px;
+    }
+
+    .score-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    footer {
+      text-align: center;
+      color: #777;
+      padding: 25px 10px;
+    }
+  </style>
 </head>
 
 <body>
 
 <div class="header">
-  <h1>BigVic Fun 🎉</h1>
-  <p>Chat • Games • Fun</p>
-</div>
-
-<div class="container">
-
-  <!-- HOME -->
-  <div id="homePage">
-
-    <div class="card">
-      <h2>Welcome to BigVic Fun 👋</h2>
-
-      <p>
-        Have fun, chat and play games.
-      </p>
-
-      <button
-        class="chat"
-        onclick="window.location.href='/chat/'">
-        💬 Chat
-      </button>
-
-      <button
-        class="games"
-        onclick="showGames()">
-        🎮 Games
-      </button>
-    </div>
-
-  </div>
-
-
-  <!-- GAMES -->
-  <div id="gamesPage">
-
-    <div class="card">
-
-      <h2>🎮 Games</h2>
-
-      <p>Choose a game to play.</p>
-
-      <button
-        class="game"
-        onclick="guessNumberGame()">
-        🔢 Guess the Number
-      </button>
-
-      <button
-        class="game"
-        onclick="rpsGame()">
-        ✊ Rock Paper Scissors
-      </button>
-
-      <button
-        class="back"
-        onclick="goHome()">
-        🏠 Back Home
-      </button>
-
-    </div>
-
-
-    <!-- NUMBER GAME -->
-    <div
-      id="numberGame"
-      class="card"
-      style="display:none;">
-
-      <h2>🔢 Guess the Number</h2>
-
-      <p>
-        Guess a number between 1 and 10.
-      </
+  <h1>Big
