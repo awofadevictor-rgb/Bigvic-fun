@@ -1,88 +1,110 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BigVic Fun</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BigVic Fun</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f2f4f7;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f2f4f7;
+}
 
-    .header {
-      background: #111827;
-      color: white;
-      text-align: center;
-      padding: 25px 15px;
-    }
+.header {
+  background: #111827;
+  color: white;
+  text-align: center;
+  padding: 25px 15px;
+}
 
-    .header h1 {
-      margin: 0;
-    }
+.header h1 {
+  margin: 0;
+}
 
-    .header p {
-      margin: 8px 0 0;
-    }
+.header p {
+  margin: 8px 0 0;
+}
 
-    .container {
-      max-width: 500px;
-      margin: 30px auto;
-      padding: 15px;
-    }
+.container {
+  max-width: 500px;
+  margin: 30px auto;
+  padding: 15px;
+}
 
-    .card {
-      background: white;
-      padding: 25px;
-      border-radius: 15px;
-      margin-bottom: 15px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-      text-align: center;
-    }
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  text-align: center;
+}
 
-    button {
-      display: block;
-      width: 100%;
-      padding: 15px;
-      margin: 10px 0;
-      border: 0;
-      border-radius: 10px;
-      font-size: 16px;
-      cursor: pointer;
-    }
+button {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  margin: 10px 0;
+  border: 0;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
 
-    .chat {
-      background: #2563eb;
-      color: white;
-    }
+.chat {
+  background: #2563eb;
+  color: white;
+}
 
-    .games {
-      background: #16a34a;
-      color: white;
-    }
+.games {
+  background: #16a34a;
+  color: white;
+}
 
-    .trending {
-      background: #f59e0b;
-      color: white;
-    }
+.game {
+  background: #0ea5e9;
+  color: white;
+}
 
-    .scores {
-      background: #7c3aed;
-      color: white;
-    }
-  </style>
+.back {
+  background: #6b7280;
+  color: white;
+}
+
+#gamesPage {
+  display: none;
+}
+
+input {
+  width: 100%;
+  padding: 13px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+.result {
+  margin-top: 15px;
+  font-weight: bold;
+  font-size: 18px;
+}
+</style>
 </head>
 
 <body>
 
-  <div class="header">
-    <h1>BigVic Fun 🎉</h1>
-    <p>Chat • Games • Trending • Scores</p>
-  </div>
+<div class="header">
+  <h1>BigVic Fun 🎉</h1>
+  <p>Chat • Games • Fun</p>
+</div>
 
-  <div class="container">
+<div class="container">
+
+  <!-- HOME -->
+  <div id="homePage">
 
     <div class="card">
       <h2>Welcome to BigVic Fun 👋</h2>
@@ -99,24 +121,52 @@
 
       <button
         class="games"
-        onclick="alert('Games coming soon!')">
+        onclick="showGames()">
         🎮 Games
-      </button>
-
-      <button
-        class="trending"
-        onclick="alert('Trending coming soon!')">
-        🔥 Trending
-      </button>
-
-      <button
-        class="scores"
-        onclick="alert('Scores coming soon!')">
-        🏆 Scores
       </button>
     </div>
 
   </div>
 
-</body>
-</html>
+
+  <!-- GAMES -->
+  <div id="gamesPage">
+
+    <div class="card">
+
+      <h2>🎮 Games</h2>
+
+      <p>Choose a game to play.</p>
+
+      <button
+        class="game"
+        onclick="guessNumberGame()">
+        🔢 Guess the Number
+      </button>
+
+      <button
+        class="game"
+        onclick="rpsGame()">
+        ✊ Rock Paper Scissors
+      </button>
+
+      <button
+        class="back"
+        onclick="goHome()">
+        🏠 Back Home
+      </button>
+
+    </div>
+
+
+    <!-- NUMBER GAME -->
+    <div
+      id="numberGame"
+      class="card"
+      style="display:none;">
+
+      <h2>🔢 Guess the Number</h2>
+
+      <p>
+        Guess a number between 1 and 10.
+      </
