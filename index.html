@@ -1,275 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BigVic Fun</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BigVic Fun</title>
 
-<style>
-* {
-  box-sizing: border-box;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f3f4f6;
-  color: #111827;
-}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #222;
+    }
 
-header {
-  background: #2563eb;
-  color: white;
-  text-align: center;
-  padding: 28px 15px;
-}
+    header {
+      background: #111827;
+      color: white;
+      padding: 18px;
+      text-align: center;
+    }
 
-header h1 {
-  margin: 0;
-  font-size: 30px;
-}
+    header h1 {
+      margin: 0;
+      font-size: 26px;
+    }
 
-header p {
-  margin: 8px 0 0;
-}
+    header p {
+      margin: 6px 0 0;
+      opacity: 0.8;
+    }
 
-nav {
-  background: white;
-  padding: 10px;
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-}
+    .nav {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 15px;
+      background: white;
+      border-bottom: 1px solid #ddd;
+    }
 
-nav button {
-  border: 0;
-  border-radius: 8px;
-  padding: 12px 15px;
-  background: #e5e7eb;
-  font-weight: bold;
-  white-space: nowrap;
-}
+    .nav button {
+      border: 0;
+      background: #e5e7eb;
+      padding: 11px 16px;
+      border-radius: 10px;
+      font-size: 15px;
+      cursor: pointer;
+    }
 
-main {
-  max-width: 700px;
-  margin: auto;
-  padding: 20px;
-}
+    .nav button:hover {
+      background: #d1d5db;
+    }
 
-.page {
-  display: none;
-}
-
-.page.active {
-  display: block;
-}
-
-.card {
-  background: white;
-  padding: 20px;
-  margin-bottom: 15px;
-  border-radius: 14px;
-  box-shadow: 0 2px 10px #00000012;
-}
-
-.action {
-  width: 100%;
-  border: 0;
-  border-radius: 8px;
-  padding: 14px;
-  margin-top: 10px;
-  background: #2563eb;
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.green {
-  background: #16a34a;
-}
-
-.dark {
-  background: #111827;
-}
-
-input,
-textarea {
-  width: 100%;
-  padding: 13px;
-  margin-top: 10px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 16px;
-}
-
-textarea {
-  min-height: 100px;
-  resize: vertical;
-}
-
-.result {
-  text-align: center;
-  margin-top: 15px;
-  font-weight: bold;
-}
-
-.post {
-  background: white;
-  padding: 15px;
-  margin-top: 12px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px #00000012;
-}
-
-.post-name {
-  font-weight: bold;
-}
-
-.post-text {
-  margin-top: 10px;
-  white-space: pre-wrap;
-}
-
-.post-time {
-  margin-top: 8px;
-  color: #64748b;
-  font-size: 12px;
-}
-
-.score {
-  background: white;
-  padding: 14px;
-  margin-top: 8px;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-}
-
-footer {
-  text-align: center;
-  padding: 30px 15px;
-  color: #64748b;
-}
-</style>
-</head>
-
-<body>
-
-<header>
-  <h1>BigVic Fun 🎉</h1>
-  <p>Chat • Games • Trending • Scores</p>
-</header>
-
-<nav>
-  <button onclick="goHome()">🏠 Home</button>
-
-  <button onclick="openChat()">💬 Chat</button>
-
-  <button onclick="showPage('games')">
-    🎮 Games
-  </button>
-
-  <button onclick="showPage('trending')">
-    🔥 Trending
-  </button>
-
-  <button onclick="showPage('scores')">
-    🏆 Scores
-  </button>
-</nav>
-
-<main>
-
-<!-- HOME -->
-
-<section id="home" class="page active">
-
-  <div class="card">
-
-    <h2>Welcome to BigVic Fun 👋</h2>
-
-    <p>
-      Have fun, chat, play games and share what's trending.
-    </p>
-
-    <button
-      class="action"
-      onclick="openChat()">
-      💬 Open Chat
-    </button>
-
-    <button
-      class="action green"
-      onclick="showPage('games')">
-      🎮 Play Games
-    </button>
-
-    <button
-      class="action dark"
-      onclick="showPage('trending')">
-      🔥 Trending
-    </button>
-
-  </div>
-
-</section>
-
-
-<!-- GAMES -->
-
-<section id="games" class="page">
-
-  <div class="card">
-
-    <h2>🎮 Games</h2>
-
-    <h3>🔢 Guess the Number</h3>
-
-    <p>
-      Guess a number between 1 and 10.
-    </p>
-
-    <input
-      id="guess"
-      type="number"
-      min="1"
-      max="10"
-      placeholder="Enter your guess">
-
-    <button
-      class="action"
-      onclick="guessNumber()">
-      Guess
-    </button>
-
-    <div
-      id="guessResult"
-      class="result">
-    </div>
-
-  </div>
-
-
-  <div class="card">
-
-    <h3>✊ Rock Paper Scissors</h3>
-
-    <button
-      class="action"
-      onclick="playRPS('Rock')">
-      ✊ Rock
-    </button>
-
-    <button
-      class="action"
-      onclick="playRPS('Paper')">
-      ✋ Paper
-    </button>
-
-    <button
-      class="action"
-      onclick="playRPS('Scissors')">
-      ✌️ Scissors
-    </button>
-
-    <div
+    .page {
+      display: none;
+      max-width: 700px;
+      margin:
