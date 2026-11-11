@@ -5,7 +5,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BigVic Fun Profile</title>
+
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2319233b'/%3E%3Ctext x='50' y='68' font-size='60' text-anchor='middle' fill='%23ffca28' font-family='Arial' font-weight='bold'%3EB%3C/text%3E%3C/svg%3E">
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#101322;color:white;font-family:Arial,sans-serif}
@@ -18,10 +20,12 @@ label{display:block;margin-top:15px;color:#ffca28;font-weight:bold}
 input,textarea{width:100%;padding:12px;margin-top:7px;border:1px solid #46506d;border-radius:8px;background:#101322;color:white;font-size:15px}
 textarea{min-height:100px;resize:vertical}
 button{border:0;border-radius:8px;padding:12px 16px;background:#ffca28;color:#101322;font-weight:bold;margin-top:15px;cursor:pointer}
+button:disabled{opacity:.6}
 .back{display:block;text-align:center;color:#ffca28;margin-top:20px}
-#status{text-align:center;color:#ffca28;margin-top:12px;font-size:13px}
+#status{text-align:center;color:#ffca28;margin-top:12px;font-size:13px;overflow-wrap:anywhere}
 </style>
 </head>
+
 <body>
 <div class="app">
 <header>
@@ -30,7 +34,10 @@ button{border:0;border-radius:8px;padding:12px 16px;background:#ffca28;color:#10
 </header>
 
 <div class="card">
-<img id="avatar" class="avatar" src="https://ui-avatars.com/api/?name=BigVic" alt="Profile picture">
+
+<img id="avatar" class="avatar"
+src="https://ui-avatars.com/api/?name=BigVic"
+alt="Profile picture">
 
 <h2 id="displayName">My Profile</h2>
 
@@ -52,150 +59,214 @@ button{border:0;border-radius:8px;padding:12px 16px;background:#ffca28;color:#10
 
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-const client=window.supabase.createClient(
-window.SUPABASE_URL,
-window.SUPABASE_ANON_KEY
+const client = window.supabase.createClient(
+  window.SUPABASE_URL,
+  window.SUPABASE_ANON_KEY
 );
 
-const avatar=document.getElementById("avatar");
-const usernameInput=document.getElementById("username");
-const bioInput=document.getElementById("bio");
-const photoInput=document.getElementById("photo");
-const saveButton=document.getElementById("saveButton");
-const statusBox=document.getElementById("status");
-const displayName=document.getElementById("displayName");
+const avatar = document.getElementById("avatar");
+const usernameInput = document.getElementById("username");
+const bioInput = document.getElementById("bio");
+const photoInput = document.getElementById("photo");
+const saveButton = document.getElementById("saveButton");
+const statusBox = document.getElementById("status");
+const displayName = document.getElementById("displayName");
 
-let currentUser=null;
-let selectedPhoto=null;
-let existingAvatar=null;
+let currentUser = null;
+let selectedPhoto = null;
+let existingAvatar = null;
 
-function makeAvatar(name){
-return "https://ui-avatars.com/api/?name="+
-encodeURIComponent(name||"BigVic")+
-"&background=303957&color=ffca28";
+function makeAvatar(name) {
+  return "https://ui-avatars.com/api/?name=" +
+    encodeURIComponent(name || "BigVic") +
+    "&background=303957&color=ffca28";
 }
 
-async function loadProfile(){
-try{
-const result=await client.auth.getUser();
+function showAvatar(url, name) {
+  avatar.onerror = function() {
+    avatar.onerror = null;
+    avatar.src = makeAvatar(name);
+    statusBox.textContent =
+      "Profile loaded, but the picture could not be displayed.";
+  };
 
-if(!result.data.user){
-window.location.href="/auth.html";
-return;
+  avatar.src = url || makeAvatar(name);
 }
 
-currentUser=result.data.user;
+async function loadProfile() {
+  try {
+    const result = await client.auth.getUser();
 
-const profile=await client
-.from("profiles")
-.select("username,bio,avatar")
-.eq("id",currentUser.id)
-.maybeSingle();
+    if (result.error) throw result.error;
 
-if(profile.error)throw profile.error;
+    if (!result.data.user) {
+      window.location.href = "/auth.html";
+      return;
+    }
 
-usernameInput.value=profile.data?.username||"";
-bioInput.value=profile.data?.bio||"";
-existingAvatar=profile.data?.avatar||null;
+    currentUser = result.data.user;
 
-avatar.src=existingAvatar||makeAvatar(usernameInput.value);
-displayName.textContent=usernameInput.value||"My Profile";
+    const profile = await client
+      .from("profiles")
+      .select("username,bio,avatar")
+      .eq("id", currentUser.id)
+      .maybeSingle();
 
-statusBox.textContent="Profile loaded successfully.";
-}catch(error){
-console.error(error);
-statusBox.textContent="Could not load profile: "+error.message;
+    if (profile.error) throw profile.error;
+
+    const savedName = profile.data?.username || "";
+    const databaseAvatar = profile.data?.avatar || "";
+    const localAvatar =
+      localStorage.getItem("bigvic_avatar") || "";
+
+    usernameInput.value = savedName;
+    bioInput.value = profile.data?.bio || "";
+
+    existingAvatar = databaseAvatar || localAvatar;
+
+    displayName.textContent = savedName || "My Profile";
+
+    showAvatar(existingAvatar, savedName);
+
+    statusBox.textContent = "Profile loaded successfully.";
+
+  } catch (error) {
+    console.error(error);
+    statusBox.textContent =
+      "Could not load profile: " + error.message;
+  }
 }
-}
 
-photoInput.addEventListener("change",function(){
-const file=photoInput.files[0];
-if(!file)return;
+photoInput.addEventListener("change", function() {
+  const file = photoInput.files[0];
 
-if(!file.type.startsWith("image/")){
-alert("Please select an image.");
-photoInput.value="";
-return;
-}
+  if (!file) return;
 
-if(file.size>2*1024*1024){
-alert("Image must be smaller than 2 MB.");
-photoInput.value="";
-return;
-}
+  if (!file.type.startsWith("image/")) {
+    alert("Please select an image.");
+    photoInput.value = "";
+    return;
+  }
 
-selectedPhoto=file;
-avatar.src=URL.createObjectURL(file);
+  if (file.size > 2 * 1024 * 1024) {
+    alert("Image must be smaller than 2 MB.");
+    photoInput.value = "";
+    return;
+  }
+
+  selectedPhoto = file;
+
+  const previewURL = URL.createObjectURL(file);
+  avatar.src = previewURL;
 });
 
-usernameInput.addEventListener("input",function(){
-displayName.textContent=usernameInput.value||"My Profile";
+usernameInput.addEventListener("input", function() {
+  displayName.textContent =
+    usernameInput.value || "My Profile";
 });
 
-saveButton.addEventListener("click",async function(){
-if(!currentUser)return;
+saveButton.addEventListener("click", async function() {
 
-const name=usernameInput.value.trim();
-const bio=bioInput.value.trim();
+  if (!currentUser) {
+    statusBox.textContent = "Please sign in again.";
+    return;
+  }
 
-if(!name){
-alert("Please enter a username.");
-return;
-}
+  const name = usernameInput.value.trim();
+  const bio = bioInput.value.trim();
 
-saveButton.disabled=true;
-statusBox.textContent="Saving profile...";
+  if (!name) {
+    alert("Please enter a username.");
+    return;
+  }
 
-try{
-let avatarUrl=existingAvatar;
+  saveButton.disabled = true;
+  statusBox.textContent = "Saving profile...";
 
-if(selectedPhoto){
-const extension=selectedPhoto.name.split(".").pop().replace(/[^a-zA-Z0-9]/g,"");
-const path=currentUser.id+"/profile_"+Date.now()+"."+extension;
+  try {
 
-const upload=await client.storage
-.from("bigvic-media")
-.upload(path,selectedPhoto,{
-upsert:true,
-contentType:selectedPhoto.type
-});
+    let avatarUrl = existingAvatar;
 
-if(upload.error)throw upload.error;
+    if (selectedPhoto) {
 
-const publicResult=client.storage
-.from("bigvic-media")
-.getPublicUrl(path);
+      const extension =
+        selectedPhoto.name.split(".").pop()
+        .replace(/[^a-zA-Z0-9]/g, "") || "jpg";
 
-avatarUrl=publicResult.data.publicUrl;
-}
+      const path =
+        currentUser.id + "/profile_" +
+        Date.now() + "." + extension;
 
-const update=await client
-.from("profiles")
-.upsert({
-id:currentUser.id,
-username:name,
-bio:bio,
-avatar:avatarUrl
-},{onConflict:"id"});
+      const upload = await client.storage
+        .from("bigvic-media")
+        .upload(path, selectedPhoto, {
+          upsert: false,
+          contentType: selectedPhoto.type,
+          cacheControl: "3600"
+        });
 
-if(update.error)throw update.error;
+      if (upload.error) throw upload.error;
 
-existingAvatar=avatarUrl;
-selectedPhoto=null;
-displayName.textContent=name;
-avatar.src=avatarUrl||makeAvatar(name);
+      const publicResult = client.storage
+        .from("bigvic-media")
+        .getPublicUrl(path);
 
-localStorage.setItem("bigvic_username",name);
-if(avatarUrl)localStorage.setItem("bigvic_avatar",avatarUrl);
+      avatarUrl = publicResult.data.publicUrl;
 
-statusBox.textContent="Profile saved successfully! 🎉";
-}catch(error){
-console.error(error);
-statusBox.textContent="Could not save: "+error.message;
-}finally{
-saveButton.disabled=false;
-}
+      if (!avatarUrl) {
+        throw new Error("Could not create the picture URL.");
+      }
+    }
+
+    const update = await client
+      .from("profiles")
+      .upsert({
+        id: currentUser.id,
+        username: name,
+        bio: bio,
+        avatar: avatarUrl
+      }, {
+        onConflict: "id"
+      })
+      .select("username,bio,avatar")
+      .single();
+
+    if (update.error) throw update.error;
+
+    if (avatarUrl && update.data.avatar !== avatarUrl) {
+      throw new Error(
+        "The picture URL was not confirmed in your profile."
+      );
+    }
+
+    existingAvatar = update.data.avatar || null;
+    selectedPhoto = null;
+    photoInput.value = "";
+
+    localStorage.setItem("bigvic_username", name);
+
+    if (existingAvatar) {
+      localStorage.setItem("bigvic_avatar", existingAvatar);
+    }
+
+    displayName.textContent = name;
+
+    showAvatar(existingAvatar, name);
+
+    statusBox.textContent =
+      "Profile saved successfully! 🎉";
+
+  } catch (error) {
+    console.error(error);
+
+    statusBox.textContent =
+      "Could not save: " + error.message;
+
+  } finally {
+    saveButton.disabled = false;
+  }
 });
 
 loadProfile();
