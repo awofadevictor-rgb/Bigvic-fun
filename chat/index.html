@@ -12,43 +12,35 @@
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#101322;color:white}
 .app{max-width:600px;margin:auto;min-height:100vh;background:#101322;display:flex;flex-direction:column}
-
 .top-nav{display:flex;justify-content:space-around;gap:5px;padding:12px 5px;background:#19233b;border-bottom:1px solid #303957;overflow-x:auto}
 .top-nav button{border:0;background:transparent;color:#ffca28;font-weight:bold;font-size:15px;white-space:nowrap;padding:8px;cursor:pointer}
-
 .profile{padding:15px;background:#19233b;border-bottom:1px solid #303957;display:flex;align-items:center;gap:12px}
 .profile img{width:65px;height:65px;border-radius:50%;object-fit:cover}
 .profile-name{font-weight:bold;color:#ffca28}
 .photo-button{display:inline-block;margin-top:5px;background:#ffca28;color:#101322;padding:8px 10px;border-radius:6px;font-size:13px;cursor:pointer;font-weight:bold}
-
 .header{background:#19233b;color:#ffca28;padding:15px;text-align:center;border-bottom:1px solid #303957}
 .header h2{margin:0 0 8px}
 #logoutButton{border:0;background:#ffca28;color:#101322;padding:9px 14px;border-radius:7px;font-weight:bold}
-
 .status{padding:10px;text-align:center;font-size:13px;color:#c0c8dc}
-
 .chat-switch{display:flex;gap:8px;padding:10px;background:#19233b}
-.chat-switch button{flex:1;padding:12px 7px;border:1px solid #46506d;border-radius:9px;background:#101322;color:#ffca28;font-weight:bold}
+.chat-switch button{flex:1;padding:12px 5px;border:1px solid #46506d;border-radius:9px;background:#101322;color:#ffca28;font-weight:bold}
 .chat-switch button.active{background:#ffca28;color:#101322;border-color:#ffca28}
-
-#contactsPanel{padding:12px;background:#19233b;border-bottom:1px solid #303957}
+#contactsPanel,#groupsPanel{padding:12px;background:#19233b;border-bottom:1px solid #303957}
 .panel-title{color:#ffca28;font-weight:bold;margin-bottom:10px}
-#contactsList{display:flex;gap:9px;overflow-x:auto;padding-bottom:5px}
-
-.contact{min-width:90px;max-width:110px;padding:9px 6px;border:1px solid #46506d;border-radius:10px;background:#101322;color:white;text-align:center;cursor:pointer}
-.contact.active{border:2px solid #ffca28}
+#contactsList,#groupsList{display:flex;gap:9px;overflow-x:auto;padding:8px 0}
+.contact,.group-item{min-width:90px;max-width:120px;padding:9px 6px;border:1px solid #46506d;border-radius:10px;background:#101322;color:white;text-align:center;cursor:pointer}
+.contact.active,.group-item.active{border:2px solid #ffca28}
 .contact img{width:42px;height:42px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 6px}
 .contact span{display:block;font-size:12px;overflow-wrap:anywhere}
-
 .contact-presence{display:flex!important;align-items:center;justify-content:center;gap:4px;margin-top:5px;color:#aeb8d0}
 .online-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block}
 .offline-dot{width:8px;height:8px;border-radius:50%;background:#8992a8;display:inline-block}
-
 .unread-badge{display:inline-flex!important;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;margin:6px auto 0;border-radius:20px;background:#ffca28;color:#101322;font-size:11px!important;font-weight:bold}
-
+.group-item small{display:block;color:#aeb8d0;margin-top:5px}
+.group-controls{display:flex;gap:8px;flex-wrap:wrap}
+.small-button{border:0;border-radius:8px;padding:10px 12px;background:#ffca28;color:#101322;font-weight:bold;cursor:pointer}
 #conversationTitle{padding:11px;text-align:center;color:#ffca28;background:#19233b;font-weight:bold;border-bottom:1px solid #303957}
 #typingIndicator{min-height:22px;padding:4px 12px;text-align:center;color:#65aaff;font-size:12px;background:#19233b}
-
 #messages{flex:1;overflow-y:auto;padding:15px;min-height:250px;background:#101322}
 .message{margin-bottom:15px}
 .message.mine{text-align:right}
@@ -56,34 +48,28 @@ body{margin:0;font-family:Arial,sans-serif;background:#101322;color:white}
 .avatar{width:30px;height:30px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px}
 .bubble{display:inline-block;max-width:75%;padding:10px 14px;border-radius:16px;background:#303957;color:white;word-break:break-word;text-align:left}
 .mine .bubble{background:#ffca28;color:#101322}
-
 .chat-media{display:block;max-width:85%;width:auto;height:auto;max-height:350px;border-radius:12px;margin-top:7px}
 .mine .chat-media{margin-left:auto}
 .chat-audio{display:block;width:85%;max-width:300px;margin-top:8px}
 .mine .chat-audio{margin-left:auto}
-
 .message-meta{font-size:11px;color:#aeb8d0;margin-top:5px}
 .read-ticks{color:#aeb8d0;font-weight:bold;margin-left:5px}
 .read-ticks.read{color:#36a9ff}
-
 .message-actions{display:flex;gap:7px;margin-top:6px;justify-content:flex-start}
 .mine .message-actions{justify-content:flex-end}
 .message-actions button{border:1px solid #46506d;background:#19233b;color:#ffca28;border-radius:6px;padding:5px 9px;font-size:11px;cursor:pointer}
-
 .media-tools{padding:12px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid #303957;background:#19233b}
 .media-tools button,.media-tools label{border:0;border-radius:9px;padding:11px 13px;background:#ffca28;color:#101322;font-weight:bold;font-size:13px;cursor:pointer}
 .media-tools #stopRecordButton{background:#dc2626;color:white}
-
 #mediaPreview{padding:0 12px;background:#101322}
 #mediaPreview img,#mediaPreview video{max-width:100%;max-height:180px;border-radius:10px}
 #mediaStatus{font-size:12px;color:#ffca28;padding:5px 12px}
-
 .send-box{display:flex;padding:12px;border-top:1px solid #303957;gap:8px;position:sticky;bottom:0;background:#19233b}
 #messageInput{flex:1;min-width:0;border:1px solid #46506d;border-radius:25px;padding:12px;font-size:15px;background:#101322;color:white}
 #messageInput::placeholder{color:#aeb8d0}
 #sendButton{border:0;border-radius:25px;padding:0 18px;background:#ffca28;color:#101322;font-weight:bold}
 button:disabled{opacity:.5;cursor:not-allowed}
-
+[hidden]{display:none!important}
 @media(max-width:400px){
 .top-nav button{font-size:13px;padding:7px 5px}
 .media-tools button,.media-tools label{font-size:12px;padding:10px}
@@ -123,6 +109,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <div class="chat-switch">
 <button id="publicButton" class="active">🌍 Public Chat</button>
 <button id="privateButton">🔒 Private Chat</button>
+<button id="groupButton">👥 Group Chat</button>
 </div>
 
 <div id="contactsPanel" hidden>
@@ -130,6 +117,15 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <div id="contactsList">
 <span class="name">Loading contacts...</span>
 </div>
+</div>
+
+<div id="groupsPanel" hidden>
+<div class="panel-title">👥 My Groups</div>
+<div class="group-controls">
+<button id="createGroupButton" class="small-button">＋ Create Group</button>
+<button id="addGroupMemberButton" class="small-button" hidden>＋ Add Member</button>
+</div>
+<div id="groupsList">Loading groups...</div>
 </div>
 
 <div id="conversationTitle">🌍 Public Chat</div>
@@ -169,8 +165,14 @@ const photoInput=document.getElementById("photoInput");
 
 const publicButton=document.getElementById("publicButton");
 const privateButton=document.getElementById("privateButton");
+const groupButton=document.getElementById("groupButton");
 const contactsPanel=document.getElementById("contactsPanel");
 const contactsList=document.getElementById("contactsList");
+const groupsPanel=document.getElementById("groupsPanel");
+const groupsList=document.getElementById("groupsList");
+const createGroupButton=document.getElementById("createGroupButton");
+const addGroupMemberButton=document.getElementById("addGroupMemberButton");
+
 const conversationTitle=document.getElementById("conversationTitle");
 const typingIndicator=document.getElementById("typingIndicator");
 
@@ -185,6 +187,8 @@ let supabaseClient;
 let currentUser;
 let contacts=[];
 let activeContact=null;
+let activeGroup=null;
+let myGroups=[];
 let chatMode="public";
 
 let selectedMedia=null;
@@ -193,8 +197,6 @@ let audioChunks=[];
 let recordingStream=null;
 let previewURL=null;
 let refreshTimer=null;
-let presenceTimer=null;
-let typingTimer=null;
 let typingSendTimer=null;
 let unreadCounts={};
 let lastTypingUpdate=0;
@@ -286,6 +288,7 @@ return;
 
 await updatePresence();
 await loadContacts();
+await loadGroups();
 await loadMessages();
 
 statusBox.textContent="Connected to BigVic Chat";
@@ -300,6 +303,15 @@ await refreshTypingIndicator();
 if(chatMode==="private"&&activeContact){
 await loadMessages();
 }
+
+if(chatMode==="group"&&activeGroup){
+await loadMessages();
+}
+
+if(chatMode==="group"){
+await loadGroups();
+}
+
 },4000);
 
 }catch(error){
@@ -422,19 +434,21 @@ counts[item.sender]=(counts[item.sender]||0)+1;
 });
 
 unreadCounts=counts;
-renderContacts();
 }
 
 /* SELECT CONTACT */
 
 async function selectContact(person){
+await stopTyping();
+
 activeContact=person;
+activeGroup=null;
 chatMode="private";
 
-publicButton.classList.remove("active");
-privateButton.classList.add("active");
-
+setModeButtons();
 contactsPanel.hidden=false;
+groupsPanel.hidden=true;
+
 conversationTitle.textContent="🔒 Private chat with "+(person.username||"BigVic User");
 messageInput.placeholder="Message "+(person.username||"this user")+" privately...";
 
@@ -452,6 +466,12 @@ button.classList.toggle(
 });
 }
 
+function setModeButtons(){
+publicButton.classList.toggle("active",chatMode==="public");
+privateButton.classList.toggle("active",chatMode==="private");
+groupButton.classList.toggle("active",chatMode==="group");
+}
+
 /* PUBLIC CHAT */
 
 publicButton.addEventListener("click",async function(){
@@ -459,11 +479,12 @@ await stopTyping();
 
 chatMode="public";
 activeContact=null;
+activeGroup=null;
 
-publicButton.classList.add("active");
-privateButton.classList.remove("active");
-
+setModeButtons();
 contactsPanel.hidden=true;
+groupsPanel.hidden=true;
+
 conversationTitle.textContent="🌍 Public Chat";
 messageInput.placeholder="Type a public message...";
 
@@ -475,12 +496,14 @@ await loadMessages();
 /* PRIVATE CHAT */
 
 privateButton.addEventListener("click",async function(){
+await stopTyping();
+
 chatMode="private";
+activeGroup=null;
 
-publicButton.classList.remove("active");
-privateButton.classList.add("active");
-
+setModeButtons();
 contactsPanel.hidden=false;
+groupsPanel.hidden=true;
 
 conversationTitle.textContent=activeContact
 ?"🔒 Private chat with "+activeContact.username
@@ -489,6 +512,7 @@ conversationTitle.textContent=activeContact
 if(!activeContact){
 messagesBox.innerHTML="";
 typingIndicator.textContent="";
+
 const info=document.createElement("p");
 info.style.textAlign="center";
 info.style.color="#aeb8d0";
@@ -503,7 +527,343 @@ updateContactSelection();
 await loadUnreadCounts();
 });
 
-/* MARK MESSAGES READ */
+/* GROUP CHAT MODE */
+
+groupButton.addEventListener("click",async function(){
+await stopTyping();
+
+chatMode="group";
+activeContact=null;
+
+setModeButtons();
+contactsPanel.hidden=true;
+groupsPanel.hidden=false;
+
+messageInput.placeholder="Message your group...";
+conversationTitle.textContent=activeGroup
+?"👥 "+activeGroup.name
+:"👥 Choose a group";
+
+await loadGroups();
+
+if(activeGroup){
+await loadMessages();
+}else{
+messagesBox.innerHTML="";
+showEmptyMessage("Choose a group or create a new one.");
+}
+});
+
+/* GROUPS: LOAD MY GROUPS */
+
+async function loadGroups(){
+if(!currentUser)return;
+
+const membershipResult=await supabaseClient
+.from("group_members")
+.select("group_id,role")
+.eq("user_id",currentUser.id);
+
+if(membershipResult.error){
+console.error("Group membership error:",membershipResult.error);
+groupsList.textContent="Could not load groups: "+membershipResult.error.message;
+return;
+}
+
+const memberships=membershipResult.data||[];
+const ids=memberships.map(function(item){return item.group_id;});
+
+if(ids.length===0){
+myGroups=[];
+groupsList.innerHTML="";
+
+const empty=document.createElement("span");
+empty.className="name";
+empty.textContent="You haven't joined any groups yet.";
+groupsList.appendChild(empty);
+
+activeGroup=null;
+addGroupMemberButton.hidden=true;
+return;
+}
+
+const result=await supabaseClient
+.from("chat_groups")
+.select("id,name,description,created_by,created_at")
+.in("id",ids)
+.order("created_at",{ascending:false});
+
+if(result.error){
+console.error("Groups error:",result.error);
+groupsList.textContent="Could not load groups: "+result.error.message;
+return;
+}
+
+myGroups=result.data||[];
+renderGroups();
+}
+
+/* DISPLAY GROUPS */
+
+function renderGroups(){
+groupsList.innerHTML="";
+
+if(!myGroups.length){
+groupsList.textContent="No groups yet.";
+return;
+}
+
+myGroups.forEach(function(group){
+const button=document.createElement("button");
+button.className="group-item";
+button.dataset.id=group.id;
+
+const title=document.createElement("strong");
+title.textContent="👥 "+group.name;
+
+const small=document.createElement("small");
+small.textContent=group.description||"BigVic group";
+
+button.append(title,small);
+
+if(activeGroup&&activeGroup.id===group.id){
+button.classList.add("active");
+}
+
+button.addEventListener("click",function(){
+selectGroup(group);
+});
+
+groupsList.appendChild(button);
+});
+}
+
+/* SELECT GROUP */
+
+async function selectGroup(group){
+await stopTyping();
+
+activeGroup=group;
+activeContact=null;
+chatMode="group";
+
+setModeButtons();
+contactsPanel.hidden=true;
+groupsPanel.hidden=false;
+
+conversationTitle.textContent="👥 "+group.name;
+messageInput.placeholder="Message "+group.name+"...";
+
+addGroupMemberButton.hidden=group.created_by!==currentUser.id;
+
+renderGroups();
+await loadMessages();
+await refreshTypingIndicator();
+}
+
+/* CREATE GROUP */
+
+createGroupButton.addEventListener("click",createGroup);
+
+async function createGroup(){
+if(!currentUser)return;
+
+const name=prompt("Enter a name for your group:");
+
+if(!name||!name.trim())return;
+
+const description=prompt("Enter a short group description (optional):")||"";
+
+createGroupButton.disabled=true;
+createGroupButton.textContent="Creating...";
+
+try{
+const groupResult=await supabaseClient
+.from("chat_groups")
+.insert({
+name:name.trim(),
+description:description.trim(),
+created_by:currentUser.id
+})
+.select("id,name,description,created_by,created_at")
+.single();
+
+if(groupResult.error)throw groupResult.error;
+
+const group=groupResult.data;
+
+const memberResult=await supabaseClient
+.from("group_members")
+.insert({
+group_id:group.id,
+user_id:currentUser.id,
+role:"admin"
+});
+
+if(memberResult.error)throw memberResult.error;
+
+chatMode="group";
+activeContact=null;
+activeGroup=group;
+
+setModeButtons();
+contactsPanel.hidden=true;
+groupsPanel.hidden=false;
+
+await loadGroups();
+await selectGroup(group);
+
+alert("Your group has been created successfully! 🎉");
+
+}catch(error){
+console.error("Create group error:",error);
+alert("Could not create group: "+error.message);
+}finally{
+createGroupButton.disabled=false;
+createGroupButton.textContent="＋ Create Group";
+}
+}
+
+/* ADD A GROUP MEMBER */
+
+addGroupMemberButton.addEventListener("click",addGroupMember);
+
+async function addGroupMember(){
+if(!activeGroup)return;
+
+if(activeGroup.created_by!==currentUser.id){
+alert("Only the group creator can add members right now.");
+return;
+}
+
+if(!contacts.length){
+alert("There are no other registered users to add yet.");
+return;
+}
+
+const available=contacts.map(function(person){
+return person.username+" ("+person.email+")";
+});
+
+const choice=prompt(
+"Enter the exact username of the person to add:\n\n"+
+available.join("\n")
+);
+
+if(!choice||!choice.trim())return;
+
+const person=contacts.find(function(item){
+return (item.username||"").toLowerCase()===choice.trim().toLowerCase();
+});
+
+if(!person){
+alert("That username was not found. Please enter an exact username from the list.");
+return;
+}
+
+try{
+const existing=await supabaseClient
+.from("group_members")
+.select("user_id")
+.eq("group_id",activeGroup.id)
+.eq("user_id",person.id)
+.maybeSingle();
+
+if(existing.error)throw existing.error;
+
+if(existing.data){
+alert(person.username+" is already in this group.");
+return;
+}
+
+const result=await supabaseClient
+.from("group_members")
+.insert({
+group_id:activeGroup.id,
+user_id:person.id,
+role:"member"
+});
+
+if(result.error)throw result.error;
+
+alert(person.username+" was added to the group! 🎉");
+await showGroupMembers();
+}catch(error){
+console.error("Add member error:",error);
+alert("Could not add member: "+error.message);
+}
+}
+
+/* SHOW GROUP MEMBERS */
+
+async function showGroupMembers(){
+if(!activeGroup)return;
+
+const result=await supabaseClient
+.from("group_members")
+.select("user_id")
+.eq("group_id",activeGroup.id);
+
+if(result.error){
+alert("Could not load group members: "+result.error.message);
+return;
+}
+
+const names=(result.data||[]).map(function(member){
+if(member.user_id===currentUser.id)return username;
+
+const person=contacts.find(function(c){
+return c.id===member.user_id;
+});
+
+return person?.username||"BigVic User";
+});
+
+alert("Members of "+activeGroup.name+":\n\n"+names.join("\n"));
+}
+
+/* GROUP MESSAGE READ/WRITE */
+
+async function loadGroupMessages(){
+if(!activeGroup)return;
+
+const result=await supabaseClient
+.from("group_messages")
+.select("*")
+.eq("group_id",activeGroup.id)
+.order("created_at",{ascending:true})
+.limit(200);
+
+if(result.error){
+console.error("Group messages error:",result.error);
+statusBox.textContent="Group message error: "+result.error.message;
+return;
+}
+
+messagesBox.innerHTML="";
+
+if(!result.data||result.data.length===0){
+showEmptyMessage("No messages in this group yet. Say hello! 👋");
+}else{
+result.data.forEach(showMessage);
+}
+
+messagesBox.scrollTop=messagesBox.scrollHeight;
+statusBox.textContent="BigVic Fun Chat";
+}
+
+/* EMPTY CHAT MESSAGE */
+
+function showEmptyMessage(text){
+messagesBox.innerHTML="";
+const empty=document.createElement("p");
+empty.style.textAlign="center";
+empty.style.color="#aeb8d0";
+empty.textContent=text;
+messagesBox.appendChild(empty);
+}
+
+/* MARK PRIVATE MESSAGES READ */
 
 async function markConversationAsRead(){
 if(chatMode!=="private"||!activeContact||!currentUser)return;
@@ -521,12 +881,18 @@ return;
 }
 
 await loadUnreadCounts();
+renderContacts();
 }
 
 /* LOAD MESSAGES */
 
 async function loadMessages(){
 if(!currentUser)return;
+
+if(chatMode==="group"){
+await loadGroupMessages();
+return;
+}
 
 let query=supabaseClient.from("messages").select("*");
 
@@ -556,13 +922,9 @@ return;
 messagesBox.innerHTML="";
 
 if(!result.data||result.data.length===0){
-const empty=document.createElement("p");
-empty.style.textAlign="center";
-empty.style.color="#aeb8d0";
-empty.textContent=chatMode==="public"
+showEmptyMessage(chatMode==="public"
 ?"No public messages yet. Say hello! 👋"
-:"No private messages yet. Start the conversation! 💛";
-messagesBox.appendChild(empty);
+:"No private messages yet. Start the conversation! 💛");
 }else{
 result.data.forEach(showMessage);
 }
@@ -684,11 +1046,19 @@ alert("Message cannot be empty.");
 return;
 }
 
-const result=await supabaseClient
-.from("messages")
+const table=chatMode==="group"?"group_messages":"messages";
+
+let query=supabaseClient
+.from(table)
 .update({message:updated.trim()})
 .eq("id",item.id)
 .eq("sender",currentUser.id);
+
+if(chatMode==="group"){
+query=query.eq("group_id",activeGroup.id);
+}
+
+const result=await query;
 
 if(result.error){
 console.error(result.error);
@@ -704,11 +1074,19 @@ await loadMessages();
 async function deleteMessage(item){
 if(!confirm("Are you sure you want to delete this message?"))return;
 
-const result=await supabaseClient
-.from("messages")
+const table=chatMode==="group"?"group_messages":"messages";
+
+let query=supabaseClient
+.from(table)
 .delete()
 .eq("id",item.id)
 .eq("sender",currentUser.id);
+
+if(chatMode==="group"){
+query=query.eq("group_id",activeGroup.id);
+}
+
+const result=await query;
 
 if(result.error){
 console.error(result.error);
@@ -721,18 +1099,27 @@ await loadMessages();
 
 /* TYPING INDICATOR */
 
+function getTypingReceiver(){
+if(chatMode==="private"){
+return activeContact?activeContact.id:null;
+}
+
+if(chatMode==="group"){
+return activeGroup?activeGroup.id:null;
+}
+
+return "public";
+}
+
 async function updateTyping(){
 if(!currentUser)return;
+
+const receiver=getTypingReceiver();
+if(!receiver)return;
 
 const now=Date.now();
 if(now-lastTypingUpdate<1500)return;
 lastTypingUpdate=now;
-
-const receiver=chatMode==="private"
-?(activeContact?activeContact.id:null)
-:"public";
-
-if(!receiver)return;
 
 const result=await supabaseClient
 .from("typing_status")
@@ -782,12 +1169,18 @@ if(!currentUser)return;
 
 const receiver=chatMode==="private"
 ?currentUser.id
-:"public";
+:getTypingReceiver();
+
+if(!receiver){
+typingIndicator.textContent="";
+return;
+}
 
 let query=supabaseClient
 .from("typing_status")
 .select("user_id,receiver_id,chat_mode,updated_at")
 .eq("receiver_id",receiver)
+.eq("chat_mode",chatMode)
 .neq("user_id",currentUser.id)
 .gte("updated_at",new Date(Date.now()-8000).toISOString());
 
@@ -802,9 +1195,7 @@ console.error("Typing indicator:",result.error);
 return;
 }
 
-const typing=result.data&&result.data.length>0;
-
-if(typing){
+if(result.data&&result.data.length>0){
 const person=contacts.find(function(c){
 return c.id===result.data[0].user_id;
 });
@@ -818,6 +1209,29 @@ typingIndicator.textContent="";
 /* SAVE MESSAGE */
 
 async function saveChatMessage(text,media){
+if(chatMode==="private"&&!activeContact){
+throw new Error("Choose a contact first.");
+}
+
+if(chatMode==="group"&&!activeGroup){
+throw new Error("Choose a group first.");
+}
+
+if(chatMode==="group"){
+const result=await supabaseClient
+.from("group_messages")
+.insert({
+group_id:activeGroup.id,
+sender:currentUser.id,
+message:text||"",
+media_url:media?media.url:null,
+media_type:media?media.type:null
+});
+
+if(result.error)throw result.error;
+return;
+}
+
 const receiver=chatMode==="private"
 ?activeContact.id
 :"public";
@@ -848,6 +1262,11 @@ return;
 
 if(chatMode==="private"&&!activeContact){
 alert("Choose a contact first.");
+return;
+}
+
+if(chatMode==="group"&&!activeGroup){
+alert("Choose a group first.");
 return;
 }
 
@@ -957,6 +1376,11 @@ alert("Choose a contact first.");
 return;
 }
 
+if(chatMode==="group"&&!activeGroup){
+alert("Choose a group first.");
+return;
+}
+
 const file=selectedMedia;
 
 sendMediaButton.disabled=true;
@@ -1001,6 +1425,11 @@ if(!currentUser)return;
 
 if(chatMode==="private"&&!activeContact){
 alert("Choose a contact first.");
+return;
+}
+
+if(chatMode==="group"&&!activeGroup){
+alert("Choose a group first.");
 return;
 }
 
@@ -1135,6 +1564,12 @@ await stopTyping();
 
 if(refreshTimer)clearInterval(refreshTimer);
 
+if(recordingStream){
+recordingStream.getTracks().forEach(function(track){
+track.stop();
+});
+}
+
 await supabaseClient.auth.signOut();
 window.location.href="/auth.html";
 
@@ -1144,7 +1579,6 @@ alert("Could not log out. Please try again.");
 logoutButton.disabled=false;
 }
 });
-
 </script>
 </body>
 </html>
