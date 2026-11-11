@@ -1,165 +1,410 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BigVic Fun</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f2f4f7;
-      color: #222;
-    }
-
-    header {
-      background: #111827;
-      color: white;
-      text-align: center;
-      padding: 28px 15px;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 28px;
-    }
-
-    header p {
-      margin: 8px 0 0;
-    }
-
-    .container {
-      max-width: 520px;
-      margin: 25px auto;
-      padding: 15px;
-    }
-
-    .card {
-      background: white;
-      padding: 24px;
-      border-radius: 16px;
-      margin-bottom: 18px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-    }
-
-    .center {
-      text-align: center;
-    }
-
-    button {
-      width: 100%;
-      border: 0;
-      padding: 15px;
-      margin: 9px 0;
-      border-radius: 10px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    .chat {
-      background: #2563eb;
-      color: white;
-    }
-
-    .games {
-      background: #16a34a;
-      color: white;
-    }
-
-    .trending {
-      background: #f59e0b;
-      color: white;
-    }
-
-    .scores {
-      background: #7c3aed;
-      color: white;
-    }
-
-    .game {
-      background: #0891b2;
-      color: white;
-    }
-
-    .back {
-      background: #6b7280;
-      color: white;
-    }
-
-    .page {
-      display: none;
-    }
-
-    .page.active {
-      display: block;
-    }
-
-    input,
-    textarea {
-      width: 100%;
-      padding: 13px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      font-size: 16px;
-      margin-top: 8px;
-    }
-
-    textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-
-    .result {
-      text-align: center;
-      font-weight: bold;
-      margin-top: 15px;
-      font-size: 17px;
-    }
-
-    .post {
-      background: #fafafa;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      padding: 15px;
-      margin-top: 12px;
-    }
-
-    .post-name {
-      font-weight: bold;
-    }
-
-    .post-text {
-      margin-top: 8px;
-      white-space: pre-wrap;
-    }
-
-    .post-time {
-      margin-top: 8px;
-      color: #777;
-      font-size: 12px;
-    }
-
-    .score-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 14px 0;
-      border-bottom: 1px solid #ddd;
-    }
-
-    footer {
-      text-align: center;
-      color: #777;
-      padding: 25px 10px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BigVic Fun</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101322;color:white;font-family:Arial,sans-serif}
+header{background:#191f38;padding:18px;display:flex;justify-content:space-between;align-items:center}
+header h2{margin:0;color:#ffca28}
+button{border:0;border-radius:9px;padding:12px 16px;background:#ffca28;color:#171717;font-weight:bold;cursor:pointer}
+nav{display:flex;gap:7px;overflow-x:auto;padding:12px;background:#191f38}
+nav button{white-space:nowrap;background:#303957;color:white}
+nav button.active{background:#ffca28;color:#171717}
+main{max-width:750px;margin:auto;padding:18px}
+.page{display:none}
+.page.active{display:block}
+.card{background:#1b223b;border-radius:14px;padding:18px;margin:14px 0}
+h1,h2,h3{margin-top:8px}
+input,textarea{width:100%;padding:13px;border:1px solid #46506d;border-radius:9px;background:#10182c;color:white;margin:8px 0}
+textarea{min-height:90px}
+.game-buttons{display:flex;gap:8px;flex-wrap:wrap}
+.post{background:#29314d;padding:14px;border-radius:10px;margin:12px 0;overflow-wrap:anywhere}
+.small{color:#b9c2d8;font-size:13px}
+footer{text-align:center;color:#929bb2;padding:25px}
+.score-row{display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid #39415c}
+</style>
 </head>
-
 <body>
 
 <header>
-  <h1>Big
+<h2>BigVic Fun 🎉</h2>
+<button onclick="logout()">Logout</button>
+</header>
+
+<nav>
+<button class="active" onclick="showPage('home',this)">Home</button>
+<button onclick="showPage('games',this)">Games</button>
+<button onclick="showPage('trending',this)">Trending</button>
+<button onclick="showPage('scores',this)">Scores</button>
+<button onclick="openChat()">Chat 💬</button>
+</nav>
+
+<main>
+
+<section id="home" class="page active">
+<div class="card">
+<h1>Welcome to BigVic Fun! 👋</h1>
+<p>Connect, chat, play games and have fun.</p>
+<h3 id="welcomeName">Welcome, Player!</h3>
+<p class="small" id="accountStatus">Checking account...</p>
+</div>
+
+<div class="card">
+<h3>💬 Chat with friends</h3>
+<p>Join the BigVic community and start chatting.</p>
+<button onclick="openChat()">Open Chat</button>
+</div>
+
+<div class="card">
+<h3>🎮 Play Games</h3>
+<p>Play fun games and earn wins.</p>
+<button onclick="showPage('games')">Explore Games</button>
+</div>
+
+<div class="card">
+<h3>🔥 Trending</h3>
+<p>Share what's happening with the community.</p>
+<button onclick="showPage('trending')">Open Trending</button>
+</div>
+
+<div class="card">
+<h3>🏆 Leaderboard</h3>
+<p>See the players with the most wins.</p>
+<button onclick="showPage('scores')">View Scores</button>
+</div>
+</section>
+
+<section id="games" class="page">
+<h2>🎮 Games Zone</h2>
+
+<div class="card">
+<h3>🔢 Guess the Number</h3>
+<p>Guess a number between 1 and 10.</p>
+<input id="guessInput" type="number" min="1" max="10" placeholder="Enter your guess">
+<button onclick="guessNumber()">Check Answer</button>
+<p id="guessResult"></p>
+</div>
+
+<div class="card">
+<h3>✊ Rock Paper Scissors</h3>
+<p>Choose your move.</p>
+<div class="game-buttons">
+<button onclick="playRPS('Rock')">✊ Rock</button>
+<button onclick="playRPS('Paper')">✋ Paper</button>
+<button onclick="playRPS('Scissors')">✌️ Scissors</button>
+</div>
+<p id="rpsResult"></p>
+</div>
+</section>
+
+<section id="trending" class="page">
+<h2>🔥 Trending Posts</h2>
+<div class="card">
+<h3>Share something</h3>
+<textarea id="postText" placeholder="What's happening?"></textarea>
+<button onclick="addPost()">Publish Post</button>
+<p id="postMessage" class="small"></p>
+</div>
+<div id="posts"></div>
+</section>
+
+<section id="scores" class="page">
+<h2>🏆 Leaderboard</h2>
+<div class="card">
+<p class="small">Players are ranked by their total game wins.</p>
+<div id="leaderboard">Loading scores...</div>
+<button onclick="loadLeaderboard()">Refresh Scores</button>
+</div>
+</section>
+
+</main>
+
+<footer>BigVic Fun © 2026</footer>
+
+<script>
+let db = null;
+let currentUser = null;
+let username = "Player";
+let numberWins = 0;
+let rpsWins = 0;
+
+try {
+  if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+    db = window.supabase.createClient(
+      window.SUPABASE_URL,
+      window.SUPABASE_ANON_KEY
+    );
+  }
+} catch (error) {
+  console.log("Supabase setup issue:", error);
+}
+
+function showPage(page, button) {
+  document.querySelectorAll(".page").forEach(function(section) {
+    section.classList.remove("active");
+  });
+
+  const selected = document.getElementById(page);
+  if (selected) selected.classList.add("active");
+
+  document.querySelectorAll("nav button").forEach(function(item) {
+    item.classList.remove("active");
+  });
+
+  if (button) button.classList.add("active");
+
+  if (page === "trending") loadPosts();
+  if (page === "scores") loadLeaderboard();
+
+  window.scrollTo(0, 0);
+}
+
+function openChat() {
+  window.location.href = "/chat/";
+}
+
+async function checkLogin() {
+  if (!db) {
+    document.getElementById("accountStatus").textContent =
+      "Supabase configuration could not be loaded.";
+    return;
+  }
+
+  try {
+    const { data, error } = await db.auth.getSession();
+
+    if (error || !data.session) {
+      window.location.href = "/auth.html";
+      return;
+    }
+
+    currentUser = data.session.user;
+
+    const savedName = localStorage.getItem("bigvic_username");
+    username = savedName ||
+      currentUser.user_metadata?.username ||
+      currentUser.email?.split("@")[0] ||
+      "Player";
+
+    document.getElementById("welcomeName").textContent =
+      "Welcome, " + username + "! 👋";
+
+    document.getElementById("accountStatus").textContent =
+      "You are logged in.";
+
+    await loadPlayerScore();
+  } catch (error) {
+    document.getElementById("accountStatus").textContent =
+      "Could not check your login. Please refresh.";
+  }
+}
+
+async function logout() {
+  if (db) await db.auth.signOut();
+  window.location.href = "/auth.html";
+}
+
+async function loadPlayerScore() {
+  if (!db || !currentUser) return;
+
+  const { data } = await db
+    .from("leaderboard")
+    .select("*")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+
+  if (data) {
+    numberWins = data.number_wins || 0;
+    rpsWins = data.rps_wins || 0;
+  }
+}
+
+async function saveScore() {
+  if (!db || !currentUser) return;
+
+  const { error } = await db.from("leaderboard").upsert({
+    user_id: currentUser.id,
+    username: username,
+    number_wins: numberWins,
+    rps_wins: rpsWins,
+    updated_at: new Date().toISOString()
+  });
+
+  if (error) console.log("Score could not be saved:", error.message);
+}
+
+async function loadLeaderboard() {
+  const container = document.getElementById("leaderboard");
+
+  if (!db) {
+    container.textContent = "Leaderboard is unavailable.";
+    return;
+  }
+
+  container.textContent = "Loading scores...";
+
+  const { data, error } = await db
+    .from("leaderboard")
+    .select("username,number_wins,rps_wins")
+    .order("number_wins", { ascending: false })
+    .limit(30);
+
+  if (error) {
+    container.textContent = "Could not load scores.";
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    container.textContent = "No scores yet. Play a game to get started!";
+    return;
+  }
+
+  container.innerHTML = "";
+
+  data.sort(function(a, b) {
+    return (b.number_wins + b.rps_wins) -
+           (a.number_wins + a.rps_wins);
+  });
+
+  data.forEach(function(player, index) {
+    const row = document.createElement("div");
+    row.className = "score-row";
+
+    const name = document.createElement("span");
+    name.textContent = (index + 1) + ". " + player.username;
+
+    const score = document.createElement("strong");
+    score.textContent =
+      (player.number_wins + player.rps_wins) + " wins";
+
+    row.appendChild(name);
+    row.appendChild(score);
+    container.appendChild(row);
+  });
+}
+
+let secretNumber = Math.floor(Math.random() * 10) + 1;
+
+async function guessNumber() {
+  const input = document.getElementById("guessInput");
+  const result = document.getElementById("guessResult");
+  const guess = Number(input.value);
+
+  if (!guess || guess < 1 || guess > 10) {
+    result.textContent = "Enter a number from 1 to 10.";
+    return;
+  }
+
+  if (guess === secretNumber) {
+    result.textContent = "Correct! You won! 🎉";
+    numberWins++;
+    await saveScore();
+    secretNumber = Math.floor(Math.random() * 10) + 1;
+  } else if (guess < secretNumber) {
+    result.textContent = "Too low! Try again.";
+  } else {
+    result.textContent = "Too high! Try again.";
+  }
+}
+
+async function playRPS(player) {
+  const choices = ["Rock", "Paper", "Scissors"];
+  const computer = choices[Math.floor(Math.random() * 3)];
+  const result = document.getElementById("rpsResult");
+
+  if (player === computer) {
+    result.textContent = "You chose " + player +
+      ". Computer chose " + computer + ". It's a draw!";
+    return;
+  }
+
+  const won =
+    (player === "Rock" && computer === "Scissors") ||
+    (player === "Paper" && computer === "Rock") ||
+    (player === "Scissors" && computer === "Paper");
+
+  if (won) {
+    result.textContent = "You won! 🎉 Computer chose " + computer;
+    rpsWins++;
+    await saveScore();
+  } else {
+    result.textContent = "You lost! Computer chose " + computer;
+  }
+}
+
+function getPosts() {
+  try {
+    return JSON.parse(localStorage.getItem("bigvic_posts") || "[]");
+  } catch (error) {
+    return [];
+  }
+}
+
+function addPost() {
+  const input = document.getElementById("postText");
+  const message = document.getElementById("postMessage");
+  const text = input.value.trim();
+
+  if (!text) {
+    message.textContent = "Write something first.";
+    return;
+  }
+
+  const posts = getPosts();
+
+  posts.unshift({
+    username: username,
+    content: text,
+    time: new Date().toLocaleString()
+  });
+
+  localStorage.setItem("bigvic_posts", JSON.stringify(posts));
+
+  input.value = "";
+  message.textContent = "Posted successfully! 🎉";
+  loadPosts();
+}
+
+function loadPosts() {
+  const container = document.getElementById("posts");
+  const posts = getPosts();
+
+  container.innerHTML = "";
+
+  if (posts.length === 0) {
+    container.textContent = "No posts yet. Be the first to post! 🔥";
+    return;
+  }
+
+  posts.forEach(function(post) {
+    const box = document.createElement("div");
+    box.className = "post";
+
+    const name = document.createElement("strong");
+    name.textContent = "👤 " + post.username;
+
+    const content = document.createElement("p");
+    content.textContent = post.content;
+
+    const time = document.createElement("small");
+    time.className = "small";
+    time.textContent = post.time;
+
+    box.appendChild(name);
+    box.appendChild(content);
+    box.appendChild(time);
+    container.appendChild(box);
+  });
+}
+
+checkLogin();
+</script>
+
+</body>
+</html>
