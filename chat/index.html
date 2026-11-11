@@ -10,89 +10,335 @@
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f2f2f2}
-.app{max-width:600px;margin:auto;min-height:100vh;background:white;display:flex;flex-direction:column}
-.top-nav{display:flex;justify-content:space-around;gap:5px;padding:12px 5px;background:white;border-bottom:1px solid #ddd;overflow-x:auto}
-.top-nav button{border:0;background:none;font-weight:bold;font-size:15px;white-space:nowrap;padding:8px;cursor:pointer}
-.profile{padding:15px;background:#f8fafc;border-bottom:1px solid #ddd;display:flex;align-items:center;gap:12px}
-.profile img{width:70px;height:70px;border-radius:50%;object-fit:cover}
-.profile-name{font-weight:bold}
-.photo-button{display:inline-block;margin-top:5px;background:#2563eb;color:white;padding:8px 10px;border-radius:6px;font-size:13px;cursor:pointer}
-.header{background:#111827;color:white;padding:18px;text-align:center}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#101322;
+  color:white;
+}
+
+.app{
+  max-width:600px;
+  margin:auto;
+  min-height:100vh;
+  background:#101322;
+  display:flex;
+  flex-direction:column;
+}
+
+.top-nav{
+  display:flex;
+  justify-content:space-around;
+  gap:5px;
+  padding:12px 5px;
+  background:#19233b;
+  border-bottom:1px solid #303957;
+  overflow-x:auto;
+}
+
+.top-nav button{
+  border:0;
+  background:transparent;
+  color:#ffca28;
+  font-weight:bold;
+  font-size:15px;
+  white-space:nowrap;
+  padding:8px;
+  cursor:pointer;
+}
+
+.profile{
+  padding:15px;
+  background:#19233b;
+  border-bottom:1px solid #303957;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  color:white;
+}
+
+.profile img{
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  object-fit:cover;
+}
+
+.profile-name{
+  font-weight:bold;
+  color:#ffca28;
+}
+
+.photo-button{
+  display:inline-block;
+  margin-top:5px;
+  background:#ffca28;
+  color:#101322;
+  padding:8px 10px;
+  border-radius:6px;
+  font-size:13px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.header{
+  background:#19233b;
+  color:#ffca28;
+  padding:18px;
+  text-align:center;
+  border-bottom:1px solid #303957;
+}
+
 .header h2{margin:0}
-.status{padding:10px;text-align:center;font-size:13px;color:#666}
-#messages{flex:1;overflow-y:auto;padding:15px;min-height:250px}
+
+.status{
+  padding:10px;
+  text-align:center;
+  font-size:13px;
+  color:#c0c8dc;
+}
+
+#messages{
+  flex:1;
+  overflow-y:auto;
+  padding:15px;
+  min-height:250px;
+  background:#101322;
+}
+
 .message{margin-bottom:15px}
 .message.mine{text-align:right}
-.name{font-size:12px;color:#777;margin-bottom:3px}
-.avatar{width:30px;height:30px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px}
-.bubble{display:inline-block;max-width:75%;padding:10px 14px;border-radius:16px;background:#e5e7eb;word-break:break-word;text-align:left}
-.mine .bubble{background:#2563eb;color:white}
-.chat-media{display:block;max-width:85%;width:auto;height:auto;max-height:350px;border-radius:12px;margin-top:7px}
+
+.name{
+  font-size:12px;
+  color:#aeb8d0;
+  margin-bottom:3px;
+}
+
+.avatar{
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  object-fit:cover;
+  vertical-align:middle;
+  margin-right:6px;
+}
+
+.bubble{
+  display:inline-block;
+  max-width:75%;
+  padding:10px 14px;
+  border-radius:16px;
+  background:#303957;
+  color:white;
+  word-break:break-word;
+  text-align:left;
+}
+
+.mine .bubble{
+  background:#ffca28;
+  color:#101322;
+}
+
+.chat-media{
+  display:block;
+  max-width:85%;
+  width:auto;
+  height:auto;
+  max-height:350px;
+  border-radius:12px;
+  margin-top:7px;
+}
+
 .mine .chat-media{margin-left:auto}
-.chat-audio{display:block;width:85%;max-width:300px;margin-top:8px}
+
+.chat-audio{
+  display:block;
+  width:85%;
+  max-width:300px;
+  margin-top:8px;
+}
+
 .mine .chat-audio{margin-left:auto}
-.send-box{display:flex;padding:12px;border-top:1px solid #ddd;gap:8px;position:sticky;bottom:0;background:white}
-#messageInput{flex:1;min-width:0;border:1px solid #ccc;border-radius:25px;padding:12px;font-size:15px}
-#sendButton{border:0;border-radius:25px;padding:0 18px;background:#2563eb;color:white;font-weight:bold}
-#logoutButton{margin-top:8px;border:0;background:#ef4444;color:white;padding:9px 14px;border-radius:7px}
-.media-tools{padding:12px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid #eee;background:#fff}
-.media-tools button,.media-tools label{border:0;border-radius:9px;padding:11px 13px;background:#253454;color:white;font-weight:bold;font-size:13px;cursor:pointer}
-.media-tools button:disabled{opacity:.5}
-#stopRecordButton{background:#dc2626}
-#mediaPreview{padding:0 12px;background:white}
-#mediaPreview img,#mediaPreview video{max-width:100%;max-height:180px;border-radius:10px}
-#mediaStatus{font-size:12px;color:#555;padding:5px 12px}
+
+.send-box{
+  display:flex;
+  padding:12px;
+  border-top:1px solid #303957;
+  gap:8px;
+  position:sticky;
+  bottom:0;
+  background:#19233b;
+}
+
+#messageInput{
+  flex:1;
+  min-width:0;
+  border:1px solid #46506d;
+  border-radius:25px;
+  padding:12px;
+  font-size:15px;
+  background:#101322;
+  color:white;
+}
+
+#messageInput::placeholder{color:#aeb8d0}
+
+#sendButton{
+  border:0;
+  border-radius:25px;
+  padding:0 18px;
+  background:#ffca28;
+  color:#101322;
+  font-weight:bold;
+}
+
+#logoutButton{
+  margin-top:8px;
+  border:0;
+  background:#ffca28;
+  color:#101322;
+  padding:9px 14px;
+  border-radius:7px;
+  font-weight:bold;
+}
+
+.media-tools{
+  padding:12px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  border-top:1px solid #303957;
+  background:#19233b;
+}
+
+.media-tools button,
+.media-tools label{
+  border:0;
+  border-radius:9px;
+  padding:11px 13px;
+  background:#ffca28;
+  color:#101322;
+  font-weight:bold;
+  font-size:13px;
+  cursor:pointer;
+}
+
+.media-tools button:disabled{
+  opacity:.5;
+}
+
+.media-tools #stopRecordButton{
+  background:#dc2626;
+  color:white;
+}
+
+#mediaPreview{
+  padding:0 12px;
+  background:#101322;
+}
+
+#mediaPreview img,
+#mediaPreview video{
+  max-width:100%;
+  max-height:180px;
+  border-radius:10px;
+}
+
+#mediaStatus{
+  font-size:12px;
+  color:#ffca28;
+  padding:5px 12px;
+}
+
 #sendButton:disabled{opacity:.5}
+
+button:disabled{cursor:not-allowed}
+
+@media(max-width:400px){
+  .top-nav button{font-size:13px;padding:7px 5px}
+  .media-tools button,.media-tools label{font-size:12px;padding:10px}
+}
 </style>
 </head>
 
 <body>
 
 <div class="top-nav">
-<button onclick="goHome()">🏠 Home</button>
-<button onclick="goChat()">💬 Chat</button>
-<button onclick="goGames()">🎮 Games</button>
-<button onclick="goTrending()">🔥 Trending</button>
-<button onclick="goScores()">🏆 Scores</button>
+  <button onclick="goHome()">🏠 Home</button>
+  <button onclick="goChat()">💬 Chat</button>
+  <button onclick="goGames()">🎮 Games</button>
+  <button onclick="goTrending()">🔥 Trending</button>
+  <button onclick="goScores()">🏆 Scores</button>
 </div>
 
 <div class="app">
 
-<div class="profile">
-<img id="profileAvatar" src="https://ui-avatars.com/api/?name=BigVic" alt="Profile photo">
-<div>
-<div id="profileName" class="profile-name">BigVic</div>
-<label for="photoInput" class="photo-button">Change photo</label>
-<input id="photoInput" type="file" accept="image/*" style="display:none">
-</div>
-</div>
+  <div class="profile">
+    <img id="profileAvatar"
+      src="https://ui-avatars.com/api/?name=BigVic"
+      alt="Profile photo">
 
-<div class="header">
-<h2>BigVic Fun 💬</h2>
-<button id="logoutButton">Logout</button>
-</div>
+    <div>
+      <div id="profileName" class="profile-name">BigVic</div>
 
-<div id="status" class="status">Starting BigVic Chat...</div>
+      <label for="photoInput" class="photo-button">
+        Change photo
+      </label>
 
-<div id="messages"></div>
+      <input id="photoInput" type="file"
+        accept="image/*" style="display:none">
+    </div>
+  </div>
 
-<div id="mediaPreview"></div>
-<div id="mediaStatus"></div>
+  <div class="header">
+    <h2>BigVic Fun 💬</h2>
+    <button id="logoutButton">Logout</button>
+  </div>
 
-<div class="media-tools">
-<label for="chatMediaInput">📸 Photo / Video</label>
-<input id="chatMediaInput" type="file" accept="image/*,video/*" hidden>
+  <div id="status" class="status">
+    Starting BigVic Chat...
+  </div>
 
-<button id="sendMediaButton" disabled>Send Media</button>
-<button id="startRecordButton">🎤 Record Voice</button>
-<button id="stopRecordButton" disabled>⏹ Stop & Send</button>
-</div>
+  <div id="messages"></div>
 
-<div class="send-box">
-<input id="messageInput" type="text" placeholder="Type a message..." maxlength="3000">
-<button id="sendButton">Send</button>
-</div>
+  <div id="mediaPreview"></div>
+  <div id="mediaStatus"></div>
+
+  <div class="media-tools">
+
+    <label for="chatMediaInput">
+      📸 Photo / Video
+    </label>
+
+    <input id="chatMediaInput"
+      type="file"
+      accept="image/*,video/*"
+      hidden>
+
+    <button id="sendMediaButton" disabled>
+      Send Media
+    </button>
+
+    <button id="startRecordButton">
+      🎤 Record Voice
+    </button>
+
+    <button id="stopRecordButton" disabled>
+      ⏹ Stop & Send
+    </button>
+
+  </div>
+
+  <div class="send-box">
+    <input id="messageInput"
+      type="text"
+      placeholder="Type a message..."
+      maxlength="3000">
+
+    <button id="sendButton">Send</button>
+  </div>
 
 </div>
 
@@ -125,25 +371,43 @@ let recordingStream=null;
 let username=localStorage.getItem("bigvic_username")||"BigVic";
 let previewURL=null;
 
-function goHome(){window.location.href="/"}
-function goChat(){window.location.href="/chat/"}
-function goGames(){window.location.href="/?page=games"}
-function goTrending(){window.location.href="/?page=trending"}
-function goScores(){window.location.href="/?page=scores"}
+function goHome(){
+  window.location.href="/";
+}
+
+function goChat(){
+  window.location.href="/chat/";
+}
+
+function goGames(){
+  window.location.href="/?page=games";
+}
+
+function goTrending(){
+  window.location.href="/?page=trending";
+}
+
+function goScores(){
+  window.location.href="/?page=scores";
+}
+
+/* CHANGE NAME */
 
 const changeNameButton=document.createElement("button");
+
 changeNameButton.textContent="Change name";
 changeNameButton.style.marginTop="6px";
 changeNameButton.style.marginLeft="6px";
 changeNameButton.style.padding="6px 9px";
 changeNameButton.style.border="0";
 changeNameButton.style.borderRadius="6px";
-changeNameButton.style.background="#111827";
-changeNameButton.style.color="white";
+changeNameButton.style.background="#ffca28";
+changeNameButton.style.color="#101322";
 changeNameButton.style.fontSize="12px";
 
 changeNameButton.onclick=function(){
   const newName=prompt("Enter your BigVic name:",username);
+
   if(newName&&newName.trim()){
     username=newName.trim();
     localStorage.setItem("bigvic_username",username);
@@ -154,25 +418,41 @@ changeNameButton.onclick=function(){
 profileName.parentElement.appendChild(changeNameButton);
 profileName.textContent=username;
 
-const savedAvatar=localStorage.getItem("bigvic_avatar");
-if(savedAvatar)profileAvatar.src=savedAvatar;
+/* SAVED PROFILE PHOTO */
 
-if(!window.SUPABASE_URL||!window.SUPABASE_ANON_KEY||!window.supabase){
+const savedAvatar=localStorage.getItem("bigvic_avatar");
+
+if(savedAvatar){
+  profileAvatar.src=savedAvatar;
+}
+
+/* SUPABASE CONNECTION */
+
+if(
+  !window.SUPABASE_URL||
+  !window.SUPABASE_ANON_KEY||
+  !window.supabase
+){
   statusBox.textContent="BigVic setup error. Check your configuration.";
 }else{
   supabaseClient=window.supabase.createClient(
     window.SUPABASE_URL,
     window.SUPABASE_ANON_KEY
   );
+
   startChat();
 }
+
+/* CHECK LOGIN */
 
 async function startChat(){
   try{
     statusBox.textContent="Checking login...";
+
     const result=await supabaseClient.auth.getUser();
 
     if(result.error)throw result.error;
+
     currentUser=result.data.user;
 
     if(!currentUser){
@@ -181,12 +461,16 @@ async function startChat(){
     }
 
     statusBox.textContent="Connected to BigVic Chat";
+
     await loadMessages();
+
   }catch(error){
     console.error(error);
     statusBox.textContent="Connection error. Please refresh.";
   }
 }
+
+/* LOAD MESSAGES */
 
 async function loadMessages(){
   const result=await supabaseClient
@@ -205,7 +489,7 @@ async function loadMessages(){
   if(!result.data||result.data.length===0){
     const empty=document.createElement("p");
     empty.style.textAlign="center";
-    empty.style.color="#888";
+    empty.style.color="#aeb8d0";
     empty.textContent="No messages yet. Say hello! 👋";
     messagesBox.appendChild(empty);
   }else{
@@ -213,11 +497,15 @@ async function loadMessages(){
   }
 
   statusBox.textContent="BigVic Fun Chat";
+
   messagesBox.scrollTop=messagesBox.scrollHeight;
 }
 
+/* DISPLAY MESSAGES */
+
 function showMessage(item){
   const mine=item.sender===currentUser.id;
+
   const wrapper=document.createElement("div");
   wrapper.className=mine?"message mine":"message";
 
@@ -227,8 +515,10 @@ function showMessage(item){
 
   const avatar=document.createElement("img");
   avatar.className="avatar";
+
   avatar.src=mine
-    ?(localStorage.getItem("bigvic_avatar")||"https://ui-avatars.com/api/?name=BigVic")
+    ?(localStorage.getItem("bigvic_avatar")||
+      "https://ui-avatars.com/api/?name=BigVic")
     :"https://ui-avatars.com/api/?name=BigVic";
 
   wrapper.append(name,avatar);
@@ -250,6 +540,7 @@ function showMessage(item){
       media=document.createElement("video");
       media.controls=true;
       media.preload="metadata";
+      media.playsInline=true;
     }else if(item.media_type==="audio"){
       media=document.createElement("audio");
       media.controls=true;
@@ -258,7 +549,9 @@ function showMessage(item){
 
     if(media){
       media.src=item.media_url;
-      media.className=item.media_type==="audio"?"chat-audio":"chat-media";
+      media.className=
+        item.media_type==="audio"?"chat-audio":"chat-media";
+
       wrapper.appendChild(media);
     }
   }
@@ -266,14 +559,18 @@ function showMessage(item){
   const time=document.createElement("div");
   time.className="name";
   time.textContent=new Date(item.created_at).toLocaleString();
-  wrapper.appendChild(time);
 
+  wrapper.appendChild(time);
   messagesBox.appendChild(wrapper);
 }
 
+/* UPLOAD TO SUPABASE STORAGE */
+
 async function uploadChatMedia(file,mediaType){
   const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
-  const filePath=currentUser.id+"/"+Date.now()+"_"+safeName;
+
+  const filePath=
+    currentUser.id+"/"+Date.now()+"_"+safeName;
 
   const result=await supabaseClient.storage
     .from("bigvic-media")
@@ -288,11 +585,13 @@ async function uploadChatMedia(file,mediaType){
     .from("bigvic-media")
     .getPublicUrl(filePath);
 
-  return {
+  return{
     url:publicResult.data.publicUrl,
     type:mediaType
   };
 }
+
+/* SAVE CHAT MESSAGE */
 
 async function saveChatMessage(text,media){
   const result=await supabaseClient
@@ -308,8 +607,11 @@ async function saveChatMessage(text,media){
   if(result.error)throw result.error;
 }
 
+/* SEND TEXT MESSAGE */
+
 async function sendMessage(){
   const text=messageInput.value.trim();
+
   if(!text)return;
 
   if(!currentUser){
@@ -322,11 +624,15 @@ async function sendMessage(){
 
   try{
     await saveChatMessage(text,null);
+
     messageInput.value="";
+
     await loadMessages();
+
   }catch(error){
     console.error(error);
     alert("Message failed: "+error.message);
+
   }finally{
     sendButton.disabled=false;
     sendButton.textContent="Send";
@@ -342,8 +648,11 @@ messageInput.addEventListener("keydown",function(event){
   }
 });
 
+/* SELECT PHOTO OR VIDEO */
+
 chatMediaInput.addEventListener("change",function(event){
   const file=event.target.files[0];
+
   selectedMedia=null;
   sendMediaButton.disabled=true;
   mediaPreview.innerHTML="";
@@ -355,7 +664,10 @@ chatMediaInput.addEventListener("change",function(event){
 
   if(!file)return;
 
-  if(!file.type.startsWith("image/")&&!file.type.startsWith("video/")){
+  if(
+    !file.type.startsWith("image/")&&
+    !file.type.startsWith("video/")
+  ){
     mediaStatus.textContent="Please choose a picture or video.";
     chatMediaInput.value="";
     return;
@@ -371,6 +683,7 @@ chatMediaInput.addEventListener("change",function(event){
   previewURL=URL.createObjectURL(file);
 
   let preview;
+
   if(file.type.startsWith("image/")){
     preview=document.createElement("img");
     preview.alt="Picture preview";
@@ -381,20 +694,27 @@ chatMediaInput.addEventListener("change",function(event){
 
   preview.src=previewURL;
   mediaPreview.appendChild(preview);
+
   mediaStatus.textContent="Media ready to send.";
   sendMediaButton.disabled=false;
 });
 
+/* SEND PHOTO OR VIDEO */
+
 sendMediaButton.addEventListener("click",async function(){
   if(!selectedMedia||!currentUser)return;
+
+  const file=selectedMedia;
 
   sendMediaButton.disabled=true;
   sendMediaButton.textContent="Uploading...";
   mediaStatus.textContent="Uploading your media. Please wait...";
 
   try{
-    const type=selectedMedia.type.startsWith("image/")?"image":"video";
-    const media=await uploadChatMedia(selectedMedia,type);
+    const type=file.type.startsWith("image/")?"image":"video";
+
+    const media=await uploadChatMedia(file,type);
+
     const text=messageInput.value.trim();
 
     await saveChatMessage(text,media);
@@ -403,35 +723,45 @@ sendMediaButton.addEventListener("click",async function(){
     chatMediaInput.value="";
     selectedMedia=null;
     mediaPreview.innerHTML="";
-    mediaStatus.textContent="Media shared successfully! 🎉";
 
     if(previewURL){
       URL.revokeObjectURL(previewURL);
       previewURL=null;
     }
 
+    mediaStatus.textContent="Media shared successfully! 🎉";
+
     await loadMessages();
+
   }catch(error){
     console.error(error);
     mediaStatus.textContent="Upload failed: "+error.message;
+
   }finally{
     sendMediaButton.disabled=!selectedMedia;
     sendMediaButton.textContent="Send Media";
   }
 });
 
-/* VOICE NOTES */
+/* RECORD VOICE NOTES */
 
 startRecordButton.addEventListener("click",async function(){
   if(!currentUser)return;
 
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){
+  if(
+    !navigator.mediaDevices||
+    !navigator.mediaDevices.getUserMedia||
+    !window.MediaRecorder
+  ){
     alert("Voice recording is not supported by this browser.");
     return;
   }
 
   try{
-    recordingStream=await navigator.mediaDevices.getUserMedia({audio:true});
+    recordingStream=await navigator.mediaDevices.getUserMedia({
+      audio:true
+    });
+
     audioChunks=[];
 
     const mimeTypes=[
@@ -441,6 +771,7 @@ startRecordButton.addEventListener("click",async function(){
     ];
 
     let options={};
+
     for(const type of mimeTypes){
       if(MediaRecorder.isTypeSupported(type)){
         options={mimeType:type};
@@ -458,6 +789,7 @@ startRecordButton.addEventListener("click",async function(){
 
     mediaRecorder.onstop=async function(){
       const mime=mediaRecorder.mimeType||"audio/webm";
+
       const blob=new Blob(audioChunks,{type:mime});
 
       recordingStream.getTracks().forEach(track=>track.stop());
@@ -469,6 +801,7 @@ startRecordButton.addEventListener("click",async function(){
       }
 
       const extension=mime.includes("mp4")?"m4a":"webm";
+
       const file=new File(
         [blob],
         "voice-note-"+Date.now()+"."+extension,
@@ -479,10 +812,15 @@ startRecordButton.addEventListener("click",async function(){
 
       try{
         const media=await uploadChatMedia(file,"audio");
+
         await saveChatMessage(messageInput.value.trim(),media);
+
         messageInput.value="";
+
         mediaStatus.textContent="Voice note sent successfully! 🎤";
+
         await loadMessages();
+
       }catch(error){
         console.error(error);
         mediaStatus.textContent="Voice upload failed: "+error.message;
@@ -490,28 +828,37 @@ startRecordButton.addEventListener("click",async function(){
     };
 
     mediaRecorder.start();
+
     startRecordButton.disabled=true;
     stopRecordButton.disabled=false;
-    mediaStatus.textContent="🔴 Recording... Tap Stop & Send when finished.";
+
+    mediaStatus.textContent=
+      "🔴 Recording... Tap Stop & Send when finished.";
+
   }catch(error){
     console.error(error);
     alert("Could not start recording. Please allow microphone access.");
   }
 });
 
+/* STOP AND SEND VOICE NOTE */
+
 stopRecordButton.addEventListener("click",function(){
   if(mediaRecorder&&mediaRecorder.state!=="inactive"){
     mediaRecorder.stop();
+
     startRecordButton.disabled=false;
     stopRecordButton.disabled=true;
+
     mediaStatus.textContent="Finishing your voice note...";
   }
 });
 
-/* PROFILE PHOTO */
+/* CHANGE PROFILE PHOTO */
 
 photoInput.addEventListener("change",function(event){
   const file=event.target.files[0];
+
   if(!file)return;
 
   if(!file.type.startsWith("image/")){
@@ -525,10 +872,12 @@ photoInput.addEventListener("change",function(event){
   }
 
   const reader=new FileReader();
+
   reader.onload=function(e){
     localStorage.setItem("bigvic_avatar",e.target.result);
     profileAvatar.src=e.target.result;
   };
+
   reader.readAsDataURL(file);
 });
 
@@ -540,13 +889,14 @@ logoutButton.addEventListener("click",async function(){
   try{
     await supabaseClient.auth.signOut();
     window.location.href="/auth.html";
+
   }catch(error){
     console.error(error);
     alert("Could not log out. Please try again.");
     logoutButton.disabled=false;
   }
 });
-
 </script>
+
 </body>
 </html>
