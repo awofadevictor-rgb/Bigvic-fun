@@ -7,6 +7,7 @@
 <title>BigVic Fun</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/config.js"></script>
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#101322;color:white;font-family:Arial,sans-serif}
@@ -30,6 +31,7 @@ footer{text-align:center;color:#929bb2;padding:25px}
 .score-row{display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid #39415c}
 </style>
 </head>
+
 <body>
 
 <header>
@@ -105,12 +107,14 @@ footer{text-align:center;color:#929bb2;padding:25px}
 
 <section id="trending" class="page">
 <h2>🔥 Trending Posts</h2>
+
 <div class="card">
 <h3>Share something</h3>
 <textarea id="postText" placeholder="What's happening?"></textarea>
 <button onclick="addPost()">Publish Post</button>
 <p id="postMessage" class="small"></p>
 </div>
+
 <div id="posts"></div>
 </section>
 
@@ -199,6 +203,7 @@ async function checkLogin() {
       "You are logged in.";
 
     await loadPlayerScore();
+
   } catch (error) {
     document.getElementById("accountStatus").textContent =
       "Could not check your login. Please refresh.";
@@ -338,15 +343,9 @@ async function playRPS(player) {
   }
 }
 
-function getPosts() {
-  try {
-    return JSON.parse(localStorage.getItem("bigvic_posts") || "[]");
-  } catch (error) {
-    return [];
-  }
-}
+/* SHARED TRENDING POSTS */
 
-function addPost() {
+async function addPost() {
   const input = document.getElementById("postText");
   const message = document.getElementById("postMessage");
   const text = input.value.trim();
@@ -356,49 +355,83 @@ function addPost() {
     return;
   }
 
-  const posts = getPosts();
+  if (!db || !currentUser) {
+    message.textContent = "Please log in before publishing.";
+    return;
+  }
 
-  posts.unshift({
-    username: username,
-    content: text,
-    time: new Date().toLocaleString()
-  });
+  message.textContent = "Publishing...";
 
-  localStorage.setItem("bigvic_posts", JSON.stringify(posts));
+  const { error } = await db
+    .from("posts")
+    .insert({
+      user_id: currentUser.id,
+      username: username,
+      content: text
+    });
+
+  if (error) {
+    console.log("Post error:", error.message);
+    message.textContent = "Post failed: " + error.message;
+    return;
+  }
 
   input.value = "";
   message.textContent = "Posted successfully! 🎉";
-  loadPosts();
+
+  await loadPosts();
 }
 
-function loadPosts() {
+async function loadPosts() {
   const container = document.getElementById("posts");
-  const posts = getPosts();
+
+  if (!db || !currentUser) {
+    container.textContent = "Please wait while your account loads...";
+    return;
+  }
+
+  container.textContent = "Loading community posts...";
+
+  const { data, error } = await db
+    .from("posts")
+    .select("id,username,content,created_at")
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  if (error) {
+    console.log("Posts loading error:", error.message);
+    container.textContent = "Could not load posts: " + error.message;
+    return;
+  }
 
   container.innerHTML = "";
 
-  if (posts.length === 0) {
+  if (!data || data.length === 0) {
     container.textContent = "No posts yet. Be the first to post! 🔥";
     return;
   }
 
-  posts.forEach(function(post) {
+  data.forEach(function(post) {
     const box = document.createElement("div");
     box.className = "post";
 
     const name = document.createElement("strong");
-    name.textContent = "👤 " + post.username;
+    name.textContent = "👤 " + (post.username || "Player");
 
     const content = document.createElement("p");
     content.textContent = post.content;
 
     const time = document.createElement("small");
     time.className = "small";
-    time.textContent = post.time;
+
+    time.textContent = post.created_at
+      ? new Date(post.created_at).toLocaleString()
+      : "";
 
     box.appendChild(name);
     box.appendChild(content);
     box.appendChild(time);
+
     container.appendChild(box);
   });
 }
