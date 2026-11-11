@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BigVic Fun Profile</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2319233b'/%3E%3Ctext x='50' y='68' font-size='60' text-anchor='middle' fill='%23ffca28' font-family='Arial' font-weight='bold'%3EB%3C/text%3E%3C/svg%3E">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101322;color:white;font-family:Arial,sans-serif}
+.app{max-width:600px;margin:auto;min-height:100vh;padding:15px}
+header{background:#19233b;padding:18px;border-radius:12px;text-align:center;color:#ffca28}
+.card{background:#19233b;padding:20px;border-radius:12px;margin-top:18px}
+.avatar{width:110px;height:110px;border-radius:50%;object-fit:cover;border:3px solid #ffca28;display:block;margin:10px auto}
+h2{text-align:center;color:#ffca28}
+label{display:block;margin-top:15px;color:#ffca28;font-weight:bold}
+input,textarea{width:100%;padding:12px;margin-top:7px;border:1px solid #46506d;border-radius:8px;background:#101322;color:white;font-size:15px}
+textarea{min-height:100px;resize:vertical}
+button{border:0;border-radius:8px;padding:12px 16px;background:#ffca28;color:#101322;font-weight:bold;margin-top:15px;cursor:pointer}
+.back{display:block;text-align:center;color:#ffca28;margin-top:20px}
+#status{text-align:center;color:#ffca28;margin-top:12px;font-size:13px}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+<h1>BigVic Fun 👤</h1>
+<div>My Profile</div>
+</header>
+
+<div class="card">
+<img id="avatar" class="avatar" src="https://ui-avatars.com/api/?name=BigVic" alt="Profile picture">
+
+<h2 id="displayName">My Profile</h2>
+
+<label for="photo">Profile Picture</label>
+<input id="photo" type="file" accept="image/*">
+
+<label for="username">Username</label>
+<input id="username" maxlength="30" placeholder="Enter your username">
+
+<label for="bio">About Me</label>
+<textarea id="bio" maxlength="300" placeholder="Write something about yourself..."></textarea>
+
+<button id="saveButton">Save Profile</button>
+<div id="status">Loading profile...</div>
+</div>
+
+<a class="back" href="/chat/">← Back to Chat</a>
+</div>
+
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const client=window.supabase.createClient(
+window.SUPABASE_URL,
+window.SUPABASE_ANON_KEY
+);
+
+const avatar=document.getElementById("avatar");
+const usernameInput=document.getElementById("username");
+const bioInput=document.getElementById("bio");
+const photoInput=document.getElementById("photo");
+const saveButton=document.getElementById("saveButton");
+const statusBox=document.getElementById("status");
+const displayName=document.getElementById("displayName");
+
+let currentUser=null;
+let selectedPhoto=null;
+let existingAvatar=null;
+
+function makeAvatar(name){
+return "https://ui-avatars.com/api/?name="+
+encodeURIComponent(name||"BigVic")+
+"&background=303957&color=ffca28";
+}
+
+async function loadProfile(){
+try{
+const result=await client.auth.getUser();
+
+if(!result.data.user){
+window.location.href="/auth.html";
+return;
+}
+
+currentUser=result.data.user;
+
+const profile=await client
+.from("profiles")
+.select("username,bio,avatar")
+.eq("id",currentUser.id)
+.maybeSingle();
+
+if(profile.error)throw profile.error;
+
+usernameInput.value=profile.data?.username||"";
+bioInput.value=profile.data?.bio||"";
+existingAvatar=profile.data?.avatar||null;
+
+avatar.src=existingAvatar||makeAvatar(usernameInput.value);
+displayName.textContent=usernameInput.value||"My Profile";
+
+statusBox.textContent="Profile loaded successfully.";
+}catch(error){
+console.error(error);
+statusBox.textContent="Could not load profile: "+error.message;
+}
+}
+
+photoInput.addEventListener("change",function(){
+const file=photoInput.files[0];
+if(!file)return;
+
+if(!file.type.startsWith("image/")){
+alert("Please select an image.");
+photoInput.value="";
+return;
+}
+
+if(file.size>2*1024*1024){
+alert("Image must be smaller than 2 MB.");
+photoInput.value="";
+return;
+}
+
+selectedPhoto=file;
+avatar.src=URL.createObjectURL(file);
+});
+
+usernameInput.addEventListener("input",function(){
+displayName.textContent=usernameInput.value||"My Profile";
+});
+
+saveButton.addEventListener("click",async function(){
+if(!currentUser)return;
+
+const name=usernameInput.value.trim();
+const bio=bioInput.value.trim();
+
+if(!name){
+alert("Please enter a username.");
+return;
+}
+
+saveButton.disabled=true;
+statusBox.textContent="Saving profile...";
+
+try{
+let avatarUrl=existingAvatar;
+
+if(selectedPhoto){
+const extension=selectedPhoto.name.split(".").pop().replace(/[^a-zA-Z0-9]/g,"");
+const path=currentUser.id+"/profile_"+Date.now()+"."+extension;
+
+const upload=await client.storage
+.from("bigvic-media")
+.upload(path,selectedPhoto,{
+upsert:true,
+contentType:selectedPhoto.type
+});
+
+if(upload.error)throw upload.error;
+
+const publicResult=client.storage
+.from("bigvic-media")
+.getPublicUrl(path);
+
+avatarUrl=publicResult.data.publicUrl;
+}
+
+const update=await client
+.from("profiles")
+.upsert({
+id:currentUser.id,
+username:name,
+bio:bio,
+avatar:avatarUrl
+},{onConflict:"id"});
+
+if(update.error)throw update.error;
+
+existingAvatar=avatarUrl;
+selectedPhoto=null;
+displayName.textContent=name;
+avatar.src=avatarUrl||makeAvatar(name);
+
+localStorage.setItem("bigvic_username",name);
+if(avatarUrl)localStorage.setItem("bigvic_avatar",avatarUrl);
+
+statusBox.textContent="Profile saved successfully! 🎉";
+}catch(error){
+console.error(error);
+statusBox.textContent="Could not save: "+error.message;
+}finally{
+saveButton.disabled=false;
+}
+});
+
+loadProfile();
+</script>
+</body>
+</html>
