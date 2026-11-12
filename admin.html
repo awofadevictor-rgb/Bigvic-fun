@@ -32,17 +32,27 @@ h1 {
 }
 
 button {
-    padding: 11px 16px;
+    padding: 10px 15px;
     margin: 4px;
     border: 0;
     border-radius: 8px;
     background: #2563eb;
     color: white;
     font-weight: bold;
+    cursor: pointer;
 }
 
 .logout {
     background: #dc2626;
+}
+
+.suspend {
+    background: #f59e0b;
+    color: #111827;
+}
+
+.restore {
+    background: #16a34a;
 }
 
 .status {
@@ -100,11 +110,35 @@ button {
     margin-bottom: 10px;
 }
 
+.user.suspended {
+    background: #fff7ed;
+    border-color: #fdba74;
+}
+
 .small {
     color: #64748b;
     font-size: 13px;
     margin-top: 6px;
     word-break: break-word;
+}
+
+.badge {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.suspended-badge {
+    background: #fee2e2;
+    color: #991b1b;
 }
 
 .hidden {
@@ -185,7 +219,7 @@ Total Reports
 
 <div class="box">
 
-<h2>Users</h2>
+<h2>User Management</h2>
 
 <div id="users" class="loading">
 Loading users...
@@ -261,9 +295,7 @@ async function startDashboard() {
 
 
         await loadUsers();
-
         await loadPosts();
-
         await loadReports();
 
 
@@ -291,7 +323,7 @@ async function loadUsers() {
             await supabaseClient
             .from("profiles")
             .select(
-                "id, username, email, bio, last_seen"
+                "id, username, email, bio, last_seen, is_suspended"
             )
             .order(
                 "username",
@@ -327,8 +359,11 @@ async function loadUsers() {
         box.innerHTML =
             users.map(user => {
 
+                const suspended =
+                    user.is_suspended === true;
+
                 return `
-                    <div class="user">
+                    <div class="user ${suspended ? "suspended" : ""}">
 
                         <strong>
                             ${escapeHTML(
@@ -336,6 +371,20 @@ async function loadUsers() {
                                 "Unnamed user"
                             )}
                         </strong>
+
+                        <div class="badge ${
+                            suspended
+                            ? "suspended-badge"
+                            : "active"
+                        }">
+
+                            ${
+                                suspended
+                                ? "SUSPENDED"
+                                : "ACTIVE"
+                            }
+
+                        </div>
 
                         <div class="small">
                             Email:
@@ -360,6 +409,30 @@ async function loadUsers() {
                             )}
                         </div>
 
+                        <div style="margin-top:10px;">
+
+                            ${
+                                suspended
+
+                                ? `
+                                <button
+                                    class="restore"
+                                    onclick="restoreUser('${user.id}')">
+                                    Restore Account
+                                </button>
+                                `
+
+                                : `
+                                <button
+                                    class="suspend"
+                                    onclick="suspendUser('${user.id}')">
+                                    Suspend Account
+                                </button>
+                                `
+                            }
+
+                        </div>
+
                     </div>
                 `;
 
@@ -376,6 +449,82 @@ async function loadUsers() {
             </div>
         `;
     }
+}
+
+
+async function suspendUser(userId) {
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to suspend this account?"
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    const result =
+        await supabaseClient
+        .from("profiles")
+        .update({
+            is_suspended: true
+        })
+        .eq("id", userId);
+
+
+    if (result.error) {
+
+        alert(
+            "Could not suspend account:\n\n" +
+            result.error.message
+        );
+
+        return;
+    }
+
+
+    alert("Account suspended successfully.");
+
+    await loadUsers();
+}
+
+
+async function restoreUser(userId) {
+
+    const confirmed =
+        confirm(
+            "Restore this account?"
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    const result =
+        await supabaseClient
+        .from("profiles")
+        .update({
+            is_suspended: false
+        })
+        .eq("id", userId);
+
+
+    if (result.error) {
+
+        alert(
+            "Could not restore account:\n\n" +
+            result.error.message
+        );
+
+        return;
+    }
+
+
+    alert("Account restored successfully.");
+
+    await loadUsers();
 }
 
 
