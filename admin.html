@@ -18,29 +18,35 @@ body {
     margin: 0;
     font-family: Arial, sans-serif;
     background: #f1f5f9;
-    color: #0f172a;
+    color: #111827;
 }
 
 header {
     background: #111827;
     color: white;
-    padding: 18px;
+    padding: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px;
 }
 
 header h1 {
     margin: 0;
-    font-size: 21px;
+    font-size: 20px;
 }
 
 button {
     border: 0;
     border-radius: 8px;
-    padding: 10px 15px;
-    cursor: pointer;
+    padding: 10px 14px;
     font-weight: bold;
+    cursor: pointer;
+}
+
+.home {
+    background: #2563eb;
+    color: white;
 }
 
 .logout {
@@ -54,81 +60,16 @@ button {
     padding: 20px;
 }
 
-.status {
+.box {
     background: white;
-    padding: 18px;
     border-radius: 12px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.08);
-}
-
-.status h2 {
-    margin-top: 0;
-}
-
-.stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-.card {
-    background: white;
     padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.08);
-}
-
-.card h3 {
-    margin: 0 0 8px;
-    font-size: 15px;
-    color: #64748b;
-}
-
-.number {
-    font-size: 30px;
-    font-weight: bold;
-}
-
-.section {
-    background: white;
     margin-bottom: 20px;
-    padding: 20px;
-    border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,.08);
 }
 
-.section h2 {
-    margin-top: 0;
-}
-
-.user {
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 13px;
-    margin-bottom: 10px;
-}
-
-.user strong {
-    display: block;
-    margin-bottom: 5px;
-}
-
-.small {
-    color: #64748b;
-    font-size: 13px;
-}
-
-.home {
-    background: #2563eb;
-    color: white;
-    margin-right: 8px;
-}
-
-.error {
-    background: #fee2e2;
-    color: #991b1b;
+.hidden {
+    display: none;
 }
 
 .success {
@@ -136,99 +77,54 @@ button {
     color: #166534;
 }
 
-.hidden {
-    display: none;
+.error {
+    background: #fee2e2;
+    color: #991b1b;
 }
-</style>
-</head>
 
-<body>
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 15px;
+}
 
-<header>
-    <h1>BigVic Fun Admin Dashboard</h1>
+.stat {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
 
-    <div>
-        <button class="home" onclick="goHome()">Home</button>
-        <button class="home" onclick="goChat()">Chat</button>
-        <button class="logout" onclick="logout()">Logout</button>
-    </div>
-</header>
+.stat-title {
+    color: #64748b;
+    font-size: 14px;
+}
 
-<div class="container">
+.stat-number {
+    font-size: 30px;
+    font-weight: bold;
+    margin-top: 5px;
+}
 
-    <div id="checking" class="status">
-        <h2>Checking administrator access...</h2>
-        <p>Please wait.</p>
-    </div>
+.user {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 10px;
+}
 
-    <div id="denied" class="status error hidden">
-        <h2>Access denied</h2>
-        <p>This account is not the administrator account.</p>
-    </div>
+.small {
+    color: #64748b;
+    font-size: 13px;
+    margin-top: 5px;
+}
 
-    <div id="dashboard" class="hidden">
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
 
-        <div class="status success">
-            <h2>Administrator access granted</h2>
-            <p id="adminAccount"></p>
-        </div>
-
-        <div class="stats">
-
-            <div class="card">
-                <h3>Total Users</h3>
-                <div id="userCount" class="number">0</div>
-            </div>
-
-            <div class="card">
-                <h3>Total Posts</h3>
-                <div id="postCount" class="number">0</div>
-            </div>
-
-            <div class="card">
-                <h3>Reports</h3>
-                <div id="reportCount" class="number">0</div>
-            </div>
-
-        </div>
-
-        <div class="section">
-            <h2>User Management</h2>
-            <div id="users">
-                Loading users...
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>Reports</h2>
-            <div id="reports">
-                Loading reports...
-            </div>
-        </div>
-
-    </div>
-
-</div>
-
-<script>
-
-const supabaseClient = window.supabase.createClient(
-    window.SUPABASE_URL,
-    window.SUPABASE_ANON_KEY
-);
-
-async function checkAdmin() {
-
-    try {
-
-        document.getElementById("checking").classList.remove("hidden");
-        document.getElementById("denied").classList.add("hidden");
-        document.getElementById("dashboard").classList.add("hidden");
-
-        const {
-            data: { user },
-            error
-        } = await supabaseClient.auth.getUser();
-
-        if (error) {
-            throw error
+td, th {
+    text-align: left;
+    padding: 10px;
+   
