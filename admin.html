@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>BigVic Fun Admin</title>
+<title>BigVic Fun Admin Dashboard</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/config.js"></script>
@@ -15,15 +15,16 @@ body {
     background: #f1f5f9;
     margin: 0;
     padding: 20px;
+    color: #111827;
 }
 
 .box {
-    max-width: 700px;
-    margin: 40px auto;
+    max-width: 1000px;
+    margin: 25px auto;
     background: white;
-    padding: 25px;
+    padding: 22px;
     border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }
 
 h1 {
@@ -31,8 +32,8 @@ h1 {
 }
 
 button {
-    padding: 12px 18px;
-    margin: 5px;
+    padding: 11px 16px;
+    margin: 4px;
     border: 0;
     border-radius: 8px;
     background: #2563eb;
@@ -40,11 +41,14 @@ button {
     font-weight: bold;
 }
 
+.logout {
+    background: #dc2626;
+}
+
 .status {
     padding: 15px;
-    background: #e0f2fe;
     border-radius: 8px;
-    margin-top: 15px;
+    margin-bottom: 20px;
 }
 
 .success {
@@ -56,6 +60,60 @@ button {
     background: #fee2e2;
     color: #991b1b;
 }
+
+.info {
+    background: #e0f2fe;
+    color: #075985;
+}
+
+.stats {
+    max-width: 1000px;
+    margin: 25px auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+.stat {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.stat-title {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.stat-number {
+    font-size: 32px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.user,
+.report {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.small {
+    color: #64748b;
+    font-size: 13px;
+    margin-top: 6px;
+    word-break: break-word;
+}
+
+.hidden {
+    display: none;
+}
+
+.loading {
+    color: #64748b;
+}
 </style>
 </head>
 
@@ -65,12 +123,11 @@ button {
 
 <h1>BigVic Fun Admin Dashboard</h1>
 
-<div id="status" class="status">
+<div id="status" class="status info">
 Checking login...
 </div>
 
-<br>
-
+<div>
 <button onclick="location.href='/'">
 Home
 </button>
@@ -79,11 +136,76 @@ Home
 Chat
 </button>
 
-<button onclick="location.href='/auth.html'">
-Login
+<button class="logout" onclick="logout()">
+Logout
 </button>
+</div>
 
 </div>
+
+
+<div id="dashboard" class="hidden">
+
+<div class="stats">
+
+<div class="stat">
+<div class="stat-title">
+Total Users
+</div>
+
+<div id="userCount" class="stat-number">
+0
+</div>
+</div>
+
+
+<div class="stat">
+<div class="stat-title">
+Total Posts
+</div>
+
+<div id="postCount" class="stat-number">
+0
+</div>
+</div>
+
+
+<div class="stat">
+<div class="stat-title">
+Total Reports
+</div>
+
+<div id="reportCount" class="stat-number">
+0
+</div>
+</div>
+
+</div>
+
+
+<div class="box">
+
+<h2>Users</h2>
+
+<div id="users" class="loading">
+Loading users...
+</div>
+
+</div>
+
+
+<div class="box">
+
+<h2>Reports</h2>
+
+<div id="reports" class="loading">
+Loading reports...
+</div>
+
+</div>
+
+</div>
+
 
 <script>
 
@@ -93,7 +215,8 @@ const supabaseClient =
         window.SUPABASE_ANON_KEY
     );
 
-async function checkLogin() {
+
+async function startDashboard() {
 
     const status =
         document.getElementById("status");
@@ -109,27 +232,40 @@ async function checkLogin() {
             throw error;
         }
 
-        if (data.session) {
 
-            status.className =
-                "status success";
-
-            status.innerHTML = `
-                <strong>Login detected.</strong><br><br>
-                Your BigVic Fun account is logged in.
-            `;
-
-        } else {
+        if (!data.session) {
 
             status.className =
                 "status error";
 
             status.innerHTML = `
                 <strong>Not logged in.</strong><br><br>
-                Please log in to your BigVic Fun account.
+                Please log in first.
             `;
 
+            return;
         }
+
+
+        status.className =
+            "status success";
+
+        status.innerHTML = `
+            <strong>Login detected.</strong><br><br>
+            Administrator dashboard loaded.
+        `;
+
+
+        document.getElementById("dashboard")
+            .classList.remove("hidden");
+
+
+        await loadUsers();
+
+        await loadPosts();
+
+        await loadReports();
+
 
     } catch (error) {
 
@@ -137,14 +273,275 @@ async function checkLogin() {
             "status error";
 
         status.innerHTML = `
-            <strong>Supabase error:</strong><br><br>
-            ${error.message}
+            <strong>Error:</strong><br><br>
+            ${escapeHTML(error.message)}
         `;
-
     }
 }
 
-checkLogin();
+
+async function loadUsers() {
+
+    const box =
+        document.getElementById("users");
+
+    try {
+
+        const result =
+            await supabaseClient
+            .from("profiles")
+            .select(
+                "id, username, email, bio, last_seen"
+            )
+            .order(
+                "username",
+                {
+                    ascending: true
+                }
+            );
+
+
+        if (result.error) {
+            throw result.error;
+        }
+
+
+        const users =
+            result.data || [];
+
+
+        document.getElementById("userCount")
+            .textContent =
+            users.length;
+
+
+        if (users.length === 0) {
+
+            box.innerHTML =
+                "<p>No users found.</p>";
+
+            return;
+        }
+
+
+        box.innerHTML =
+            users.map(user => {
+
+                return `
+                    <div class="user">
+
+                        <strong>
+                            ${escapeHTML(
+                                user.username ||
+                                "Unnamed user"
+                            )}
+                        </strong>
+
+                        <div class="small">
+                            Email:
+                            ${escapeHTML(
+                                user.email ||
+                                "No email"
+                            )}
+                        </div>
+
+                        <div class="small">
+                            Bio:
+                            ${escapeHTML(
+                                user.bio ||
+                                "No bio"
+                            )}
+                        </div>
+
+                        <div class="small">
+                            User ID:
+                            ${escapeHTML(
+                                user.id
+                            )}
+                        </div>
+
+                    </div>
+                `;
+
+            }).join("");
+
+    } catch (error) {
+
+        box.innerHTML = `
+            <div class="status error">
+                Could not load users:<br><br>
+                ${escapeHTML(
+                    error.message
+                )}
+            </div>
+        `;
+    }
+}
+
+
+async function loadPosts() {
+
+    try {
+
+        const result =
+            await supabaseClient
+            .from("posts")
+            .select(
+                "id",
+                {
+                    count: "exact",
+                    head: true
+                }
+            );
+
+
+        if (result.error) {
+            throw result.error;
+        }
+
+
+        document.getElementById("postCount")
+            .textContent =
+            result.count || 0;
+
+    } catch (error) {
+
+        document.getElementById("postCount")
+            .textContent = "?";
+    }
+}
+
+
+async function loadReports() {
+
+    const box =
+        document.getElementById("reports");
+
+    try {
+
+        const result =
+            await supabaseClient
+            .from("user_reports")
+            .select(
+                "id, reporter_id, reported_id, reason, details, created_at"
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            );
+
+
+        if (result.error) {
+            throw result.error;
+        }
+
+
+        const reports =
+            result.data || [];
+
+
+        document.getElementById("reportCount")
+            .textContent =
+            reports.length;
+
+
+        if (reports.length === 0) {
+
+            box.innerHTML =
+                "<p>No reports yet.</p>";
+
+            return;
+        }
+
+
+        box.innerHTML =
+            reports.map(report => {
+
+                return `
+                    <div class="report">
+
+                        <strong>
+                            ${escapeHTML(
+                                report.reason ||
+                                "Report"
+                            )}
+                        </strong>
+
+                        <div class="small">
+                            Reporter:
+                            ${escapeHTML(
+                                report.reporter_id
+                            )}
+                        </div>
+
+                        <div class="small">
+                            Reported user:
+                            ${escapeHTML(
+                                report.reported_id
+                            )}
+                        </div>
+
+                        <div class="small">
+                            Details:
+                            ${escapeHTML(
+                                report.details ||
+                                "No details"
+                            )}
+                        </div>
+
+                        <div class="small">
+                            Date:
+                            ${escapeHTML(
+                                report.created_at
+                                ? new Date(
+                                    report.created_at
+                                ).toLocaleString()
+                                : "Unknown"
+                            )}
+                        </div>
+
+                    </div>
+                `;
+
+            }).join("");
+
+    } catch (error) {
+
+        box.innerHTML = `
+            <div class="status error">
+                Could not load reports:<br><br>
+                ${escapeHTML(
+                    error.message
+                )}
+            </div>
+        `;
+    }
+}
+
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+async function logout() {
+
+    await supabaseClient.auth.signOut();
+
+    location.href =
+        "/auth.html";
+}
+
+
+startDashboard();
 
 </script>
 
