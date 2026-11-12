@@ -3,156 +3,141 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BigVic Fun Admin</title>
+
+<title>BigVic Fun Admin Dashboard</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/config.js"></script>
 
 <style>
-*{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#f4f7fb;
-  color:#172033;
+* {
+    box-sizing: border-box;
 }
 
-header{
-  background:linear-gradient(135deg,#111827,#2563eb);
-  color:white;
-  padding:24px 18px;
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f1f5f9;
+    color: #0f172a;
 }
 
-header h1{
-  margin:0;
-  font-size:25px;
+header {
+    background: #111827;
+    color: white;
+    padding: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-header p{
-  margin:7px 0 0;
+header h1 {
+    margin: 0;
+    font-size: 21px;
 }
 
-.container{
-  max-width:1100px;
-  margin:auto;
-  padding:18px;
+button {
+    border: 0;
+    border-radius: 8px;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-weight: bold;
 }
 
-.card{
-  background:white;
-  border-radius:16px;
-  padding:18px;
-  margin-bottom:18px;
-  box-shadow:0 5px 20px rgba(0,0,0,.08);
+.logout {
+    background: #ef4444;
+    color: white;
 }
 
-.buttons{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:16px;
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 20px;
 }
 
-button{
-  border:0;
-  padding:11px 16px;
-  border-radius:10px;
-  font-weight:bold;
-  cursor:pointer;
+.status {
+    background: white;
+    padding: 18px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
 }
 
-.home{
-  background:white;
-  color:#111827;
+.status h2 {
+    margin-top: 0;
 }
 
-.logout{
-  background:#dc2626;
-  color:white;
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
 }
 
-.status{
-  padding:14px;
-  border-radius:10px;
-  margin-bottom:18px;
-  background:#eff6ff;
-  color:#1d4ed8;
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
 }
 
-.success{
-  background:#f0fdf4;
-  color:#15803d;
+.card h3 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    color: #64748b;
 }
 
-.error{
-  background:#fef2f2;
-  color:#b91c1c;
+.number {
+    font-size: 30px;
+    font-weight: bold;
 }
 
-.hidden{
-  display:none!important;
+.section {
+    background: white;
+    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
 }
 
-.stats{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-  margin-bottom:18px;
+.section h2 {
+    margin-top: 0;
 }
 
-.stat{
-  background:white;
-  border-radius:16px;
-  padding:20px;
-  box-shadow:0 5px 20px rgba(0,0,0,.08);
+.user {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 13px;
+    margin-bottom: 10px;
 }
 
-.number{
-  font-size:30px;
-  font-weight:bold;
-  color:#2563eb;
+.user strong {
+    display: block;
+    margin-bottom: 5px;
 }
 
-.label{
-  color:#64748b;
-  margin-top:5px;
+.small {
+    color: #64748b;
+    font-size: 13px;
 }
 
-.table-wrap{
-  overflow-x:auto;
+.home {
+    background: #2563eb;
+    color: white;
+    margin-right: 8px;
 }
 
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:600px;
+.error {
+    background: #fee2e2;
+    color: #991b1b;
 }
 
-th,td{
-  padding:11px;
-  border-bottom:1px solid #e5e7eb;
-  text-align:left;
+.success {
+    background: #dcfce7;
+    color: #166534;
 }
 
-th{
-  background:#f8fafc;
-}
-
-.loading{
-  padding:20px;
-  text-align:center;
-  color:#64748b;
-}
-
-@media(max-width:700px){
-  .stats{
-    grid-template-columns:1fr;
-  }
-
-  .container{
-    padding:12px;
-  }
+.hidden {
+    display: none;
 }
 </style>
 </head>
@@ -160,482 +145,90 @@ th{
 <body>
 
 <header>
+    <h1>BigVic Fun Admin Dashboard</h1>
 
-<h1>🛡️ BigVic Fun Admin</h1>
-
-<p>Administrator Dashboard</p>
-
-<div class="buttons">
-
-<button class="home"
-onclick="location.href='/'">
-🏠 Home
-</button>
-
-<button class="home"
-onclick="location.href='/chat/'">
-💬 Chat
-</button>
-
-<button class="logout"
-onclick="logout()">
-🚪 Logout
-</button>
-
-</div>
-
+    <div>
+        <button class="home" onclick="goHome()">Home</button>
+        <button class="home" onclick="goChat()">Chat</button>
+        <button class="logout" onclick="logout()">Logout</button>
+    </div>
 </header>
 
-<main class="container">
+<div class="container">
 
-<div id="status" class="status">
-Checking administrator access...
-</div>
+    <div id="checking" class="status">
+        <h2>Checking administrator access...</h2>
+        <p>Please wait.</p>
+    </div>
 
-<div id="dashboard" class="hidden">
+    <div id="denied" class="status error hidden">
+        <h2>Access denied</h2>
+        <p>This account is not the administrator account.</p>
+    </div>
 
-<div class="stats">
+    <div id="dashboard" class="hidden">
 
-<div class="stat">
-<div id="usersNumber" class="number">0</div>
-<div class="label">Users</div>
-</div>
+        <div class="status success">
+            <h2>Administrator access granted</h2>
+            <p id="adminAccount"></p>
+        </div>
 
-<div class="stat">
-<div id="postsNumber" class="number">0</div>
-<div class="label">Posts</div>
-</div>
+        <div class="stats">
 
-<div class="stat">
-<div id="reportsNumber" class="number">0</div>
-<div class="label">Reports</div>
-</div>
+            <div class="card">
+                <h3>Total Users</h3>
+                <div id="userCount" class="number">0</div>
+            </div>
 
-</div>
+            <div class="card">
+                <h3>Total Posts</h3>
+                <div id="postCount" class="number">0</div>
+            </div>
 
-<div class="card">
+            <div class="card">
+                <h3>Reports</h3>
+                <div id="reportCount" class="number">0</div>
+            </div>
 
-<h2>👤 Users</h2>
+        </div>
 
-<div id="usersLoading"
-class="loading">
-Loading users...
-</div>
+        <div class="section">
+            <h2>User Management</h2>
+            <div id="users">
+                Loading users...
+            </div>
+        </div>
 
-<div class="table-wrap">
+        <div class="section">
+            <h2>Reports</h2>
+            <div id="reports">
+                Loading reports...
+            </div>
+        </div>
 
-<table id="usersTable"
-class="hidden">
-
-<thead>
-<tr>
-<th>Username</th>
-<th>Email</th>
-<th>Last Seen</th>
-</tr>
-</thead>
-
-<tbody id="usersBody"></tbody>
-
-</table>
-
-</div>
-
-</div>
-
-<div class="card">
-
-<h2>📢 Reports</h2>
-
-<div id="reportsLoading"
-class="loading">
-Loading reports...
-</div>
-
-<div class="table-wrap">
-
-<table id="reportsTable"
-class="hidden">
-
-<thead>
-<tr>
-<th>Reported User</th>
-<th>Reason</th>
-<th>Details</th>
-<th>Date</th>
-</tr>
-</thead>
-
-<tbody id="reportsBody"></tbody>
-
-</table>
+    </div>
 
 </div>
-
-</div>
-
-<div class="card">
-
-<h2>🔐 Admin Account</h2>
-
-<p id="adminAccount">
-Checking account...
-</p>
-
-<p>
-<strong>Status:</strong>
-Administrator access active
-</p>
-
-</div>
-
-</div>
-
-</main>
 
 <script>
 
-const client =
-window.supabase.createClient(
-window.SUPABASE_URL,
-window.SUPABASE_ANON_KEY
+const supabaseClient = window.supabase.createClient(
+    window.SUPABASE_URL,
+    window.SUPABASE_ANON_KEY
 );
 
+async function checkAdmin() {
 
-/*
-ADMIN SECURITY
+    try {
 
-This page uses your current logged-in
-Supabase account.
+        document.getElementById("checking").classList.remove("hidden");
+        document.getElementById("denied").classList.add("hidden");
+        document.getElementById("dashboard").classList.add("hidden");
 
-The first account that opens this page
-will be recorded locally in this browser
-as the administrator.
-*/
+        const {
+            data: { user },
+            error
+        } = await supabaseClient.auth.getUser();
 
-const savedAdmin =
-localStorage.getItem("bigvic_admin_id");
-
-
-async function checkAdmin(){
-
-const result =
-await client.auth.getSession();
-
-const session =
-result.data.session;
-
-
-if(!session){
-
-showError(
-"You are not logged in. Redirecting to login..."
-);
-
-setTimeout(function(){
-
-location.href="/auth.html";
-
-},1500);
-
-return;
-
-}
-
-
-const currentUserId =
-session.user.id;
-
-
-/*
-FIRST ADMIN SETUP
-
-If no admin has been saved yet,
-the currently logged-in account becomes
-the administrator on this browser.
-*/
-
-if(!savedAdmin){
-
-localStorage.setItem(
-"bigvic_admin_id",
-currentUserId
-);
-
-}
-
-
-/*
-CHECK ADMIN
-
-Only the account stored during setup
-can open the dashboard on this browser.
-*/
-
-const adminId =
-localStorage.getItem("bigvic_admin_id");
-
-
-if(currentUserId !== adminId){
-
-showError(
-"Access denied. This account is not the administrator."
-);
-
-return;
-
-}
-
-
-document
-.getElementById("dashboard")
-.classList.remove("hidden");
-
-
-document
-.getElementById("status")
-.textContent=
-"Administrator access verified.";
-
-
-document
-.getElementById("status")
-.className=
-"status success";
-
-
-document
-.getElementById("adminAccount")
-textContent=
-"Admin account: "+
-(session.user.email || "Email unavailable");
-
-
-loadUsers();
-loadPosts();
-loadReports();
-
-}
-
-
-function showError(message){
-
-const box =
-document.getElementById("status");
-
-box.textContent=
-message;
-
-box.className=
-"status error";
-
-}
-
-
-async function loadUsers(){
-
-try{
-
-const result=
-await client
-.from("profiles")
-.select(
-"username,email,last_seen",
-{count:"exact"}
-)
-.order("username",{
-ascending:true
-});
-
-
-if(result.error){
-throw result.error;
-}
-
-
-document
-.getElementById("usersNumber")
-.textContent=
-result.count ||
-result.data.length;
-
-
-const body=
-document.getElementById("usersBody");
-
-body.innerHTML="";
-
-
-result.data.forEach(function(user){
-
-const row=
-document.createElement("tr");
-
-row.innerHTML=`
-
-<td>
-${escapeHtml(
-user.username || "Unknown"
-)}
-</td>
-
-<td>
-${escapeHtml(
-user.email || "—"
-)}
-</td>
-
-<td>
-${formatDate(
-user.last_seen
-)}
-</td>
-
-`;
-
-body.appendChild(row);
-
-});
-
-
-document
-.getElementById("usersLoading")
-.classList.add("hidden");
-
-
-document
-.getElementById("usersTable")
-.classList.remove("hidden");
-
-}
-
-catch(error){
-
-const box=
-document.getElementById("usersLoading");
-
-box.textContent=
-"Could not load users: "+
-error.message;
-
-box.className=
-"loading error";
-
-}
-
-}
-
-
-async function loadPosts(){
-
-try{
-
-const result=
-await client
-.from("posts")
-.select("id",{
-count:"exact",
-head:true
-});
-
-
-if(result.error){
-throw result.error;
-}
-
-
-document
-.getElementById("postsNumber")
-.textContent=
-result.count || 0;
-
-}
-
-catch(error){
-
-document
-.getElementById("postsNumber")
-.textContent=
-"—";
-
-}
-
-}
-
-
-async function loadReports(){
-
-try{
-
-const result=
-await client
-.from("user_reports")
-.select(
-"id,reported_id,reason,details,created_at"
-)
-.order("created_at",{
-ascending:false
-});
-
-
-if(result.error){
-throw result.error;
-}
-
-
-document
-.getElementById("reportsNumber")
-.textContent=
-result.data.length;
-
-
-const body=
-document.getElementById("reportsBody");
-
-body.innerHTML="";
-
-
-if(result.data.length===0){
-
-body.innerHTML=`
-
-<tr>
-
-<td colspan="4">
-No reports yet.
-</td>
-
-</tr>
-
-`;
-
-}else{
-
-result.data.forEach(function(report){
-
-const row=
-document.createElement("tr");
-
-row.innerHTML=`
-
-<td>
-${escapeHtml(
-report.reported_id || "—"
-)}
-</td>
-
-<td>
-${escapeHtml(
-report.reason || "—"
-)}
-</td>
-
-<td>
-${escapeHtml(
-report.details || "—"
-)}
-</td>
-
-<td>
-${formatDate(
-report
+        if (error) {
+            throw error
