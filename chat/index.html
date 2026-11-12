@@ -78,15 +78,18 @@ body{margin:0;font-family:Arial,sans-serif;background:#101322;color:white}
 button:disabled{opacity:.5;cursor:not-allowed}
 [hidden]{display:none!important}
 
+/* SECURITY */
+#securityPanel{padding:15px;background:#19233b;border-bottom:1px solid #46506d}
+#securityPanel h3{color:#ffca28}
+#securityPanel select{width:100%;padding:12px;border-radius:8px;background:#101322;color:white;border:1px solid #46506d}
+#securityPanel button{margin-top:8px}
+#blockedUsersList{display:flex;flex-direction:column;gap:8px}
+.blocked-user-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px;background:#101322;border:1px solid #46506d;border-radius:8px}
+.blocked-user-row button{background:#ffca28;color:#101322;border:0;border-radius:6px;padding:7px;font-weight:bold}
+
 /* CALLING INTERFACE */
-#callBar,#incomingCallPanel,#activeCallPanel{
- display:none;padding:13px;background:#19233b;
- border-bottom:1px solid #46506d;text-align:center;
-}
-#callBar button,#incomingCallPanel button,#activeCallPanel button{
- border:0;border-radius:8px;padding:10px 13px;margin:4px;
- background:#ffca28;color:#101322;font-weight:bold;cursor:pointer;
-}
+#callBar,#incomingCallPanel,#activeCallPanel{display:none;padding:13px;background:#19233b;border-bottom:1px solid #46506d;text-align:center}
+#callBar button,#incomingCallPanel button,#activeCallPanel button{border:0;border-radius:8px;padding:10px 13px;margin:4px;background:#ffca28;color:#101322;font-weight:bold;cursor:pointer}
 #incomingCallPanel{border:2px solid #ffca28}
 #activeCallPanel h3,#incomingCallPanel h3{color:#ffca28}
 #callStatus{color:#ffca28;font-size:13px;margin:8px}
@@ -141,6 +144,45 @@ button:disabled{opacity:.5;cursor:not-allowed}
 
 <div id="status" class="status">Starting BigVic Chat...</div>
 
+<!-- SECURITY AND PRIVACY -->
+<div style="padding:12px;background:#19233b;border-bottom:1px solid #303957">
+<button id="securityButton" class="small-button" style="width:100%">🛡️ Security & Privacy</button>
+
+<div id="securityPanel" hidden>
+<h3>🔐 Message Privacy</h3>
+<p>Choose who can send you private messages:</p>
+
+<select id="messagePrivacy">
+<option value="everyone">Everyone</option>
+<option value="existing_chats">Existing chats only</option>
+<option value="nobody">Nobody</option>
+</select>
+
+<button id="savePrivacyButton" class="small-button" style="width:100%">Save Privacy Settings</button>
+
+<hr style="border-color:#46506d;margin:16px 0">
+
+<h3>🚫 Blocked Users</h3>
+<div id="blockedUsersList">Loading blocked users...</div>
+
+<hr style="border-color:#46506d;margin:16px 0">
+
+<h3>👤 Current Contact</h3>
+<p id="selectedSecurityContact">Choose a private contact first.</p>
+<button id="blockUserButton" class="small-button" style="width:100%">🚫 Block Selected User</button>
+<button id="reportUserButton" class="small-button" style="width:100%">🚩 Report Selected User</button>
+
+<hr style="border-color:#46506d;margin:16px 0">
+
+<h3>🔑 Account Protection</h3>
+<p id="securityEmail" style="overflow-wrap:anywhere"></p>
+<button id="resetPasswordButton" class="small-button" style="width:100%">Send Password Reset Email</button>
+
+<p id="securityStatus" style="font-size:12px;color:#ffca28"></p>
+<p style="font-size:12px;color:#aeb8d0">Never share your password or password-reset link with anyone.</p>
+</div>
+</div>
+
 <div class="chat-switch">
 <button id="publicButton" class="active">🌍 Public Chat</button>
 <button id="privateButton">🔒 Private Chat</button>
@@ -163,14 +205,12 @@ button:disabled{opacity:.5;cursor:not-allowed}
 
 <div id="conversationTitle">🌍 Public Chat</div>
 
-<!-- CALL BUTTONS -->
 <div id="callBar">
 <strong style="color:#ffca28">Private Calls</strong><br>
 <button id="voiceCallButton">📞 Voice Call</button>
 <button id="videoCallButton">📹 Video Call</button>
 </div>
 
-<!-- INCOMING CALL -->
 <div id="incomingCallPanel">
 <h3>📲 Incoming Call</h3>
 <p id="incomingCallText">Someone is calling you.</p>
@@ -178,7 +218,6 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <button id="rejectCallButton">Reject</button>
 </div>
 
-<!-- ACTIVE CALL -->
 <div id="activeCallPanel">
 <h3>📞 BigVic Call</h3>
 <div id="callStatus">Connecting...</div>
@@ -194,7 +233,6 @@ button:disabled{opacity:.5;cursor:not-allowed}
 
 <div id="typingIndicator"></div>
 <div id="messages"></div>
-
 <div id="mediaPreview"></div>
 <div id="mediaStatus"></div>
 
@@ -217,49 +255,51 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-const statusBox=document.getElementById("status");
-const messagesBox=document.getElementById("messages");
-const messageInput=document.getElementById("messageInput");
-const sendButton=document.getElementById("sendButton");
-const logoutButton=document.getElementById("logoutButton");
-const profileAvatar=document.getElementById("profileAvatar");
-const profileName=document.getElementById("profileName");
-const photoInput=document.getElementById("photoInput");
+const $=id=>document.getElementById(id);
 
-const publicButton=document.getElementById("publicButton");
-const privateButton=document.getElementById("privateButton");
-const groupButton=document.getElementById("groupButton");
-const contactsPanel=document.getElementById("contactsPanel");
-const contactsList=document.getElementById("contactsList");
-const groupsPanel=document.getElementById("groupsPanel");
-const groupsList=document.getElementById("groupsList");
-const createGroupButton=document.getElementById("createGroupButton");
-const addGroupMemberButton=document.getElementById("addGroupMemberButton");
+const statusBox=$("status");
+const messagesBox=$("messages");
+const messageInput=$("messageInput");
+const sendButton=$("sendButton");
+const logoutButton=$("logoutButton");
+const profileAvatar=$("profileAvatar");
+const profileName=$("profileName");
+const photoInput=$("photoInput");
 
-const conversationTitle=document.getElementById("conversationTitle");
-const typingIndicator=document.getElementById("typingIndicator");
+const publicButton=$("publicButton");
+const privateButton=$("privateButton");
+const groupButton=$("groupButton");
+const contactsPanel=$("contactsPanel");
+const contactsList=$("contactsList");
+const groupsPanel=$("groupsPanel");
+const groupsList=$("groupsList");
+const createGroupButton=$("createGroupButton");
+const addGroupMemberButton=$("addGroupMemberButton");
 
-const chatMediaInput=document.getElementById("chatMediaInput");
-const sendMediaButton=document.getElementById("sendMediaButton");
-const startRecordButton=document.getElementById("startRecordButton");
-const stopRecordButton=document.getElementById("stopRecordButton");
-const mediaPreview=document.getElementById("mediaPreview");
-const mediaStatus=document.getElementById("mediaStatus");
+const conversationTitle=$("conversationTitle");
+const typingIndicator=$("typingIndicator");
 
-const notificationButton=document.getElementById("notificationButton");
-const notificationCount=document.getElementById("notificationCount");
-const notificationsPanel=document.getElementById("notificationsPanel");
-const notificationsList=document.getElementById("notificationsList");
-const markNotificationsRead=document.getElementById("markNotificationsRead");
+const chatMediaInput=$("chatMediaInput");
+const sendMediaButton=$("sendMediaButton");
+const startRecordButton=$("startRecordButton");
+const stopRecordButton=$("stopRecordButton");
+const mediaPreview=$("mediaPreview");
+const mediaStatus=$("mediaStatus");
 
-const callBar=document.getElementById("callBar");
-const incomingCallPanel=document.getElementById("incomingCallPanel");
-const activeCallPanel=document.getElementById("activeCallPanel");
-const incomingCallText=document.getElementById("incomingCallText");
-const callStatus=document.getElementById("callStatus");
-const localVideo=document.getElementById("localVideo");
-const remoteVideo=document.getElementById("remoteVideo");
-const remoteAudio=document.getElementById("remoteAudio");
+const notificationButton=$("notificationButton");
+const notificationCount=$("notificationCount");
+const notificationsPanel=$("notificationsPanel");
+const notificationsList=$("notificationsList");
+const markNotificationsRead=$("markNotificationsRead");
+
+const callBar=$("callBar");
+const incomingCallPanel=$("incomingCallPanel");
+const activeCallPanel=$("activeCallPanel");
+const incomingCallText=$("incomingCallText");
+const callStatus=$("callStatus");
+const localVideo=$("localVideo");
+const remoteVideo=$("remoteVideo");
+const remoteAudio=$("remoteAudio");
 
 let supabaseClient;
 let currentUser;
@@ -282,7 +322,6 @@ let notifications=[];
 
 let username=localStorage.getItem("bigvic_username")||"BigVic";
 
-/* CALL VARIABLES */
 let activeCall=null;
 let incomingCall=null;
 let callPeer=null;
@@ -292,6 +331,10 @@ let callPollTimer=null;
 let processedCallSignals=new Set();
 let pendingCallIce=[];
 let callBusy=false;
+
+/* SECURITY STATE */
+let blockedUserIds=[];
+let messagePrivacy="everyone";
 
 function goHome(){window.location.href="/";}
 function goChat(){window.location.href="/chat/";}
@@ -310,38 +353,20 @@ profileName.textContent=username;
 
 const changeNameButton=document.createElement("button");
 changeNameButton.textContent="Change name";
-changeNameButton.style.marginTop="6px";
-changeNameButton.style.marginLeft="6px";
-changeNameButton.style.padding="6px 9px";
-changeNameButton.style.border="0";
-changeNameButton.style.borderRadius="6px";
-changeNameButton.style.background="#ffca28";
-changeNameButton.style.color="#101322";
-changeNameButton.style.fontSize="12px";
+changeNameButton.style.cssText="margin-top:6px;margin-left:6px;padding:6px 9px;border:0;border-radius:6px;background:#ffca28;color:#101322;font-size:12px";
 
 changeNameButton.onclick=async function(){
 const newName=prompt("Enter your BigVic name:",username);
 if(!newName||!newName.trim())return;
-
 username=newName.trim();
 localStorage.setItem("bigvic_username",username);
 profileName.textContent=username;
-
 if(currentUser){
-const result=await supabaseClient.from("profiles").upsert({
-id:currentUser.id,
-username:username
-});
-
-if(result.error){
-console.error(result.error);
-alert("Name saved on this device, but profile update failed.");
-}else{
-await loadContacts();
-}
+const result=await supabaseClient.from("profiles").upsert({id:currentUser.id,username:username});
+if(result.error)alert("Name saved on this device, but profile update failed.");
+else await loadContacts();
 }
 };
-
 profileName.parentElement.appendChild(changeNameButton);
 
 const savedAvatar=localStorage.getItem("bigvic_avatar");
@@ -351,10 +376,7 @@ if(savedAvatar)profileAvatar.src=savedAvatar;
 if(!window.SUPABASE_URL||!window.SUPABASE_ANON_KEY||!window.supabase){
 statusBox.textContent="BigVic setup error. Check your configuration.";
 }else{
-supabaseClient=window.supabase.createClient(
-window.SUPABASE_URL,
-window.SUPABASE_ANON_KEY
-);
+supabaseClient=window.supabase.createClient(window.SUPABASE_URL,window.SUPABASE_ANON_KEY);
 startChat();
 }
 
@@ -362,34 +384,27 @@ startChat();
 async function startChat(){
 try{
 statusBox.textContent="Checking login...";
-
 const result=await supabaseClient.auth.getUser();
 if(result.error)throw result.error;
-
 currentUser=result.data.user;
-
-if(!currentUser){
-window.location.href="/auth.html";
-return;
-}
+if(!currentUser){window.location.href="/auth.html";return;}
 
 await updatePresence();
 await loadContacts();
 await loadGroups();
 await loadMessages();
 await loadNotifications();
+await loadSecuritySettings();
 
 statusBox.textContent="Connected to BigVic Chat";
 
 if(refreshTimer)clearInterval(refreshTimer);
-
 refreshTimer=setInterval(async function(){
 await updatePresence();
 await loadUnreadCounts();
 renderContacts();
 await refreshTypingIndicator();
 await loadNotifications();
-
 if(chatMode==="private"&&activeContact)await loadMessages();
 if(chatMode==="group"&&activeGroup)await loadMessages();
 if(chatMode==="group")await loadGroups();
@@ -397,46 +412,27 @@ if(chatMode==="group")await loadGroups();
 
 if(callPollTimer)clearInterval(callPollTimer);
 callPollTimer=setInterval(function(){
-if(currentUser){
-pollBigVicCalls().catch(function(error){
-console.error("Call polling error:",error);
-});
-}
+if(currentUser)pollBigVicCalls().catch(console.error);
 },2500);
-
 updateCallControls();
-
 }catch(error){
 console.error(error);
 statusBox.textContent="Connection error: "+error.message;
 }
 }
 
-/* ONLINE PRESENCE */
+/* PRESENCE */
 async function updatePresence(){
 if(!currentUser)return;
-const result=await supabaseClient.from("profiles")
-.update({last_seen:new Date().toISOString()})
-.eq("id",currentUser.id);
+const result=await supabaseClient.from("profiles").update({last_seen:new Date().toISOString()}).eq("id",currentUser.id);
 if(result.error)console.error("Presence update:",result.error);
 }
 
 /* CONTACTS */
 async function loadContacts(){
-const result=await supabaseClient.from("profiles")
-.select("id,username,avatar,last_seen")
-.order("username",{ascending:true});
-
-if(result.error){
-console.error(result.error);
-contactsList.textContent="Could not load contacts. Check profile permissions.";
-return;
-}
-
-contacts=(result.data||[]).filter(function(person){
-return person.id!==currentUser.id;
-});
-
+const result=await supabaseClient.from("profiles").select("id,username,avatar,last_seen").order("username",{ascending:true});
+if(result.error){console.error(result.error);contactsList.textContent="Could not load contacts. Check profile permissions.";return;}
+contacts=(result.data||[]).filter(person=>person.id!==currentUser.id);
 await loadUnreadCounts();
 renderContacts();
 }
@@ -448,10 +444,7 @@ return Date.now()-new Date(person.last_seen).getTime()<60000;
 
 function renderContacts(){
 contactsList.innerHTML="";
-if(contacts.length===0){
-contactsList.textContent="No other registered users yet.";
-return;
-}
+if(contacts.length===0){contactsList.textContent="No other registered users yet.";return;}
 
 contacts.forEach(function(person){
 const button=document.createElement("button");
@@ -467,13 +460,10 @@ name.textContent=person.username||"BigVic User";
 
 const presence=document.createElement("span");
 presence.className="contact-presence";
-
 const dot=document.createElement("i");
 dot.className=isOnline(person)?"online-dot":"offline-dot";
-
 const label=document.createElement("span");
 label.textContent=isOnline(person)?"Online":"Offline";
-
 presence.append(dot,label);
 button.append(image,name,presence);
 
@@ -485,29 +475,26 @@ badge.textContent=unread>99?"99+":unread;
 button.appendChild(badge);
 }
 
-button.addEventListener("click",function(){selectContact(person);});
+if(blockedUserIds.includes(person.id)){
+const blocked=document.createElement("small");
+blocked.textContent="🚫 Blocked by you";
+blocked.style.color="#ff7777";
+button.appendChild(blocked);
+}
+
+button.addEventListener("click",()=>selectContact(person));
 contactsList.appendChild(button);
 });
 updateContactSelection();
 }
 
-/* UNREAD PRIVATE MESSAGE COUNTS */
+/* UNREAD COUNTS */
 async function loadUnreadCounts(){
 if(!currentUser)return;
-const result=await supabaseClient.from("messages")
-.select("sender")
-.eq("receiver",currentUser.id)
-.is("read_at",null);
-
-if(result.error){
-console.error("Unread count error:",result.error);
-return;
-}
-
+const result=await supabaseClient.from("messages").select("sender").eq("receiver",currentUser.id).is("read_at",null);
+if(result.error){console.error("Unread count error:",result.error);return;}
 const counts={};
-(result.data||[]).forEach(function(item){
-counts[item.sender]=(counts[item.sender]||0)+1;
-});
+(result.data||[]).forEach(item=>{counts[item.sender]=(counts[item.sender]||0)+1;});
 unreadCounts=counts;
 }
 
@@ -519,76 +506,46 @@ if(!notificationsPanel.hidden)await loadNotifications();
 
 async function loadNotifications(){
 if(!currentUser)return;
-
-const result=await supabaseClient.from("notifications")
-.select("*")
-.eq("user_id",currentUser.id)
-.order("created_at",{ascending:false})
-.limit(50);
-
-if(result.error){
-console.error("Notification loading error:",result.error);
-notificationsList.textContent="Could not load notifications: "+result.error.message;
-return;
-}
-
+const result=await supabaseClient.from("notifications").select("*").eq("user_id",currentUser.id).order("created_at",{ascending:false}).limit(50);
+if(result.error){console.error(result.error);notificationsList.textContent="Could not load notifications: "+result.error.message;return;}
 notifications=result.data||[];
-const unread=notifications.filter(function(item){return !item.is_read;}).length;
-notificationCount.textContent=unread>99?"99+":unread;
+notificationCount.textContent=notifications.filter(item=>!item.is_read).length;
 renderNotifications();
 }
 
 function renderNotifications(){
 notificationsList.innerHTML="";
-if(!notifications.length){
-notificationsList.textContent="No notifications yet. 🔔";
-return;
-}
-
+if(!notifications.length){notificationsList.textContent="No notifications yet. 🔔";return;}
 notifications.forEach(function(item){
 const card=document.createElement("div");
 card.className="notification-item"+(item.is_read?"":" unread");
-
 const title=document.createElement("strong");
 title.textContent=item.type==="group_message"?"👥 Group message":"💬 New private message";
-
 const message=document.createElement("p");
 message.textContent=item.message||"You have a new message.";
-
 const time=document.createElement("small");
 time.textContent=new Date(item.created_at).toLocaleString();
-
 card.append(title,message,time);
-card.addEventListener("click",function(){openNotification(item);});
+card.addEventListener("click",()=>openNotification(item));
 notificationsList.appendChild(card);
 });
 }
 
 async function openNotification(item){
 if(!item.is_read){
-const result=await supabaseClient.from("notifications")
-.update({is_read:true})
-.eq("id",item.id)
-.eq("user_id",currentUser.id);
-if(result.error)console.error("Could not mark notification read:",result.error);
+const result=await supabaseClient.from("notifications").update({is_read:true}).eq("id",item.id).eq("user_id",currentUser.id);
+if(result.error)console.error(result.error);
 }
-
 await loadNotifications();
-
 if(item.type==="private_message"&&item.actor_id){
-const person=contacts.find(function(c){return c.id===item.actor_id;});
+const person=contacts.find(c=>c.id===item.actor_id);
 if(person)await selectContact(person);
 }
-
 if(item.type==="group_message"&&item.related_id){
-let group=myGroups.find(function(g){return g.id===item.related_id;});
-if(!group){
-await loadGroups();
-group=myGroups.find(function(g){return g.id===item.related_id;});
-}
+let group=myGroups.find(g=>g.id===item.related_id);
+if(!group){await loadGroups();group=myGroups.find(g=>g.id===item.related_id);}
 if(group)await selectGroup(group);
 }
-
 notificationsPanel.hidden=true;
 }
 
@@ -596,33 +553,191 @@ markNotificationsRead.addEventListener("click",async function(){
 if(!currentUser)return;
 markNotificationsRead.disabled=true;
 try{
-const result=await supabaseClient.from("notifications")
-.update({is_read:true})
-.eq("user_id",currentUser.id)
-.eq("is_read",false);
+const result=await supabaseClient.from("notifications").update({is_read:true}).eq("user_id",currentUser.id).eq("is_read",false);
 if(result.error)throw result.error;
 await loadNotifications();
-}catch(error){
-console.error(error);
-alert("Could not mark notifications as read: "+error.message);
-}finally{
-markNotificationsRead.disabled=false;
-}
+}catch(error){alert("Could not mark notifications as read: "+error.message);}
+finally{markNotificationsRead.disabled=false;}
 });
 
 async function createNotification(userId,type,message,relatedId){
 if(!userId||userId===currentUser.id)return;
-const result=await supabaseClient.from("notifications").insert({
-user_id:userId,
-actor_id:currentUser.id,
-type:type,
-message:message,
-related_id:relatedId||null
-});
+const result=await supabaseClient.from("notifications").insert({user_id:userId,actor_id:currentUser.id,type:type,message:message,related_id:relatedId||null});
 if(result.error)console.error("Notification insert error:",result.error);
 }
 
-/* SELECT CONTACT */
+/* SECURITY AND PRIVACY */
+$("securityButton").addEventListener("click",async function(){
+$("securityPanel").hidden=!$("securityPanel").hidden;
+if(!$("securityPanel").hidden)await loadSecuritySettings();
+});
+
+async function loadSecuritySettings(){
+if(!currentUser)return;
+$("securityEmail").textContent="Signed in as: "+(currentUser.email||"Email unavailable");
+
+const profile=await supabaseClient.from("profiles").select("message_privacy").eq("id",currentUser.id).maybeSingle();
+if(profile.error){
+$("securityStatus").textContent="Could not load privacy setting: "+profile.error.message;
+}else{
+messagePrivacy=profile.data?.message_privacy||"everyone";
+$("messagePrivacy").value=messagePrivacy;
+}
+await loadBlockedUsers();
+updateSelectedSecurityContact();
+}
+
+async function loadBlockedUsers(){
+if(!currentUser)return;
+const result=await supabaseClient.from("blocked_users").select("blocked_id").eq("blocker_id",currentUser.id);
+if(result.error){
+$("blockedUsersList").textContent="Could not load blocked users: "+result.error.message;
+console.error(result.error);
+return;
+}
+blockedUserIds=(result.data||[]).map(item=>item.blocked_id);
+renderBlockedUsers();
+renderContacts();
+updateSelectedSecurityContact();
+}
+
+function renderBlockedUsers(){
+const list=$("blockedUsersList");
+list.innerHTML="";
+if(!blockedUserIds.length){
+list.textContent="You have not blocked anyone.";
+return;
+}
+blockedUserIds.forEach(function(id){
+const person=contacts.find(c=>c.id===id);
+const row=document.createElement("div");
+row.className="blocked-user-row";
+const name=document.createElement("span");
+name.textContent=person?.username||"Blocked user";
+const button=document.createElement("button");
+button.textContent="Unblock";
+button.onclick=()=>unblockUser(id);
+row.append(name,button);
+list.appendChild(row);
+});
+}
+
+$("savePrivacyButton").addEventListener("click",async function(){
+if(!currentUser)return;
+const value=$("messagePrivacy").value;
+$("savePrivacyButton").disabled=true;
+try{
+const result=await supabaseClient.from("profiles").update({message_privacy:value}).eq("id",currentUser.id);
+if(result.error)throw result.error;
+messagePrivacy=value;
+$("securityStatus").textContent="Privacy settings saved.";
+}catch(error){
+$("securityStatus").textContent="Could not save privacy settings: "+error.message;
+}finally{$("savePrivacyButton").disabled=false;}
+});
+
+function updateSelectedSecurityContact(){
+const person=activeContact;
+$("selectedSecurityContact").textContent=person?person.username||"BigVic User":"Choose a private contact first.";
+$("blockUserButton").disabled=!person;
+$("reportUserButton").disabled=!person||(person&&blockedUserIds.includes(person.id));
+$("blockUserButton").textContent=person&&blockedUserIds.includes(person.id)?"Unblock Selected User":"🚫 Block Selected User";
+}
+
+async function isEitherUserBlocked(userId){
+if(!userId||!currentUser)return false;
+if(blockedUserIds.includes(userId))return true;
+const result=await supabaseClient.from("blocked_users").select("id").eq("blocker_id",userId).eq("blocked_id",currentUser.id).maybeSingle();
+if(result.error)throw result.error;
+return !!result.data;
+}
+
+async function blockUser(userId){
+if(!userId||userId===currentUser.id)return;
+if(blockedUserIds.includes(userId))return;
+if(!confirm("Block this user? You will not be able to message or call them."))return;
+const result=await supabaseClient.from("blocked_users").insert({blocker_id:currentUser.id,blocked_id:userId});
+if(result.error){alert("Could not block user: "+result.error.message);return;}
+await loadBlockedUsers();
+$("securityStatus").textContent="User blocked successfully.";
+if(activeContact?.id===userId){
+messagesBox.innerHTML="";
+showEmptyMessage("This contact is blocked.");
+messageInput.disabled=true;
+sendButton.disabled=true;
+callBar.style.display="none";
+}
+}
+
+async function unblockUser(userId){
+if(!confirm("Unblock this user?"))return;
+const result=await supabaseClient.from("blocked_users").delete().eq("blocker_id",currentUser.id).eq("blocked_id",userId);
+if(result.error){alert("Could not unblock user: "+result.error.message);return;}
+await loadBlockedUsers();
+$("securityStatus").textContent="User unblocked.";
+if(activeContact?.id===userId){
+messageInput.disabled=false;
+sendButton.disabled=false;
+await loadMessages();
+}
+}
+
+$("blockUserButton").addEventListener("click",async function(){
+if(!activeContact){alert("Choose a private contact first.");return;}
+if(blockedUserIds.includes(activeContact.id)){
+await unblockUser(activeContact.id);
+}else{
+await blockUser(activeContact.id);
+}
+updateSelectedSecurityContact();
+});
+
+$("reportUserButton").addEventListener("click",async function(){
+if(!activeContact){alert("Choose a private contact first.");return;}
+const reason=prompt("Why are you reporting this user?\n\n1. Harassment\n2. Spam\n3. Fake account\n4. Inappropriate content\n5. Other");
+if(!reason||!reason.trim())return;
+const details=prompt("Add more details (optional):")||"";
+const result=await supabaseClient.from("user_reports").insert({
+reporter_id:currentUser.id,
+reported_id:activeContact.id,
+reason:reason.trim(),
+details:details.trim()
+});
+if(result.error){alert("Report failed: "+result.error.message);return;}
+$("securityStatus").textContent="Your report has been submitted.";
+alert("Report submitted successfully. Thank you.");
+});
+
+$("resetPasswordButton").addEventListener("click",async function(){
+if(!currentUser?.email){alert("Your account email could not be found.");return;}
+if(!confirm("Send a password reset email to "+currentUser.email+"?"))return;
+$("resetPasswordButton").disabled=true;
+try{
+const result=await supabaseClient.auth.resetPasswordForEmail(currentUser.email,{redirectTo:window.location.origin+"/auth.html"});
+if(result.error)throw result.error;
+alert("Password reset email requested. Check your inbox and spam folder.");
+}catch(error){alert("Could not send reset email: "+error.message);}
+finally{$("resetPasswordButton").disabled=false;}
+});
+
+async function checkReceiverPrivacy(userId){
+if(await isEitherUserBlocked(userId)){
+throw new Error("Messaging is unavailable because one of you has blocked the other.");
+}
+const result=await supabaseClient.from("profiles").select("message_privacy").eq("id",userId).maybeSingle();
+if(result.error)throw result.error;
+const privacy=result.data?.message_privacy||"everyone";
+if(privacy==="nobody")throw new Error("This user is not accepting private messages.");
+if(privacy==="existing_chats"){
+const previous=await supabaseClient.from("messages").select("id").or(
+"and(sender.eq."+currentUser.id+",receiver.eq."+userId+"),and(sender.eq."+userId+",receiver.eq."+currentUser.id+")"
+).limit(1);
+if(previous.error)throw previous.error;
+if(!previous.data?.length)throw new Error("This user only accepts messages from existing chats.");
+}
+}
+
+/* CONTACT SELECTION */
 async function selectContact(person){
 await stopTyping();
 activeContact=person;
@@ -634,13 +749,29 @@ groupsPanel.hidden=true;
 conversationTitle.textContent="🔒 Private chat with "+(person.username||"BigVic User");
 messageInput.placeholder="Message "+(person.username||"this user")+" privately...";
 updateContactSelection();
+updateSelectedSecurityContact();
+
+try{
+const blocked=await isEitherUserBlocked(person.id);
+messageInput.disabled=blocked;
+sendButton.disabled=blocked;
+callBar.style.display=blocked?"none":"block";
+if(blocked){
+messagesBox.innerHTML="";
+showEmptyMessage("Messaging and calls are unavailable because one of you has blocked the other.");
+typingIndicator.textContent="";
+return;
+}
 await loadMessages();
 await refreshTypingIndicator();
+}catch(error){
+showEmptyMessage("Could not check contact permissions: "+error.message);
+}
 updateCallControls();
 }
 
 function updateContactSelection(){
-document.querySelectorAll(".contact").forEach(function(button){
+document.querySelectorAll(".contact").forEach(button=>{
 button.classList.toggle("active",!!activeContact&&button.dataset.id===activeContact.id);
 });
 }
@@ -662,8 +793,11 @@ contactsPanel.hidden=true;
 groupsPanel.hidden=true;
 conversationTitle.textContent="🌍 Public Chat";
 messageInput.placeholder="Type a public message...";
+messageInput.disabled=false;
+sendButton.disabled=false;
 typingIndicator.textContent="";
 updateContactSelection();
+updateSelectedSecurityContact();
 await loadMessages();
 updateCallControls();
 });
@@ -676,19 +810,14 @@ activeGroup=null;
 setModeButtons();
 contactsPanel.hidden=false;
 groupsPanel.hidden=true;
-conversationTitle.textContent=activeContact
-?"🔒 Private chat with "+activeContact.username
-:"🔒 Choose a contact";
-
+conversationTitle.textContent=activeContact?"🔒 Private chat with "+activeContact.username:"🔒 Choose a contact";
 if(!activeContact){
 messagesBox.innerHTML="";
 typingIndicator.textContent="";
 showEmptyMessage("Choose someone above to start a private conversation.");
 }else{
-await loadMessages();
-await refreshTypingIndicator();
+await selectContact(activeContact);
 }
-
 updateContactSelection();
 await loadUnreadCounts();
 renderContacts();
@@ -703,84 +832,54 @@ activeContact=null;
 setModeButtons();
 contactsPanel.hidden=true;
 groupsPanel.hidden=false;
+messageInput.disabled=false;
+sendButton.disabled=false;
 messageInput.placeholder="Message your group...";
 conversationTitle.textContent=activeGroup?"👥 "+activeGroup.name:"👥 Choose a group";
 await loadGroups();
 if(activeGroup)await loadMessages();
-else{
-messagesBox.innerHTML="";
-showEmptyMessage("Choose a group or create a new one.");
-}
+else{messagesBox.innerHTML="";showEmptyMessage("Choose a group or create a new one.");}
+updateSelectedSecurityContact();
 updateCallControls();
 });
 
-/* LOAD GROUPS */
+/* GROUPS */
 async function loadGroups(){
 if(!currentUser)return;
-
-const membershipResult=await supabaseClient.from("group_members")
-.select("group_id,role").eq("user_id",currentUser.id);
-
-if(membershipResult.error){
-console.error("Group membership error:",membershipResult.error);
-groupsList.textContent="Could not load groups: "+membershipResult.error.message;
-return;
-}
-
-const memberships=membershipResult.data||[];
-const ids=memberships.map(function(item){return item.group_id;});
-
-if(ids.length===0){
+const membership=await supabaseClient.from("group_members").select("group_id,role").eq("user_id",currentUser.id);
+if(membership.error){groupsList.textContent="Could not load groups: "+membership.error.message;return;}
+const ids=(membership.data||[]).map(item=>item.group_id);
+if(!ids.length){
 myGroups=[];
-groupsList.innerHTML="";
-const empty=document.createElement("span");
-empty.className="name";
-empty.textContent="You haven't joined any groups yet.";
-groupsList.appendChild(empty);
+groupsList.innerHTML="You haven't joined any groups yet.";
 activeGroup=null;
 addGroupMemberButton.hidden=true;
 return;
 }
-
-const result=await supabaseClient.from("chat_groups")
-.select("id,name,description,created_by,created_at")
-.in("id",ids).order("created_at",{ascending:false});
-
-if(result.error){
-console.error("Groups error:",result.error);
-groupsList.textContent="Could not load groups: "+result.error.message;
-return;
-}
-
+const result=await supabaseClient.from("chat_groups").select("id,name,description,created_by,created_at").in("id",ids).order("created_at",{ascending:false});
+if(result.error){groupsList.textContent="Could not load groups: "+result.error.message;return;}
 myGroups=result.data||[];
 renderGroups();
 }
 
 function renderGroups(){
 groupsList.innerHTML="";
-if(!myGroups.length){
-groupsList.textContent="No groups yet.";
-return;
-}
-
-myGroups.forEach(function(group){
+if(!myGroups.length){groupsList.textContent="No groups yet.";return;}
+myGroups.forEach(group=>{
 const button=document.createElement("button");
 button.className="group-item";
 button.dataset.id=group.id;
-
 const title=document.createElement("strong");
 title.textContent="👥 "+group.name;
 const small=document.createElement("small");
 small.textContent=group.description||"BigVic group";
-
 button.append(title,small);
-if(activeGroup&&activeGroup.id===group.id)button.classList.add("active");
-button.addEventListener("click",function(){selectGroup(group);});
+if(activeGroup?.id===group.id)button.classList.add("active");
+button.addEventListener("click",()=>selectGroup(group));
 groupsList.appendChild(button);
 });
 }
 
-/* SELECT GROUP */
 async function selectGroup(group){
 await stopTyping();
 activeGroup=group;
@@ -789,10 +888,13 @@ chatMode="group";
 setModeButtons();
 contactsPanel.hidden=true;
 groupsPanel.hidden=false;
+messageInput.disabled=false;
+sendButton.disabled=false;
 conversationTitle.textContent="👥 "+group.name;
 messageInput.placeholder="Message "+group.name+"...";
 addGroupMemberButton.hidden=group.created_by!==currentUser.id;
 renderGroups();
+updateSelectedSecurityContact();
 await loadMessages();
 await refreshTypingIndicator();
 updateCallControls();
@@ -806,26 +908,13 @@ if(!currentUser)return;
 const name=prompt("Enter a name for your group:");
 if(!name||!name.trim())return;
 const description=prompt("Enter a short group description (optional):")||"";
-
 createGroupButton.disabled=true;
-createGroupButton.textContent="Creating...";
-
 try{
-const groupResult=await supabaseClient.from("chat_groups")
-.insert({
-name:name.trim(),
-description:description.trim(),
-created_by:currentUser.id
-}).select("id,name,description,created_by,created_at").single();
-
+const groupResult=await supabaseClient.from("chat_groups").insert({name:name.trim(),description:description.trim(),created_by:currentUser.id}).select("id,name,description,created_by,created_at").single();
 if(groupResult.error)throw groupResult.error;
 const group=groupResult.data;
-
-const memberResult=await supabaseClient.from("group_members").insert({
-group_id:group.id,user_id:currentUser.id,role:"admin"
-});
+const memberResult=await supabaseClient.from("group_members").insert({group_id:group.id,user_id:currentUser.id,role:"admin"});
 if(memberResult.error)throw memberResult.error;
-
 chatMode="group";
 activeContact=null;
 activeGroup=group;
@@ -835,13 +924,8 @@ groupsPanel.hidden=false;
 await loadGroups();
 await selectGroup(group);
 alert("Your group has been created successfully! 🎉");
-}catch(error){
-console.error("Create group error:",error);
-alert("Could not create group: "+error.message);
-}finally{
-createGroupButton.disabled=false;
-createGroupButton.textContent="＋ Create Group";
-}
+}catch(error){alert("Could not create group: "+error.message);}
+finally{createGroupButton.disabled=false;}
 }
 
 /* ADD GROUP MEMBER */
@@ -849,69 +933,32 @@ addGroupMemberButton.addEventListener("click",addGroupMember);
 
 async function addGroupMember(){
 if(!activeGroup)return;
-if(activeGroup.created_by!==currentUser.id){
-alert("Only the group creator can add members right now.");
-return;
-}
-if(!contacts.length){
-alert("There are no other registered users to add yet.");
-return;
-}
-
-const available=contacts.map(function(person){return person.username||"BigVic User";});
+if(activeGroup.created_by!==currentUser.id){alert("Only the group creator can add members.");return;}
+if(!contacts.length){alert("There are no other registered users to add yet.");return;}
+const available=contacts.map(person=>person.username||"BigVic User");
 const choice=prompt("Enter the exact username of the person to add:\n\n"+available.join("\n"));
 if(!choice||!choice.trim())return;
-
-const person=contacts.find(function(item){
-return (item.username||"").toLowerCase()===choice.trim().toLowerCase();
-});
-if(!person){
-alert("That username was not found. Please enter an exact username from the list.");
-return;
-}
-
+const person=contacts.find(item=>(item.username||"").toLowerCase()===choice.trim().toLowerCase());
+if(!person){alert("That username was not found.");return;}
 try{
-const existing=await supabaseClient.from("group_members")
-.select("user_id").eq("group_id",activeGroup.id)
-.eq("user_id",person.id).maybeSingle();
-
+const existing=await supabaseClient.from("group_members").select("user_id").eq("group_id",activeGroup.id).eq("user_id",person.id).maybeSingle();
 if(existing.error)throw existing.error;
-if(existing.data){
-alert(person.username+" is already in this group.");
-return;
-}
-
-const result=await supabaseClient.from("group_members").insert({
-group_id:activeGroup.id,user_id:person.id,role:"member"
-});
+if(existing.data){alert(person.username+" is already in this group.");return;}
+const result=await supabaseClient.from("group_members").insert({group_id:activeGroup.id,user_id:person.id,role:"member"});
 if(result.error)throw result.error;
-
-await createNotification(
-person.id,"group_message",
-username+" added you to the group "+activeGroup.name,
-activeGroup.id
-);
-
+await createNotification(person.id,"group_message",username+" added you to the group "+activeGroup.name,activeGroup.id);
 alert(person.username+" was added to the group! 🎉");
 await showGroupMembers();
-}catch(error){
-console.error("Add member error:",error);
-alert("Could not add member: "+error.message);
-}
+}catch(error){alert("Could not add member: "+error.message);}
 }
 
 async function showGroupMembers(){
 if(!activeGroup)return;
-const result=await supabaseClient.from("group_members")
-.select("user_id").eq("group_id",activeGroup.id);
-if(result.error){
-alert("Could not load group members: "+result.error.message);
-return;
-}
-const names=(result.data||[]).map(function(member){
+const result=await supabaseClient.from("group_members").select("user_id").eq("group_id",activeGroup.id);
+if(result.error){alert("Could not load group members: "+result.error.message);return;}
+const names=(result.data||[]).map(member=>{
 if(member.user_id===currentUser.id)return username;
-const person=contacts.find(function(c){return c.id===member.user_id;});
-return person?.username||"BigVic User";
+return contacts.find(c=>c.id===member.user_id)?.username||"BigVic User";
 });
 alert("Members of "+activeGroup.name+":\n\n"+names.join("\n"));
 }
@@ -919,27 +966,15 @@ alert("Members of "+activeGroup.name+":\n\n"+names.join("\n"));
 /* GROUP MESSAGES */
 async function loadGroupMessages(){
 if(!activeGroup)return;
-const result=await supabaseClient.from("group_messages")
-.select("*").eq("group_id",activeGroup.id)
-.order("created_at",{ascending:true}).limit(200);
-
-if(result.error){
-console.error("Group messages error:",result.error);
-statusBox.textContent="Group message error: "+result.error.message;
-return;
-}
-
+const result=await supabaseClient.from("group_messages").select("*").eq("group_id",activeGroup.id).order("created_at",{ascending:true}).limit(200);
+if(result.error){statusBox.textContent="Group message error: "+result.error.message;return;}
 messagesBox.innerHTML="";
-if(!result.data||result.data.length===0){
-showEmptyMessage("No messages in this group yet. Say hello! 👋");
-}else{
-result.data.forEach(showMessage);
-}
+if(!result.data?.length)showEmptyMessage("No messages in this group yet. Say hello! 👋");
+else result.data.forEach(showMessage);
 messagesBox.scrollTop=messagesBox.scrollHeight;
 statusBox.textContent="BigVic Fun Chat";
 }
 
-/* EMPTY CHAT */
 function showEmptyMessage(text){
 messagesBox.innerHTML="";
 const empty=document.createElement("p");
@@ -952,14 +987,8 @@ messagesBox.appendChild(empty);
 /* MARK PRIVATE MESSAGES READ */
 async function markConversationAsRead(){
 if(chatMode!=="private"||!activeContact||!currentUser)return;
-const result=await supabaseClient.from("messages")
-.update({read_at:new Date().toISOString()})
-.eq("sender",activeContact.id).eq("receiver",currentUser.id)
-.is("read_at",null);
-if(result.error){
-console.error("Could not mark messages as read:",result.error);
-return;
-}
+const result=await supabaseClient.from("messages").update({read_at:new Date().toISOString()}).eq("sender",activeContact.id).eq("receiver",currentUser.id).is("read_at",null);
+if(result.error)return;
 await loadUnreadCounts();
 renderContacts();
 }
@@ -967,39 +996,21 @@ renderContacts();
 /* LOAD MESSAGES */
 async function loadMessages(){
 if(!currentUser)return;
-if(chatMode==="group"){
-await loadGroupMessages();
-return;
-}
-
+if(chatMode==="group"){await loadGroupMessages();return;}
 let query=supabaseClient.from("messages").select("*");
 if(chatMode==="public"){
 query=query.eq("receiver","public");
 }else{
 if(!activeContact)return;
 const otherId=activeContact.id;
-query=query.or(
-"and(sender.eq."+currentUser.id+",receiver.eq."+otherId+
-"),and(sender.eq."+otherId+",receiver.eq."+currentUser.id+")"
-);
+query=query.or("and(sender.eq."+currentUser.id+",receiver.eq."+otherId+"),and(sender.eq."+otherId+",receiver.eq."+currentUser.id+")");
 }
-
 const result=await query.order("created_at",{ascending:true}).limit(200);
-if(result.error){
-console.error(result.error);
-statusBox.textContent="Messages error: "+result.error.message;
-return;
-}
-
+if(result.error){statusBox.textContent="Messages error: "+result.error.message;return;}
 messagesBox.innerHTML="";
-if(!result.data||result.data.length===0){
-showEmptyMessage(chatMode==="public"
-?"No public messages yet. Say hello! 👋"
-:"No private messages yet. Start the conversation! 💛");
-}else{
-result.data.forEach(showMessage);
-}
-
+if(!result.data?.length){
+showEmptyMessage(chatMode==="public"?"No public messages yet. Say hello! 👋":"No private messages yet. Start the conversation! 💛");
+}else result.data.forEach(showMessage);
 statusBox.textContent="BigVic Chat";
 messagesBox.scrollTop=messagesBox.scrollHeight;
 if(chatMode==="private")await markConversationAsRead();
@@ -1010,20 +1021,14 @@ function showMessage(item){
 const mine=item.sender===currentUser.id;
 const wrapper=document.createElement("div");
 wrapper.className=mine?"message mine":"message";
-
-const person=contacts.find(function(contact){return contact.id===item.sender;});
+const person=contacts.find(contact=>contact.id===item.sender);
 const displayName=mine?username:(person?.username||"BigVic User");
-
 const name=document.createElement("div");
 name.className="name";
 name.textContent=displayName;
-
 const avatar=document.createElement("img");
 avatar.className="avatar";
-avatar.src=mine
-?(localStorage.getItem("bigvic_avatar")||avatarURL(username))
-:(person?.avatar||avatarURL(displayName));
-
+avatar.src=mine?(localStorage.getItem("bigvic_avatar")||avatarURL(username)):(person?.avatar||avatarURL(displayName));
 wrapper.append(name,avatar);
 
 if(item.message){
@@ -1032,33 +1037,16 @@ bubble.className="bubble";
 bubble.textContent=item.message;
 wrapper.appendChild(bubble);
 }
-
 if(item.media_url){
 let media;
-if(item.media_type==="image"){
-media=document.createElement("img");
-media.alt="Shared picture";
-}else if(item.media_type==="video"){
-media=document.createElement("video");
-media.controls=true;
-media.preload="metadata";
-media.playsInline=true;
-}else if(item.media_type==="audio"){
-media=document.createElement("audio");
-media.controls=true;
-media.preload="metadata";
+if(item.media_type==="image"){media=document.createElement("img");media.alt="Shared picture";}
+else if(item.media_type==="video"){media=document.createElement("video");media.controls=true;media.preload="metadata";media.playsInline=true;}
+else if(item.media_type==="audio"){media=document.createElement("audio");media.controls=true;media.preload="metadata";}
+if(media){media.src=item.media_url;media.className=item.media_type==="audio"?"chat-audio":"chat-media";wrapper.appendChild(media);}
 }
-if(media){
-media.src=item.media_url;
-media.className=item.media_type==="audio"?"chat-audio":"chat-media";
-wrapper.appendChild(media);
-}
-}
-
 const meta=document.createElement("div");
 meta.className="message-meta";
 meta.textContent=new Date(item.created_at).toLocaleString();
-
 if(mine&&chatMode==="private"){
 const ticks=document.createElement("span");
 ticks.className=item.read_at?"read-ticks read":"read-ticks";
@@ -1067,20 +1055,19 @@ ticks.title=item.read_at?"Read":"Sent";
 meta.appendChild(ticks);
 }
 wrapper.appendChild(meta);
-
 if(mine){
 const actions=document.createElement("div");
 actions.className="message-actions";
 if(item.message){
-const editButton=document.createElement("button");
-editButton.textContent="✏️ Edit";
-editButton.onclick=function(){editMessage(item);};
-actions.appendChild(editButton);
+const edit=document.createElement("button");
+edit.textContent="✏️ Edit";
+edit.onclick=()=>editMessage(item);
+actions.appendChild(edit);
 }
-const deleteButton=document.createElement("button");
-deleteButton.textContent="🗑️ Delete";
-deleteButton.onclick=function(){deleteMessage(item);};
-actions.appendChild(deleteButton);
+const del=document.createElement("button");
+del.textContent="🗑️ Delete";
+del.onclick=()=>deleteMessage(item);
+actions.appendChild(del);
 wrapper.appendChild(actions);
 }
 messagesBox.appendChild(wrapper);
@@ -1090,20 +1077,12 @@ messagesBox.appendChild(wrapper);
 async function editMessage(item){
 const updated=prompt("Edit your message:",item.message||"");
 if(updated===null)return;
-if(!updated.trim()){
-alert("Message cannot be empty.");
-return;
-}
+if(!updated.trim()){alert("Message cannot be empty.");return;}
 const table=chatMode==="group"?"group_messages":"messages";
-let query=supabaseClient.from(table).update({message:updated.trim()})
-.eq("id",item.id).eq("sender",currentUser.id);
+let query=supabaseClient.from(table).update({message:updated.trim()}).eq("id",item.id).eq("sender",currentUser.id);
 if(chatMode==="group")query=query.eq("group_id",activeGroup.id);
 const result=await query;
-if(result.error){
-console.error(result.error);
-alert("Could not edit message: "+result.error.message);
-return;
-}
+if(result.error){alert("Could not edit message: "+result.error.message);return;}
 await loadMessages();
 }
 
@@ -1111,15 +1090,10 @@ await loadMessages();
 async function deleteMessage(item){
 if(!confirm("Are you sure you want to delete this message?"))return;
 const table=chatMode==="group"?"group_messages":"messages";
-let query=supabaseClient.from(table).delete()
-.eq("id",item.id).eq("sender",currentUser.id);
+let query=supabaseClient.from(table).delete().eq("id",item.id).eq("sender",currentUser.id);
 if(chatMode==="group")query=query.eq("group_id",activeGroup.id);
 const result=await query;
-if(result.error){
-console.error(result.error);
-alert("Could not delete message: "+result.error.message);
-return;
-}
+if(result.error){alert("Could not delete message: "+result.error.message);return;}
 await loadMessages();
 }
 
@@ -1137,32 +1111,19 @@ if(!receiver)return;
 const now=Date.now();
 if(now-lastTypingUpdate<1500)return;
 lastTypingUpdate=now;
-
-const result=await supabaseClient.from("typing_status").upsert({
-user_id:currentUser.id,
-receiver_id:receiver,
-chat_mode:chatMode,
-updated_at:new Date().toISOString()
-},{onConflict:"user_id"});
+const result=await supabaseClient.from("typing_status").upsert({user_id:currentUser.id,receiver_id:receiver,chat_mode:chatMode,updated_at:new Date().toISOString()},{onConflict:"user_id"});
 if(result.error)console.error("Typing update:",result.error);
 }
 
 async function stopTyping(){
 if(!currentUser)return;
-if(typingSendTimer){
-clearTimeout(typingSendTimer);
-typingSendTimer=null;
-}
-const result=await supabaseClient.from("typing_status")
-.delete().eq("user_id",currentUser.id);
+if(typingSendTimer){clearTimeout(typingSendTimer);typingSendTimer=null;}
+const result=await supabaseClient.from("typing_status").delete().eq("user_id",currentUser.id);
 if(result.error)console.error("Stop typing:",result.error);
 }
 
 messageInput.addEventListener("input",function(){
-if(!messageInput.value.trim()){
-stopTyping();
-return;
-}
+if(!messageInput.value.trim()){stopTyping();return;}
 if(typingSendTimer)clearTimeout(typingSendTimer);
 typingSendTimer=setTimeout(updateTyping,400);
 });
@@ -1171,81 +1132,43 @@ messageInput.addEventListener("blur",stopTyping);
 async function refreshTypingIndicator(){
 if(!currentUser)return;
 const receiver=chatMode==="private"?currentUser.id:getTypingReceiver();
-if(!receiver){
-typingIndicator.textContent="";
-return;
-}
-
-let query=supabaseClient.from("typing_status")
-.select("user_id,receiver_id,chat_mode,updated_at")
-.eq("receiver_id",receiver).eq("chat_mode",chatMode)
-.neq("user_id",currentUser.id)
-.gte("updated_at",new Date(Date.now()-8000).toISOString());
-
+if(!receiver){typingIndicator.textContent="";return;}
+let query=supabaseClient.from("typing_status").select("user_id,receiver_id,chat_mode,updated_at").eq("receiver_id",receiver).eq("chat_mode",chatMode).neq("user_id",currentUser.id).gte("updated_at",new Date(Date.now()-8000).toISOString());
 if(chatMode==="private"&&activeContact)query=query.eq("user_id",activeContact.id);
 const result=await query;
-if(result.error){
-console.error("Typing indicator:",result.error);
-return;
-}
-if(result.data&&result.data.length>0){
-const person=contacts.find(function(c){return c.id===result.data[0].user_id;});
+if(result.error)return;
+if(result.data?.length){
+const person=contacts.find(c=>c.id===result.data[0].user_id);
 typingIndicator.textContent=(person?.username||"Someone")+" is typing...";
-}else{
-typingIndicator.textContent="";
-}
+}else typingIndicator.textContent="";
 }
 
-/* SAVE MESSAGE AND CREATE NOTIFICATION */
+/* SAVE MESSAGE */
 async function saveChatMessage(text,media){
 if(chatMode==="private"&&!activeContact)throw new Error("Choose a contact first.");
 if(chatMode==="group"&&!activeGroup)throw new Error("Choose a group first.");
 
-if(chatMode==="group"){
-const result=await supabaseClient.from("group_messages").insert({
-group_id:activeGroup.id,
-sender:currentUser.id,
-message:text||"",
-media_url:media?media.url:null,
-media_type:media?media.type:null
-});
-if(result.error)throw result.error;
-
-const members=await supabaseClient.from("group_members")
-.select("user_id").eq("group_id",activeGroup.id);
-if(members.error){
-console.error("Could not load group members for notifications:",members.error);
-}else{
-const preview=text||(media?.type==="image"?"📷 Photo":
-media?.type==="video"?"🎥 Video":
-media?.type==="audio"?"🎤 Voice note":"New message");
-for(const member of members.data||[]){
-if(member.user_id!==currentUser.id){
-await createNotification(
-member.user_id,"group_message",
-username+" in "+activeGroup.name+": "+preview.slice(0,120),
-activeGroup.id
-);
+if(chatMode==="private"){
+await checkReceiverPrivacy(activeContact.id);
 }
+
+if(chatMode==="group"){
+const result=await supabaseClient.from("group_messages").insert({group_id:activeGroup.id,sender:currentUser.id,message:text||"",media_url:media?media.url:null,media_type:media?media.type:null});
+if(result.error)throw result.error;
+const members=await supabaseClient.from("group_members").select("user_id").eq("group_id",activeGroup.id);
+if(!members.error){
+const preview=text||(media?.type==="image"?"📷 Photo":media?.type==="video"?"🎥 Video":media?.type==="audio"?"🎤 Voice note":"New message");
+for(const member of members.data||[]){
+if(member.user_id!==currentUser.id)await createNotification(member.user_id,"group_message",username+" in "+activeGroup.name+": "+preview.slice(0,120),activeGroup.id);
 }
 }
 return;
 }
-
 const receiver=chatMode==="private"?activeContact.id:"public";
-const result=await supabaseClient.from("messages").insert({
-sender:currentUser.id,
-receiver:receiver,
-message:text||"",
-media_url:media?media.url:null,
-media_type:media?media.type:null
-});
+const result=await supabaseClient.from("messages").insert({sender:currentUser.id,receiver:receiver,message:text||"",media_url:media?media.url:null,media_type:media?media.type:null});
 if(result.error)throw result.error;
-
 if(chatMode==="private"){
-const preview=text||(media?.type==="image"?"📷 Sent you a photo":
-media?.type==="video"?"🎥 Sent you a video":
-media?.type==="audio"?"🎤 Sent you a voice note":"New message");
+const preview=text||(media?.type==="image"?"📷 Sent you a photo":media?.type==="video"?"🎥 Sent you a video":media?.type==="audio"?"🎤 Sent you a voice note":"New message");
 await createNotification(activeContact.id,"private_message",username+": "+preview.slice(0,120),null);
 }
 }
@@ -1254,19 +1177,9 @@ await createNotification(activeContact.id,"private_message",username+": "+previe
 async function sendMessage(){
 const text=messageInput.value.trim();
 if(!text)return;
-if(!currentUser){
-alert("You are not logged in.");
-return;
-}
-if(chatMode==="private"&&!activeContact){
-alert("Choose a contact first.");
-return;
-}
-if(chatMode==="group"&&!activeGroup){
-alert("Choose a group first.");
-return;
-}
-
+if(!currentUser){alert("You are not logged in.");return;}
+if(chatMode==="private"&&!activeContact){alert("Choose a contact first.");return;}
+if(chatMode==="group"&&!activeGroup){alert("Choose a group first.");return;}
 sendButton.disabled=true;
 sendButton.textContent="Sending...";
 try{
@@ -1274,34 +1187,21 @@ await stopTyping();
 await saveChatMessage(text,null);
 messageInput.value="";
 await loadMessages();
-}catch(error){
-console.error(error);
-alert("Message failed: "+error.message);
-}finally{
-sendButton.disabled=false;
-sendButton.textContent="Send";
-}
+}catch(error){alert("Message failed: "+error.message);}
+finally{sendButton.disabled=false;sendButton.textContent="Send";}
 }
 sendButton.addEventListener("click",sendMessage);
-messageInput.addEventListener("keydown",function(event){
-if(event.key==="Enter"){
-event.preventDefault();
-sendMessage();
-}
+messageInput.addEventListener("keydown",event=>{
+if(event.key==="Enter"){event.preventDefault();sendMessage();}
 });
 
 /* UPLOAD MEDIA */
 async function uploadChatMedia(file){
 const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
 const filePath=currentUser.id+"/"+Date.now()+"_"+safeName;
-const result=await supabaseClient.storage.from("bigvic-media")
-.upload(filePath,file,{
-upsert:false,
-contentType:file.type||"application/octet-stream"
-});
+const result=await supabaseClient.storage.from("bigvic-media").upload(filePath,file,{upsert:false,contentType:file.type||"application/octet-stream"});
 if(result.error)throw result.error;
-const publicResult=supabaseClient.storage.from("bigvic-media").getPublicUrl(filePath);
-return publicResult.data.publicUrl;
+return supabaseClient.storage.from("bigvic-media").getPublicUrl(filePath).data.publicUrl;
 }
 
 /* SELECT PHOTO OR VIDEO */
@@ -1310,31 +1210,15 @@ const file=event.target.files[0];
 selectedMedia=null;
 sendMediaButton.disabled=true;
 mediaPreview.innerHTML="";
-if(previewURL){
-URL.revokeObjectURL(previewURL);
-previewURL=null;
-}
+if(previewURL){URL.revokeObjectURL(previewURL);previewURL=null;}
 if(!file)return;
-if(!file.type.startsWith("image/")&&!file.type.startsWith("video/")){
-mediaStatus.textContent="Please choose a picture or video.";
-chatMediaInput.value="";
-return;
-}
-if(file.size>50*1024*1024){
-mediaStatus.textContent="File is too large. Maximum size is 50 MB.";
-chatMediaInput.value="";
-return;
-}
+if(!file.type.startsWith("image/")&&!file.type.startsWith("video/")){mediaStatus.textContent="Please choose a picture or video.";chatMediaInput.value="";return;}
+if(file.size>50*1024*1024){mediaStatus.textContent="File is too large. Maximum size is 50 MB.";chatMediaInput.value="";return;}
 selectedMedia=file;
 previewURL=URL.createObjectURL(file);
 let preview;
-if(file.type.startsWith("image/")){
-preview=document.createElement("img");
-preview.alt="Picture preview";
-}else{
-preview=document.createElement("video");
-preview.controls=true;
-}
+if(file.type.startsWith("image/")){preview=document.createElement("img");preview.alt="Picture preview";}
+else{preview=document.createElement("video");preview.controls=true;}
 preview.src=previewURL;
 mediaPreview.appendChild(preview);
 mediaStatus.textContent="Media ready to send.";
@@ -1344,104 +1228,62 @@ sendMediaButton.disabled=false;
 /* SEND PHOTO OR VIDEO */
 sendMediaButton.addEventListener("click",async function(){
 if(!selectedMedia||!currentUser)return;
-if(chatMode==="private"&&!activeContact){
-alert("Choose a contact first.");
-return;
-}
-if(chatMode==="group"&&!activeGroup){
-alert("Choose a group first.");
-return;
-}
-
+if(chatMode==="private"&&!activeContact){alert("Choose a contact first.");return;}
+if(chatMode==="group"&&!activeGroup){alert("Choose a group first.");return;}
 const file=selectedMedia;
 sendMediaButton.disabled=true;
 sendMediaButton.textContent="Uploading...";
 mediaStatus.textContent="Uploading your media. Please wait...";
-
 try{
 const type=file.type.startsWith("image/")?"image":"video";
 const url=await uploadChatMedia(file);
-await saveChatMessage(messageInput.value.trim(),{url:url,type:type});
+await saveChatMessage(messageInput.value.trim(),{url,type});
 messageInput.value="";
 chatMediaInput.value="";
 selectedMedia=null;
 mediaPreview.innerHTML="";
-if(previewURL){
-URL.revokeObjectURL(previewURL);
-previewURL=null;
-}
+if(previewURL){URL.revokeObjectURL(previewURL);previewURL=null;}
 mediaStatus.textContent="Media shared successfully! 🎉";
 await loadMessages();
-}catch(error){
-console.error(error);
-mediaStatus.textContent="Upload failed: "+error.message;
-}finally{
-sendMediaButton.disabled=!selectedMedia;
-sendMediaButton.textContent="Send Media";
-}
+}catch(error){mediaStatus.textContent="Upload failed: "+error.message;}
+finally{sendMediaButton.disabled=!selectedMedia;sendMediaButton.textContent="Send Media";}
 });
 
 /* RECORD VOICE NOTES */
 startRecordButton.addEventListener("click",async function(){
 if(!currentUser)return;
-if(chatMode==="private"&&!activeContact){
-alert("Choose a contact first.");
-return;
-}
-if(chatMode==="group"&&!activeGroup){
-alert("Choose a group first.");
-return;
-}
-if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){
-alert("Voice recording is not supported by this browser.");
-return;
-}
-
+if(chatMode==="private"&&!activeContact){alert("Choose a contact first.");return;}
+if(chatMode==="group"&&!activeGroup){alert("Choose a group first.");return;}
+if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){alert("Voice recording is not supported by this browser.");return;}
 try{
 recordingStream=await navigator.mediaDevices.getUserMedia({audio:true});
 audioChunks=[];
 const mimeTypes=["audio/webm;codecs=opus","audio/mp4","audio/webm"];
 let options={};
-for(const type of mimeTypes){
-if(MediaRecorder.isTypeSupported(type)){
-options={mimeType:type};
-break;
-}
-}
+for(const type of mimeTypes){if(MediaRecorder.isTypeSupported(type)){options={mimeType:type};break;}}
 mediaRecorder=new MediaRecorder(recordingStream,options);
-mediaRecorder.ondataavailable=function(event){
-if(event.data&&event.data.size>0)audioChunks.push(event.data);
-};
+mediaRecorder.ondataavailable=event=>{if(event.data?.size>0)audioChunks.push(event.data);};
 mediaRecorder.onstop=async function(){
 const mime=mediaRecorder.mimeType||"audio/webm";
 const blob=new Blob(audioChunks,{type:mime});
-recordingStream.getTracks().forEach(function(track){track.stop();});
+recordingStream.getTracks().forEach(track=>track.stop());
 recordingStream=null;
-if(blob.size>50*1024*1024){
-mediaStatus.textContent="Voice note is too large.";
-return;
-}
+if(blob.size>50*1024*1024){mediaStatus.textContent="Voice note is too large.";return;}
 const extension=mime.includes("mp4")?"m4a":"webm";
 const file=new File([blob],"voice-note-"+Date.now()+"."+extension,{type:mime});
 mediaStatus.textContent="Uploading voice note...";
 try{
 const url=await uploadChatMedia(file);
-await saveChatMessage("",{url:url,type:"audio"});
+await saveChatMessage("",{url,type:"audio"});
 mediaStatus.textContent="Voice note sent successfully! 🎤";
 await loadMessages();
-}catch(error){
-console.error(error);
-mediaStatus.textContent="Voice upload failed: "+error.message;
-}
+}catch(error){mediaStatus.textContent="Voice upload failed: "+error.message;}
 };
 mediaRecorder.start();
 startRecordButton.disabled=true;
 stopRecordButton.disabled=false;
 mediaStatus.textContent="🔴 Recording... Tap Stop & Send when finished.";
-}catch(error){
-console.error(error);
-alert("Could not start recording. Please allow microphone access.");
-}
+}catch(error){alert("Could not start recording. Please allow microphone access.");}
 });
 
 stopRecordButton.addEventListener("click",function(){
@@ -1457,41 +1299,20 @@ mediaStatus.textContent="Finishing your voice note...";
 photoInput.addEventListener("change",function(event){
 const file=event.target.files[0];
 if(!file)return;
-if(!file.type.startsWith("image/")){
-alert("Please choose an image.");
-return;
-}
-if(file.size>2*1024*1024){
-alert("Please choose an image smaller than 2 MB.");
-return;
-}
+if(!file.type.startsWith("image/")){alert("Please choose an image.");return;}
+if(file.size>2*1024*1024){alert("Please choose an image smaller than 2 MB.");return;}
 const reader=new FileReader();
-reader.onload=function(e){
-localStorage.setItem("bigvic_avatar",e.target.result);
-profileAvatar.src=e.target.result;
-};
+reader.onload=function(e){localStorage.setItem("bigvic_avatar",e.target.result);profileAvatar.src=e.target.result;};
 reader.readAsDataURL(file);
 });
 
-/* =========================================
-   VOICE AND VIDEO CALLING
-========================================= */
-
+/* CALLING */
 function updateCallControls(){
-const show=chatMode==="private"&&!!activeContact&&!activeCall&&!incomingCall;
+const show=chatMode==="private"&&!!activeContact&&!activeCall&&!incomingCall&&!blockedUserIds.includes(activeContact.id);
 callBar.style.display=show?"block":"none";
 }
-
-function setCallStatus(text){
-callStatus.textContent=text;
-}
-
-function showActiveCall(){
-activeCallPanel.style.display="block";
-incomingCallPanel.style.display="none";
-callBar.style.display="none";
-}
-
+function setCallStatus(text){callStatus.textContent=text;}
+function showActiveCall(){activeCallPanel.style.display="block";incomingCallPanel.style.display="none";callBar.style.display="none";}
 function hideCallPanels(){
 activeCallPanel.style.display="none";
 incomingCallPanel.style.display="none";
@@ -1503,151 +1324,92 @@ updateCallControls();
 
 async function sendCallSignal(recipientId,signal){
 if(!activeCall)throw new Error("There is no active call.");
-const result=await supabaseClient.from("call_signals").insert({
-call_id:activeCall.id,
-sender_id:currentUser.id,
-recipient_id:recipientId,
-signal:signal
-});
+const result=await supabaseClient.from("call_signals").insert({call_id:activeCall.id,sender_id:currentUser.id,recipient_id:recipientId,signal});
 if(result.error)throw result.error;
 }
 
 async function getCallMedia(type){
-if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
-throw new Error("Your browser does not support calls. Open BigVic using HTTPS.");
-}
-return await navigator.mediaDevices.getUserMedia({
-audio:true,
-video:type==="video"?{facingMode:"user"}:false
-});
+if(!navigator.mediaDevices?.getUserMedia)throw new Error("Open BigVic using HTTPS and allow microphone/camera access.");
+return navigator.mediaDevices.getUserMedia({audio:true,video:type==="video"?{facingMode:"user"}:false});
 }
 
 function createCallPeer(otherUserId){
-callPeer=new RTCPeerConnection({
-iceServers:[
-{urls:"stun:stun.l.google.com:19302"},
-{urls:"stun:stun1.l.google.com:19302"}
-]
-});
-
+callPeer=new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"}]});
 callRemoteStream=new MediaStream();
-
 callPeer.ontrack=function(event){
 const incomingStream=event.streams&&event.streams[0];
 if(incomingStream){
-incomingStream.getTracks().forEach(function(track){
-if(!callRemoteStream.getTracks().some(function(existing){return existing.id===track.id;})){
-callRemoteStream.addTrack(track);
-}
+incomingStream.getTracks().forEach(track=>{
+if(!callRemoteStream.getTracks().some(existing=>existing.id===track.id))callRemoteStream.addTrack(track);
 });
-}else{
-callRemoteStream.addTrack(event.track);
-}
-
-if(activeCall&&activeCall.call_type==="video"){
+}else callRemoteStream.addTrack(event.track);
+if(activeCall?.call_type==="video"){
 remoteVideo.srcObject=callRemoteStream;
 remoteVideo.style.display="block";
-remoteVideo.play().catch(function(){});
+remoteVideo.play().catch(()=>{});
 }else{
 remoteAudio.srcObject=callRemoteStream;
-remoteAudio.play().catch(function(){});
+remoteAudio.play().catch(()=>{});
 }
 setCallStatus("Connected");
 };
-
 callPeer.onicecandidate=async function(event){
 if(!event.candidate||!activeCall)return;
-try{
-await sendCallSignal(otherUserId,{
-type:"ice",
-candidate:event.candidate
-});
-}catch(error){
-console.error("ICE signal error:",error);
-}
+try{await sendCallSignal(otherUserId,{type:"ice",candidate:event.candidate});}
+catch(error){console.error(error);}
 };
-
 callPeer.onconnectionstatechange=function(){
 if(!callPeer)return;
 if(callPeer.connectionState==="connected")setCallStatus("Connected");
 if(callPeer.connectionState==="failed")setCallStatus("Connection failed. Try again.");
 if(callPeer.connectionState==="disconnected")setCallStatus("Connection interrupted...");
 };
-
-callLocalStream.getTracks().forEach(function(track){
-callPeer.addTrack(track,callLocalStream);
-});
+callLocalStream.getTracks().forEach(track=>callPeer.addTrack(track,callLocalStream));
 }
 
-/* START A CALL */
 async function startBigVicCall(type){
 if(!currentUser||!activeContact||callBusy)return;
-if(chatMode!=="private"){
-alert("Calls are available in private chat only.");
-return;
-}
-if(activeCall||incomingCall){
-alert("You already have a call in progress.");
-return;
-}
+if(chatMode!=="private"){alert("Calls are available in private chat only.");return;}
+if(activeCall||incomingCall){alert("You already have a call in progress.");return;}
+try{
+if(await isEitherUserBlocked(activeContact.id)){alert("Calls are unavailable because one of you has blocked the other.");return;}
+}catch(error){alert("Could not check block status: "+error.message);return;}
 
 callBusy=true;
-document.getElementById("voiceCallButton").disabled=true;
-document.getElementById("videoCallButton").disabled=true;
-
+$("voiceCallButton").disabled=true;
+$("videoCallButton").disabled=true;
 try{
 callLocalStream=await getCallMedia(type);
-
-const result=await supabaseClient.from("call_sessions").insert({
-caller_id:currentUser.id,
-callee_id:activeContact.id,
-status:"ringing",
-call_type:type
-}).select().single();
-
+const result=await supabaseClient.from("call_sessions").insert({caller_id:currentUser.id,callee_id:activeContact.id,status:"ringing",call_type:type}).select().single();
 if(result.error)throw result.error;
 activeCall=result.data;
-
 localVideo.srcObject=callLocalStream;
 localVideo.style.display=type==="video"?"block":"none";
 remoteVideo.style.display=type==="video"?"block":"none";
 showActiveCall();
 setCallStatus("Calling "+(activeContact.username||"user")+"...");
-
 createCallPeer(activeContact.id);
 const offer=await callPeer.createOffer();
 await callPeer.setLocalDescription(offer);
-
-await sendCallSignal(activeContact.id,{
-type:"offer",
-sdp:callPeer.localDescription
-});
+await sendCallSignal(activeContact.id,{type:"offer",sdp:callPeer.localDescription});
 }catch(error){
-console.error("Call start error:",error);
 alert("Could not start call: "+error.message);
 await finishBigVicCall(true);
 }finally{
 callBusy=false;
 updateCallControls();
-document.getElementById("voiceCallButton").disabled=false;
-document.getElementById("videoCallButton").disabled=false;
+$("voiceCallButton").disabled=false;
+$("videoCallButton").disabled=false;
 }
 }
+$("voiceCallButton").onclick=()=>startBigVicCall("audio");
+$("videoCallButton").onclick=()=>startBigVicCall("video");
 
-document.getElementById("voiceCallButton").onclick=function(){
-startBigVicCall("audio");
-};
-document.getElementById("videoCallButton").onclick=function(){
-startBigVicCall("video");
-};
-
-/* ACCEPT AN INCOMING CALL */
 async function acceptBigVicCall(){
 if(!incomingCall||callBusy)return;
 callBusy=true;
 const call=incomingCall;
 incomingCall=null;
-
 try{
 activeCall=call;
 callLocalStream=await getCallMedia(call.call_type);
@@ -1656,227 +1418,132 @@ localVideo.style.display=call.call_type==="video"?"block":"none";
 remoteVideo.style.display=call.call_type==="video"?"block":"none";
 showActiveCall();
 setCallStatus("Connecting...");
-
 createCallPeer(call.caller_id);
-
-const offerResult=await supabaseClient.from("call_signals")
-.select("*")
-.eq("call_id",call.id)
-.eq("sender_id",call.caller_id)
-.eq("recipient_id",currentUser.id)
-.order("created_at",{ascending:true});
-
+const offerResult=await supabaseClient.from("call_signals").select("*").eq("call_id",call.id).eq("sender_id",call.caller_id).eq("recipient_id",currentUser.id).order("created_at",{ascending:true});
 if(offerResult.error)throw offerResult.error;
-const offerRow=(offerResult.data||[]).find(function(item){
-return item.signal&&item.signal.type==="offer";
-});
+const offerRow=(offerResult.data||[]).find(item=>item.signal?.type==="offer");
 if(!offerRow)throw new Error("Call offer not found. Please try again.");
-
 processedCallSignals.add(offerRow.id);
 await callPeer.setRemoteDescription(new RTCSessionDescription(offerRow.signal.sdp));
-
 const answer=await callPeer.createAnswer();
 await callPeer.setLocalDescription(answer);
-
-const update=await supabaseClient.from("call_sessions")
-.update({status:"accepted"}).eq("id",call.id);
+const update=await supabaseClient.from("call_sessions").update({status:"accepted"}).eq("id",call.id);
 if(update.error)throw update.error;
-
-await sendCallSignal(call.caller_id,{
-type:"answer",
-sdp:callPeer.localDescription
-});
+await sendCallSignal(call.caller_id,{type:"answer",sdp:callPeer.localDescription});
 await applyPendingCallIce();
 setCallStatus("Connecting...");
-}catch(error){
-console.error("Accept call error:",error);
-alert("Could not accept call: "+error.message);
-await finishBigVicCall(true);
-}finally{
-callBusy=false;
+}catch(error){alert("Could not accept call: "+error.message);await finishBigVicCall(true);}
+finally{callBusy=false;}
 }
-}
+$("acceptCallButton").onclick=acceptBigVicCall;
 
-document.getElementById("acceptCallButton").onclick=acceptBigVicCall;
-
-/* REJECT AN INCOMING CALL */
 async function rejectBigVicCall(){
 if(!incomingCall)return;
 const call=incomingCall;
 incomingCall=null;
-try{
-const result=await supabaseClient.from("call_sessions")
-.update({status:"rejected",ended_at:new Date().toISOString()})
-.eq("id",call.id);
-if(result.error)console.error("Reject call:",result.error);
-}catch(error){
-console.error(error);
-}
+const result=await supabaseClient.from("call_sessions").update({status:"rejected",ended_at:new Date().toISOString()}).eq("id",call.id);
+if(result.error)console.error(result.error);
 hideCallPanels();
 }
-document.getElementById("rejectCallButton").onclick=rejectBigVicCall;
+$("rejectCallButton").onclick=rejectBigVicCall;
 
-/* APPLY QUEUED ICE CANDIDATES */
 async function applyPendingCallIce(){
 if(!callPeer||!callPeer.remoteDescription)return;
 const candidates=pendingCallIce.splice(0);
 for(const candidate of candidates){
-try{
-await callPeer.addIceCandidate(new RTCIceCandidate(candidate));
-}catch(error){
-console.error("ICE candidate error:",error);
-}
+try{await callPeer.addIceCandidate(new RTCIceCandidate(candidate));}
+catch(error){console.error(error);}
 }
 }
 
-/* RECEIVE SIGNALS */
 async function pollBigVicCallSignals(){
 if(!activeCall||!currentUser)return;
-
-const result=await supabaseClient.from("call_signals")
-.select("*")
-.eq("call_id",activeCall.id)
-.eq("recipient_id",currentUser.id)
-.order("created_at",{ascending:true});
-
-if(result.error){
-console.error("Call signal polling:",result.error);
-return;
-}
-
+const result=await supabaseClient.from("call_signals").select("*").eq("call_id",activeCall.id).eq("recipient_id",currentUser.id).order("created_at",{ascending:true});
+if(result.error){console.error(result.error);return;}
 for(const item of result.data||[]){
 if(processedCallSignals.has(item.id))continue;
 processedCallSignals.add(item.id);
 const signal=item.signal||{};
-
 try{
 if(signal.type==="answer"&&callPeer){
 await callPeer.setRemoteDescription(new RTCSessionDescription(signal.sdp));
 await applyPendingCallIce();
 setCallStatus("Connected");
 }
-
 if(signal.type==="ice"&&callPeer){
-if(callPeer.remoteDescription){
-await callPeer.addIceCandidate(new RTCIceCandidate(signal.candidate));
-}else{
-pendingCallIce.push(signal.candidate);
+if(callPeer.remoteDescription)await callPeer.addIceCandidate(new RTCIceCandidate(signal.candidate));
+else pendingCallIce.push(signal.candidate);
 }
-}
-
 if(signal.type==="hangup"){
 await finishBigVicCall(false);
 setCallStatus("The other person ended the call.");
 }
-}catch(error){
-console.error("Signal processing error:",error);
-}
+}catch(error){console.error(error);}
 }
 }
 
-/* END CALL AND CLEAN UP */
 async function finishBigVicCall(updateServer){
 const call=activeCall;
-
 if(updateServer&&call){
 try{
 const otherId=call.caller_id===currentUser.id?call.callee_id:call.caller_id;
-const update=await supabaseClient.from("call_sessions")
-.update({status:"ended",ended_at:new Date().toISOString()})
-.eq("id",call.id);
-if(update.error)console.error("End call update:",update.error);
-
+const update=await supabaseClient.from("call_sessions").update({status:"ended",ended_at:new Date().toISOString()}).eq("id",call.id);
+if(update.error)console.error(update.error);
 await sendCallSignal(otherId,{type:"hangup"});
-}catch(error){
-console.error("End call error:",error);
+}catch(error){console.error(error);}
 }
-}
-
-if(callPeer){
-callPeer.close();
-callPeer=null;
-}
-if(callLocalStream){
-callLocalStream.getTracks().forEach(function(track){track.stop();});
-callLocalStream=null;
-}
+if(callPeer){callPeer.close();callPeer=null;}
+if(callLocalStream){callLocalStream.getTracks().forEach(track=>track.stop());callLocalStream=null;}
 callRemoteStream=null;
 activeCall=null;
 pendingCallIce=[];
 processedCallSignals.clear();
-
-localVideo.srcObject=null;
-remoteVideo.srcObject=null;
-remoteAudio.srcObject=null;
 hideCallPanels();
 }
+$("endCallButton").onclick=()=>finishBigVicCall(true);
 
-document.getElementById("endCallButton").onclick=function(){
-finishBigVicCall(true);
-};
-
-/* MUTE AND UNMUTE */
-document.getElementById("muteCallButton").onclick=function(){
+$("muteCallButton").onclick=function(){
 if(!callLocalStream)return;
 const tracks=callLocalStream.getAudioTracks();
 if(!tracks.length)return;
-tracks.forEach(function(track){track.enabled=!track.enabled;});
+tracks.forEach(track=>track.enabled=!track.enabled);
 this.textContent=tracks[0].enabled?"🎤 Mute":"🔇 Unmute";
 };
 
-/* CAMERA ON AND OFF */
-document.getElementById("cameraCallButton").onclick=function(){
+$("cameraCallButton").onclick=function(){
 if(!callLocalStream)return;
 const tracks=callLocalStream.getVideoTracks();
 if(!tracks.length)return;
-tracks.forEach(function(track){track.enabled=!track.enabled;});
+tracks.forEach(track=>track.enabled=!track.enabled);
 this.textContent=tracks[0].enabled?"📷 Camera Off":"📷 Camera On";
 };
 
-/* CHECK INCOMING CALLS AND CALL STATUS */
 async function pollBigVicCalls(){
 if(!currentUser)return;
-
 if(activeCall){
 await pollBigVicCallSignals();
 if(!activeCall)return;
-
-const state=await supabaseClient.from("call_sessions")
-.select("status").eq("id",activeCall.id).maybeSingle();
-
-if(state.error){
-console.error("Call status:",state.error);
-}else if(state.data&&["ended","rejected"].includes(state.data.status)){
+const state=await supabaseClient.from("call_sessions").select("status").eq("id",activeCall.id).maybeSingle();
+if(state.error)console.error(state.error);
+else if(state.data&&["ended","rejected"].includes(state.data.status)){
 const message=state.data.status==="rejected"?"Call was rejected.":"Call ended.";
 await finishBigVicCall(false);
 alert(message);
 }
 return;
 }
-
 if(incomingCall||callBusy)return;
-
-const result=await supabaseClient.from("call_sessions")
-.select("*")
-.eq("callee_id",currentUser.id)
-.eq("status","ringing")
-.order("created_at",{ascending:false})
-.limit(1);
-
-if(result.error){
-console.error("Incoming call check:",result.error);
+const result=await supabaseClient.from("call_sessions").select("*").eq("callee_id",currentUser.id).eq("status","ringing").order("created_at",{ascending:false}).limit(1);
+if(result.error){console.error(result.error);return;}
+if(!result.data?.length)return;
+const call=result.data[0];
+if(await isEitherUserBlocked(call.caller_id)){
+await supabaseClient.from("call_sessions").update({status:"rejected",ended_at:new Date().toISOString()}).eq("id",call.id);
 return;
 }
-if(!result.data||!result.data.length)return;
-
-const call=result.data[0];
 incomingCall=call;
-const caller=contacts.find(function(person){return person.id===call.caller_id;});
-
-incomingCallText.textContent=
-(caller?.username||"Someone")+" is calling you ("+
-(call.call_type==="video"?"Video call":"Voice call")+")";
-
+const caller=contacts.find(person=>person.id===call.caller_id);
+incomingCallText.textContent=(caller?.username||"Someone")+" is calling you ("+(call.call_type==="video"?"Video call":"Voice call")+")";
 incomingCallPanel.style.display="block";
 callBar.style.display="none";
 }
@@ -1889,30 +1556,22 @@ await stopTyping();
 if(refreshTimer)clearInterval(refreshTimer);
 if(callPollTimer)clearInterval(callPollTimer);
 if(activeCall)await finishBigVicCall(true);
-
-if(recordingStream){
-recordingStream.getTracks().forEach(function(track){track.stop();});
-}
+if(recordingStream)recordingStream.getTracks().forEach(track=>track.stop());
 await supabaseClient.auth.signOut();
 window.location.href="/auth.html";
 }catch(error){
-console.error(error);
 alert("Could not log out. Please try again.");
 logoutButton.disabled=false;
 }
 });
 
-/* CLEAN UP IF PAGE IS CLOSED */
+/* CLEANUP */
 window.addEventListener("beforeunload",function(){
 if(refreshTimer)clearInterval(refreshTimer);
 if(callPollTimer)clearInterval(callPollTimer);
 if(callPeer)callPeer.close();
-if(callLocalStream){
-callLocalStream.getTracks().forEach(function(track){track.stop();});
-}
-if(recordingStream){
-recordingStream.getTracks().forEach(function(track){track.stop();});
-}
+if(callLocalStream)callLocalStream.getTracks().forEach(track=>track.stop());
+if(recordingStream)recordingStream.getTracks().forEach(track=>track.stop());
 });
 </script>
 </body>
