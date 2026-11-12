@@ -55,6 +55,11 @@ input {
   border: 1px solid #ddd;
   border-radius: 10px;
   font-size: 16px;
+  outline: none;
+}
+
+input:focus {
+  border-color: #667eea;
 }
 
 button {
@@ -77,12 +82,31 @@ button {
   color: #333;
 }
 
+.forgot {
+  display: block;
+  text-align: right;
+  margin: 0 0 14px;
+  color: #667eea;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.forgot:hover {
+  text-decoration: underline;
+}
+
+.back {
+  background: #eee;
+  color: #333;
+}
+
 .message {
   margin-top: 15px;
   padding: 12px;
   border-radius: 10px;
   text-align: center;
   display: none;
+  font-size: 14px;
 }
 
 .success {
@@ -95,6 +119,10 @@ button {
   display: block;
   background: #fdeaea;
   color: #a52828;
+}
+
+.hidden {
+  display: none !important;
 }
 </style>
 </head>
@@ -111,31 +139,83 @@ button {
     Chat • Games • Fun
   </div>
 
-  <input
-    type="email"
-    id="email"
-    placeholder="Email address"
-    autocomplete="email"
-  >
 
-  <input
-    type="password"
-    id="password"
-    placeholder="Password"
-    autocomplete="current-password"
-  >
+  <!-- LOGIN AREA -->
 
-  <button
-    class="login"
-    onclick="login()">
-    Login
-  </button>
+  <div id="loginArea">
 
-  <button
-    class="register"
-    onclick="register()">
-    Create Account
-  </button>
+    <input
+      type="email"
+      id="email"
+      placeholder="Email address"
+      autocomplete="email"
+    >
+
+    <input
+      type="password"
+      id="password"
+      placeholder="Password"
+      autocomplete="current-password"
+    >
+
+    <div
+      class="forgot"
+      onclick="showForgot()">
+      Forgot password?
+    </div>
+
+    <button
+      class="login"
+      onclick="login()">
+      Login
+    </button>
+
+    <button
+      class="register"
+      onclick="register()">
+      Create Account
+    </button>
+
+  </div>
+
+
+  <!-- FORGOT PASSWORD AREA -->
+
+  <div
+    id="forgotArea"
+    class="hidden">
+
+    <h2 style="text-align:center;">
+      Reset Password
+    </h2>
+
+    <p style="text-align:center;color:#777;font-size:14px;">
+      Enter your email address and we'll send you a password reset link.
+    </p>
+
+    <input
+      type="email"
+      id="resetEmail"
+      placeholder="Email address"
+      autocomplete="email"
+    >
+
+    <button
+      class="login"
+      onclick="sendReset()">
+      Send Reset Link
+    </button>
+
+    <button
+      class="back"
+      onclick="backToLogin()">
+      Back to Login
+    </button>
+
+  </div>
+
+
+  <!-- MESSAGE -->
 
   <div
     id="message"
@@ -144,6 +224,9 @@ button {
 
 </div>
 
+
+<!-- SUPABASE -->
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/config.js"></script>
 
@@ -151,7 +234,12 @@ button {
 
 const client = window.supabaseClient;
 
-function message(text, type) {
+
+/* ==========================
+   MESSAGE
+========================== */
+
+function showMessage(text, type) {
 
   const box =
     document.getElementById("message");
@@ -162,15 +250,20 @@ function message(text, type) {
     "message " + type;
 }
 
+
+/* ==========================
+   LOGIN
+========================== */
+
 async function login() {
 
   const email =
-    document.getElementById("email").value.trim();
+    document.getElementById("email")
+      .value
+      .trim();
 
   const password =
-    document.getElementById("password").value;
+    document.getElementById("password")
+      .value;
 
-  if (!email || !password) {
-
-    message(
-     
+ 
