@@ -3,79 +3,136 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BigVic Fun</title>
+
+<title>BigVic Fun - Login</title>
 
 <style>
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
+  min-height: 100vh;
   font-family: Arial, sans-serif;
   background: linear-gradient(135deg, #6a11cb, #2575fc);
-  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 20px;
 }
 
 .card {
-  width: 90%;
-  max-width: 400px;
-  background: white;
-  padding: 30px;
-  border-radius: 18px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 20px;
+  padding: 30px 25px;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.25);
 }
 
-h1 {
+.logo {
   text-align: center;
+  font-size: 34px;
+  font-weight: bold;
   color: #6a11cb;
+  margin-bottom: 5px;
 }
 
-p {
+.subtitle {
   text-align: center;
   color: #777;
+  margin-bottom: 28px;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.info {
+  text-align: center;
+  color: #777;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 input {
   width: 100%;
   padding: 14px;
-  margin: 8px 0;
-  box-sizing: border-box;
+  margin-top: 12px;
   border: 1px solid #ddd;
   border-radius: 10px;
   font-size: 16px;
+  outline: none;
+}
+
+input:focus {
+  border-color: #6a11cb;
 }
 
 button {
   width: 100%;
-  padding: 14px;
-  margin-top: 10px;
   border: none;
   border-radius: 10px;
-  color: white;
-  background: #6a11cb;
+  padding: 14px;
+  margin-top: 12px;
   font-size: 16px;
   font-weight: bold;
-}
-
-button:active {
-  transform: scale(.98);
-}
-
-#forgot {
-  text-align: right;
-  color: #6a11cb;
-  margin: 10px 0;
   cursor: pointer;
 }
 
-#reset {
-  display: none;
+.login-btn {
+  background: #6a11cb;
+  color: white;
+}
+
+.register-btn {
+  background: #2575fc;
+  color: white;
+}
+
+.reset-btn {
+  background: #6a11cb;
+  color: white;
+}
+
+.back-btn {
+  background: #eee;
+  color: #333;
+}
+
+.forgot {
+  display: block;
+  text-align: right;
+  margin-top: 12px;
+  color: #6a11cb;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.forgot:active {
+  opacity: 0.6;
+}
+
+.hidden {
+  display: none !important;
 }
 
 #message {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 14px;
+  color: #444;
+  min-height: 20px;
+}
+
+.status {
   text-align: center;
   margin-top: 15px;
-  color: #444;
+  font-size: 13px;
+  color: #777;
 }
 </style>
 </head>
@@ -84,26 +141,344 @@ button:active {
 
 <div class="card">
 
-<h1>BigVic Fun</h1>
+  <div class="logo">BigVic Fun</div>
 
-<p>Chat • Games • Fun</p>
+  <div class="subtitle">
+    Chat • Games • Fun
+  </div>
 
-<div id="login">
+  <!-- LOGIN SECTION -->
+  <div id="loginSection">
 
-<input id="email" type="email" placeholder="Email address">
+    <input
+      id="email"
+      type="email"
+      placeholder="Email address"
+      autocomplete="email"
+    >
 
-<input id="password" type="password" placeholder="Password">
+    <input
+      id="password"
+      type="password"
+      placeholder="Password"
+      autocomplete="current-password"
+    >
 
-<div id="forgot">Forgot password?</div>
+    <div
+      id="forgotButton"
+      class="forgot"
+      role="button"
+      tabindex="0"
+    >
+      Forgot password?
+    </div>
 
-<button id="loginBtn">Login</button>
+    <button
+      id="loginButton"
+      class="login-btn"
+      type="button"
+    >
+      Login
+    </button>
 
-<button id="registerBtn">Create Account</button>
+    <button
+      id="registerButton"
+      class="register-btn"
+      type="button"
+    >
+      Create Account
+    </button>
+
+  </div>
+
+  <!-- RESET PASSWORD SECTION -->
+  <div id="resetSection" class="hidden">
+
+    <h2>Reset Password</h2>
+
+    <div class="info">
+      Enter your email address and we'll send you a password reset link.
+    </div>
+
+    <input
+      id="resetEmail"
+      type="email"
+      placeholder="Email address"
+      autocomplete="email"
+    >
+
+    <button
+      id="sendResetButton"
+      class="reset-btn"
+      type="button"
+    >
+      Send Reset Link
+    </button>
+
+    <button
+      id="backButton"
+      class="back-btn"
+      type="button"
+    >
+      Back to Login
+    </button>
+
+  </div>
+
+  <div id="message"></div>
+
+  <div id="status" class="status"></div>
 
 </div>
 
-<div id="reset">
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<h2>Reset Password</h2>
+<!-- YOUR SUPABASE CONFIG -->
+<script src="/config.js"></script>
 
-<input
+<script>
+(function () {
+
+  const loginSection = document.getElementById("loginSection");
+  const resetSection = document.getElementById("resetSection");
+
+  const forgotButton = document.getElementById("forgotButton");
+  const backButton = document.getElementById("backButton");
+
+  const loginButton = document.getElementById("loginButton");
+  const registerButton = document.getElementById("registerButton");
+
+  const sendResetButton =
+    document.getElementById("sendResetButton");
+
+  const message =
+    document.getElementById("message");
+
+  const status =
+    document.getElementById("status");
+
+  function showMessage(text) {
+    message.textContent = text;
+  }
+
+  function showLogin() {
+    loginSection.classList.remove("hidden");
+    resetSection.classList.add("hidden");
+    showMessage("");
+  }
+
+  function showReset() {
+    loginSection.classList.add("hidden");
+    resetSection.classList.remove("hidden");
+    showMessage("");
+  }
+
+  /* FORGOT PASSWORD */
+
+  forgotButton.addEventListener("click", showReset);
+
+  forgotButton.addEventListener("keydown", function (event) {
+    if (event.key === "Enter" || event.key === " ") {
+      showReset();
+    }
+  });
+
+  /* BACK TO LOGIN */
+
+  backButton.addEventListener("click", showLogin);
+
+  /* CHECK SUPABASE */
+
+  if (!window.supabaseClient) {
+
+    status.textContent =
+      "Supabase connection is not ready.";
+
+    console.error(
+      "window.supabaseClient was not found."
+    );
+
+    return;
+  }
+
+  status.textContent = "Ready";
+
+  /* LOGIN */
+
+  loginButton.addEventListener("click", async function () {
+
+    const email =
+      document.getElementById("email").value.trim();
+
+    const password =
+      document.getElementById("password").value;
+
+    if (!email) {
+      showMessage("Please enter your email.");
+      return;
+    }
+
+    if (!password) {
+      showMessage("Please enter your password.");
+      return;
+    }
+
+    loginButton.disabled = true;
+    showMessage("Logging in...");
+
+    try {
+
+      const result =
+        await window.supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+      if (result.error) {
+        showMessage(result.error.message);
+        loginButton.disabled = false;
+        return;
+      }
+
+      showMessage("Login successful.");
+
+      window.location.href = "/chat/";
+
+    } catch (error) {
+
+      showMessage(
+        error.message || "Login failed."
+      );
+
+      loginButton.disabled = false;
+    }
+
+  });
+
+  /* CREATE ACCOUNT */
+
+  registerButton.addEventListener("click", async function () {
+
+    const email =
+      document.getElementById("email").value.trim();
+
+    const password =
+      document.getElementById("password").value;
+
+    if (!email) {
+      showMessage("Please enter your email.");
+      return;
+    }
+
+    if (!password) {
+      showMessage("Please enter a password.");
+      return;
+    }
+
+    if (password.length < 6) {
+      showMessage(
+        "Password must be at least 6 characters."
+      );
+      return;
+    }
+
+    registerButton.disabled = true;
+    showMessage("Creating account...");
+
+    try {
+
+      const result =
+        await window.supabaseClient.auth.signUp({
+          email: email,
+          password: password
+        });
+
+      if (result.error) {
+        showMessage(result.error.message);
+        registerButton.disabled = false;
+        return;
+      }
+
+      if (result.data && result.data.session) {
+
+        showMessage("Account created.");
+
+        window.location.href = "/chat/";
+
+      } else {
+
+        showMessage(
+          "Account created. Check your email to confirm your account."
+        );
+
+        registerButton.disabled = false;
+      }
+
+    } catch (error) {
+
+      showMessage(
+        error.message || "Account creation failed."
+      );
+
+      registerButton.disabled = false;
+    }
+
+  });
+
+  /* SEND PASSWORD RESET */
+
+  sendResetButton.addEventListener("click", async function () {
+
+    const email =
+      document.getElementById("resetEmail").value.trim();
+
+    if (!email) {
+      showMessage("Please enter your email.");
+      return;
+    }
+
+    sendResetButton.disabled = true;
+    showMessage("Sending reset link...");
+
+    try {
+
+      const result =
+        await window.supabaseClient.auth
+          .resetPasswordForEmail(email, {
+            redirectTo:
+              window.location.origin + "/auth.html"
+          });
+
+      if (result.error) {
+
+        showMessage(
+          result.error.message
+        );
+
+        sendResetButton.disabled = false;
+        return;
+      }
+
+      showMessage(
+        "Reset link sent. Check your email."
+      );
+
+      sendResetButton.disabled = false;
+
+    } catch (error) {
+
+      showMessage(
+        error.message || "Could not send reset link."
+      );
+
+      sendResetButton.disabled = false;
+    }
+
+  });
+
+})();
+</script>
+
+</body>
+</html>
