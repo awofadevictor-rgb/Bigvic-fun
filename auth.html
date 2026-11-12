@@ -1,86 +1,135 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BigVic Fun</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    body {
-      font-family: Arial;
-      background: #6a11cb;
-      padding: 30px;
-      text-align: center;
-    }
+<title>BigVic Fun</title>
 
-    .box {
-      background: white;
-      max-width: 400px;
-      margin: 50px auto;
-      padding: 25px;
-      border-radius: 15px;
-    }
+<style>
+* {
+    box-sizing: border-box;
+}
 
-    input {
-      width: 100%;
-      padding: 14px;
-      margin: 8px 0;
-      box-sizing: border-box;
-    }
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
 
-    button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 10px;
-      border: 0;
-      border-radius: 8px;
-      background: #6a11cb;
-      color: white;
-      font-size: 16px;
-    }
-  </style>
+.card {
+    width: 100%;
+    max-width: 420px;
+    background: white;
+    padding: 30px 25px;
+    border-radius: 20px;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+}
+
+.logo {
+    text-align: center;
+    font-size: 34px;
+    font-weight: bold;
+    color: #6a11cb;
+}
+
+.subtitle {
+    text-align: center;
+    color: #777;
+    margin: 7px 0 25px;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    margin: 8px 0;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+    outline: none;
+}
+
+input:focus {
+    border-color: #6a11cb;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+.login-btn {
+    background: #6a11cb;
+    color: white;
+}
+
+.register-btn {
+    background: #2575fc;
+    color: white;
+}
+
+.reset-btn {
+    background: #6a11cb;
+    color: white;
+}
+
+.back-btn {
+    background: #eeeeee;
+    color: #333;
+}
+
+.forgot {
+    text-align: right;
+    color: #6a11cb;
+    font-size: 14px;
+    font-weight: bold;
+    margin: 10px 0;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none;
+}
+
+.message {
+    text-align: center;
+    margin-top: 18px;
+    min-height: 20px;
+    font-size: 14px;
+    color: #444;
+}
+
+.info {
+    text-align: center;
+    color: #777;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+</style>
 </head>
 
 <body>
 
-<div class="box">
+<div class="card">
 
-<h1>BigVic Fun</h1>
+    <div class="logo">
+        BigVic Fun
+    </div>
 
-<p>Chat • Games • Fun</p>
-
-<input id="email" placeholder="Email">
-
-<input id="password" type="password" placeholder="Password">
-
-<button onclick="testLogin()">Login</button>
-
-<button onclick="testRegister()">Create Account</button>
-
-<button onclick="testForgot()">Forgot Password</button>
-
-<p id="result"></p>
-
-</div>
-
-<script>
-
-function testLogin() {
-  document.getElementById("result").textContent =
-    "LOGIN BUTTON WORKS";
-}
-
-function testRegister() {
-  document.getElementById("result").textContent =
-    "CREATE ACCOUNT BUTTON WORKS";
-}
-
-function testForgot() {
-  document.getElementById("result").textContent =
-    "FORGOT PASSWORD BUTTON WORKS";
-}
-
-</script>
-
-</body>
-</html>
+    <div
