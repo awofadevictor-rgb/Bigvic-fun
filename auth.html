@@ -13,22 +13,23 @@
 
 body {
     margin: 0;
+    padding: 20px;
     min-height: 100vh;
     font-family: Arial, sans-serif;
     background: linear-gradient(135deg, #6a11cb, #2575fc);
+
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
 }
 
 .card {
     width: 100%;
     max-width: 420px;
     background: white;
-    padding: 30px 25px;
     border-radius: 20px;
-    box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+    padding: 30px 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
 }
 
 .logo {
@@ -41,56 +42,37 @@ body {
 .subtitle {
     text-align: center;
     color: #777;
-    margin: 7px 0 25px;
+    margin: 8px 0 25px;
 }
 
 input {
     width: 100%;
     padding: 14px;
-    margin: 8px 0;
+    margin: 7px 0;
     border: 1px solid #ddd;
     border-radius: 10px;
     font-size: 16px;
     outline: none;
 }
 
-input:focus {
-    border-color: #6a11cb;
-}
-
 button {
     width: 100%;
     padding: 14px;
     margin-top: 10px;
-    border: none;
+    border: 0;
     border-radius: 10px;
     font-size: 16px;
     font-weight: bold;
-    cursor: pointer;
 }
 
-button:active {
-    transform: scale(0.98);
-}
-
-.login-btn {
+.login {
     background: #6a11cb;
     color: white;
 }
 
-.register-btn {
+.register {
     background: #2575fc;
     color: white;
-}
-
-.reset-btn {
-    background: #6a11cb;
-    color: white;
-}
-
-.back-btn {
-    background: #eeeeee;
-    color: #333;
 }
 
 .forgot {
@@ -99,27 +81,17 @@ button:active {
     font-size: 14px;
     font-weight: bold;
     margin: 10px 0;
-    cursor: pointer;
-}
-
-.hidden {
-    display: none;
 }
 
 .message {
     text-align: center;
     margin-top: 18px;
-    min-height: 20px;
-    font-size: 14px;
     color: #444;
+    min-height: 20px;
 }
 
-.info {
-    text-align: center;
-    color: #777;
-    font-size: 14px;
-    line-height: 1.5;
-    margin-bottom: 10px;
+.hidden {
+    display: none;
 }
 </style>
 </head>
@@ -132,4 +104,47 @@ button:active {
         BigVic Fun
     </div>
 
-    <div
+    <div class="subtitle">
+        Chat • Games • Fun
+    </div>
+
+    <!-- LOGIN -->
+
+    <div id="loginBox">
+
+        <input
+            id="email"
+            type="email"
+            placeholder="Email address"
+        >
+
+        <input
+            id="password"
+            type="password"
+            placeholder="Password"
+        >
+
+        <div
+            class="forgot"
+            id="forgotButton">
+            Forgot password?
+        </div>
+
+        <button
+            class="login"
+            id="loginButton">
+            Login
+        </button>
+
+        <button
+            class="register"
+            id="registerButton">
+            Create Account
+        </button>
+
+    </div>
+
+
+    <!-- PASSWORD RESET -->
+
+    <div id="reset
