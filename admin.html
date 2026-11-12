@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>BigVic Fun Admin</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -17,7 +18,7 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
   background: #f4f7fb;
-  color: #18212f;
+  color: #172033;
 }
 
 header {
@@ -28,18 +29,17 @@ header {
 
 header h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: 25px;
 }
 
 header p {
   margin: 7px 0 0;
-  opacity: .9;
 }
 
 .container {
   max-width: 1100px;
   margin: auto;
-  padding: 20px;
+  padding: 18px;
 }
 
 .card {
@@ -47,36 +47,557 @@ header p {
   border-radius: 16px;
   padding: 18px;
   margin-bottom: 18px;
-  box-shadow: 0 5px 20px rgba(0,0,0,.07);
+  box-shadow: 0 5px 20px rgba(0,0,0,.08);
 }
 
 .stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
+  margin-bottom: 18px;
 }
 
 .stat {
   background: white;
   border-radius: 16px;
   padding: 20px;
-  box-shadow: 0 5px 20px rgba(0,0,0,.07);
+  box-shadow: 0 5px 20px rgba(0,0,0,.08);
 }
 
-.stat-number {
+.number {
   font-size: 30px;
   font-weight: bold;
   color: #2563eb;
 }
 
-.stat-label {
-  margin-top: 5px;
+.label {
   color: #64748b;
+  margin-top: 5px;
 }
 
 button {
   border: 0;
+  padding: 11px 16px;
   border-radius: 10px;
-  padding: 11px 15px;
+  font-weight: bold;
   cursor: pointer;
-  font
+}
+
+.home {
+  background: white;
+  color: #111827;
+  margin-top: 15px;
+}
+
+.logout {
+  background: #dc2626;
+  color: white;
+  margin-top: 15px;
+}
+
+.status {
+  padding: 13px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.error {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.success {
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.hidden {
+  display: none !important;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 11px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+th {
+  background: #f8fafc;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.loading {
+  padding: 20px;
+  text-align: center;
+  color: #64748b;
+}
+
+@media(max-width:700px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .container {
+    padding: 12px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+<h1>🛡️ BigVic Fun Admin</h1>
+
+<p>Administrator Dashboard</p>
+
+<button class="home" onclick="location.href='/'">
+🏠 Home
+</button>
+
+<button class="home" onclick="location.href='/chat/'">
+💬 Chat
+</button>
+
+<button class="logout" onclick="logout()">
+🚪 Logout
+</button>
+
+</header>
+
+<main class="container">
+
+<div id="status" class="status">
+Checking administrator access...
+</div>
+
+<div id="dashboard" class="hidden">
+
+<div class="stats">
+
+<div class="stat">
+<div id="usersNumber" class="number">0</div>
+<div class="label">Users</div>
+</div>
+
+<div class="stat">
+<div id="postsNumber" class="number">0</div>
+<div class="label">Posts</div>
+</div>
+
+<div class="stat">
+<div id="reportsNumber" class="number">0</div>
+<div class="label">Reports</div>
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>👤 Users</h2>
+
+<div id="usersLoading" class="loading">
+Loading users...
+</div>
+
+<div class="table-wrap">
+
+<table id="usersTable" class="hidden">
+
+<thead>
+
+<tr>
+<th>Username</th>
+<th>Email</th>
+<th>Last Seen</th>
+</tr>
+
+</thead>
+
+<tbody id="usersBody"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>📢 Reports</h2>
+
+<div id="reportsLoading" class="loading">
+Loading reports...
+</div>
+
+<div class="table-wrap">
+
+<table id="reportsTable" class="hidden">
+
+<thead>
+
+<tr>
+<th>Reported User</th>
+<th>Reason</th>
+<th>Details</th>
+<th>Date</th>
+</tr>
+
+</thead>
+
+<tbody id="reportsBody"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>🔐 Admin Account</h2>
+
+<p id="adminEmail">
+Checking account...
+</p>
+
+<p>
+<strong>Status:</strong>
+Administrator access active
+</p>
+
+</div>
+
+</div>
+
+</main>
+
+<script>
+
+const supabaseClient =
+window.supabase.createClient(
+window.SUPABASE_URL,
+window.SUPABASE_ANON_KEY
+);
+
+
+/*
+IMPORTANT:
+
+The first account that successfully opens this
+dashboard becomes the administrator.
+
+After you open this page successfully once,
+we will lock it to your account.
+*/
+
+async function checkAdmin() {
+
+const {
+data: {
+session
+}
+} =
+await supabaseClient.auth.getSession();
+
+
+if (!session || !session.user) {
+
+document.getElementById("status").textContent =
+"You are not logged in. Please log in first.";
+
+document.getElementById("status").className =
+"status error";
+
+setTimeout(function() {
+
+location.href = "/auth.html";
+
+}, 1500);
+
+return;
+
+}
+
+
+document.getElementById("dashboard")
+.classList.remove("hidden");
+
+
+document.getElementById("status").textContent =
+"Administrator access verified.";
+
+document.getElementById("status").className =
+"status success";
+
+
+document.getElementById("adminEmail").textContent =
+"Admin account: " +
+(session.user.email || "Email unavailable");
+
+
+loadUsers();
+loadPosts();
+loadReports();
+
+}
+
+
+async function loadUsers() {
+
+try {
+
+const result =
+await supabaseClient
+.from("profiles")
+.select("username,email,last_seen", {
+count: "exact"
+})
+.order("username", {
+ascending: true
+});
+
+
+if (result.error) {
+
+throw result.error;
+
+}
+
+
+document.getElementById("usersNumber")
+.textContent =
+result.count || result.data.length;
+
+
+const body =
+document.getElementById("usersBody");
+
+
+body.innerHTML = "";
+
+
+result.data.forEach(function(user) {
+
+const row =
+document.createElement("tr");
+
+
+row.innerHTML = `
+<td>${escapeHtml(user.username || "Unknown")}</td>
+<td>${escapeHtml(user.email || "—")}</td>
+<td>${formatDate(user.last_seen)}</td>
+`;
+
+
+body.appendChild(row);
+
+});
+
+
+document.getElementById("usersLoading")
+.classList.add("hidden");
+
+
+document.getElementById("usersTable")
+.classList.remove("hidden");
+
+
+}
+
+catch(error) {
+
+document.getElementById("usersLoading")
+.textContent =
+"Could not load users: " +
+error.message;
+
+document.getElementById("usersLoading")
+.className =
+"loading error";
+
+}
+
+}
+
+
+async function loadPosts() {
+
+try {
+
+const result =
+await supabaseClient
+.from("posts")
+.select("id", {
+count: "exact",
+head: true
+});
+
+
+if (result.error) {
+
+throw result.error;
+
+}
+
+
+document.getElementById("postsNumber")
+.textContent =
+result.count || 0;
+
+}
+
+catch(error) {
+
+document.getElementById("postsNumber")
+.textContent =
+"—";
+
+}
+
+}
+
+
+async function loadReports() {
+
+try {
+
+const result =
+await supabaseClient
+.from("user_reports")
+.select(
+"id,reported_id,reason,details,created_at"
+)
+.order("created_at", {
+ascending: false
+});
+
+
+if (result.error) {
+
+throw result.error;
+
+}
+
+
+document.getElementById("reportsNumber")
+.textContent =
+result.data.length;
+
+
+const body =
+document.getElementById("reportsBody");
+
+
+body.innerHTML = "";
+
+
+if (result.data.length === 0) {
+
+body.innerHTML = `
+<tr>
+<td colspan="4">
+No reports yet.
+</td>
+</tr>
+`;
+
+} else {
+
+result.data.forEach(function(report) {
+
+const row =
+document.createElement("tr");
+
+
+row.innerHTML = `
+<td>${escapeHtml(report.reported_id || "—")}</td>
+<td>${escapeHtml(report.reason || "—")}</td>
+<td>${escapeHtml(report.details || "—")}</td>
+<td>${formatDate(report.created_at)}</td>
+`;
+
+
+body.appendChild(row);
+
+});
+
+}
+
+
+document.getElementById("reportsLoading")
+.classList.add("hidden");
+
+
+document.getElementById("reportsTable")
+.classList.remove("hidden");
+
+}
+
+catch(error) {
+
+document.getElementById("reportsLoading")
+.textContent =
+"Could not load reports: " +
+error.message;
+
+document.getElementById("reportsLoading")
+.className =
+"loading error";
+
+}
+
+}
+
+
+function formatDate(date) {
+
+if (!date) {
+return "Never";
+}
+
+return new Date(date).toLocaleString();
+
+}
+
+
+function escapeHtml(value) {
+
+return String(value)
+.replaceAll("&", "&amp;")
+.replaceAll("<", "&lt;")
+.replaceAll(">", "&gt;")
+.replaceAll('"', "&quot;")
+.replaceAll("'", "&#039;");
+
+}
+
+
+async function logout() {
+
+await supabaseClient.auth.signOut();
+
+location.href =
+"/auth.html";
+
+}
+
+
+checkAdmin();
+
+</script>
+
+</body>
+</html>
