@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -320,7 +319,8 @@ let unreadCounts={};
 let lastTypingUpdate=0;
 let notifications=[];
 
-let username=localStorage.getItem("bigvic_username")||"BigVic";
+let username="BigVic";
+let currentAvatar="";
 
 let activeCall=null;
 let incomingCall=null;
@@ -348,6 +348,23 @@ encodeURIComponent(name||"BigVic")+
 "&background=303957&color=ffca28";
 }
 
+/* ACCOUNT-SPECIFIC PROFILE */
+async function loadMyProfile(){
+const result=await supabaseClient
+.from("profiles")
+.select("id,username,avatar")
+.eq("id",currentUser.id)
+.maybeSingle();
+
+if(result.error)throw result.error;
+
+username=result.data?.username||"BigVic";
+currentAvatar=result.data?.avatar||"";
+
+profileName.textContent=username;
+profileAvatar.src=currentAvatar||avatarURL(username);
+}
+
 /* PROFILE */
 profileName.textContent=username;
 
@@ -356,21 +373,39 @@ changeNameButton.textContent="Change name";
 changeNameButton.style.cssText="margin-top:6px;margin-left:6px;padding:6px 9px;border:0;border-radius:6px;background:#ffca28;color:#101322;font-size:12px";
 
 changeNameButton.onclick=async function(){
+if(!currentUser){
+alert("You are not logged in.");
+return;
+}
+
 const newName=prompt("Enter your BigVic name:",username);
 if(!newName||!newName.trim())return;
-username=newName.trim();
-localStorage.setItem("bigvic_username",username);
+
+const cleanName=newName.trim();
+
+changeNameButton.disabled=true;
+
+try{
+const result=await supabaseClient
+.from("profiles")
+.upsert({id:currentUser.id,username:cleanName},{onConflict:"id"});
+
+if(result.error)throw result.error;
+
+username=cleanName;
 profileName.textContent=username;
-if(currentUser){
-const result=await supabaseClient.from("profiles").upsert({id:currentUser.id,username:username});
-if(result.error)alert("Name saved on this device, but profile update failed.");
-else await loadContacts();
+
+await loadContacts();
+
+alert("Username updated successfully!");
+}catch(error){
+alert("Could not save username: "+error.message);
+}finally{
+changeNameButton.disabled=false;
 }
 };
-profileName.parentElement.appendChild(changeNameButton);
 
-const savedAvatar=localStorage.getItem("bigvic_avatar");
-if(savedAvatar)profileAvatar.src=savedAvatar;
+profileName.parentElement.appendChild(changeNameButton);
 
 /* CONNECTION */
 if(!window.SUPABASE_URL||!window.SUPABASE_ANON_KEY||!window.supabase){
@@ -389,6 +424,7 @@ if(result.error)throw result.error;
 currentUser=result.data.user;
 if(!currentUser){window.location.href="/auth.html";return;}
 
+await loadMyProfile();
 await updatePresence();
 await loadContacts();
 await loadGroups();
@@ -1028,7 +1064,7 @@ name.className="name";
 name.textContent=displayName;
 const avatar=document.createElement("img");
 avatar.className="avatar";
-avatar.src=mine?(localStorage.getItem("bigvic_avatar")||avatarURL(username)):(person?.avatar||avatarURL(displayName));
+avatar.src=mine?(currentAvatar||avatarURL(username)):(person?.avatar||avatarURL(displayName));
 wrapper.append(name,avatar);
 
 if(item.message){
@@ -1295,15 +1331,70 @@ mediaStatus.textContent="Finishing your voice note...";
 }
 });
 
-/* PROFILE PHOTO */
-photoInput.addEventListener("change",function(event){
+/* ACCOUNT-SPECIFIC PROFILE PHOTO */
+photoInput.addEventListener("change",async function(event){
 const file=event.target.files[0];
 if(!file)return;
-if(!file.type.startsWith("image/")){alert("Please choose an image.");return;}
-if(file.size>2*1024*1024){alert("Please choose an image smaller than 2 MB.");return;}
-const reader=new FileReader();
-reader.onload=function(e){localStorage.setItem("bigvic_avatar",e.target.result);profileAvatar.src=e.target.result;};
-reader.readAsDataURL(file);
+
+if(!currentUser){
+alert("You are not logged in.");
+photoInput.value="";
+return;
+}
+
+if(!file.type.startsWith("image/")){
+alert("Please choose an image.");
+photoInput.value="";
+return;
+}
+
+if(file.size>2*1024*1024){
+alert("Please choose an image smaller than 2 MB.");
+photoInput.value="";
+return;
+}
+
+const extension=file.name.split(".").pop().replace(/[^a-zA-Z0-9]/g,"")||"jpg";
+const filePath="avatars/"+currentUser.id+"/"+Date.now()+"."+extension;
+
+photoInput.disabled=true;
+mediaStatus.textContent="Uploading your profile photo...";
+
+try{
+const upload=await supabaseClient.storage
+.from("bigvic-media")
+.upload(filePath,file,{
+upsert:true,
+contentType:file.type
+});
+
+if(upload.error)throw upload.error;
+
+const publicURL=supabaseClient.storage
+.from("bigvic-media")
+.getPublicUrl(filePath).data.publicUrl;
+
+const update=await supabaseClient
+.from("profiles")
+.upsert({id:currentUser.id,username:username,avatar:publicURL},{onConflict:"id"});
+
+if(update.error)throw update.error;
+
+currentAvatar=publicURL;
+profileAvatar.src=publicURL;
+
+await loadContacts();
+
+mediaStatus.textContent="Profile photo updated successfully! 🎉";
+alert("Profile photo updated successfully!");
+
+}catch(error){
+mediaStatus.textContent="Profile photo upload failed.";
+alert("Photo update failed: "+error.message);
+}finally{
+photoInput.disabled=false;
+photoInput.value="";
+}
 });
 
 /* CALLING */
