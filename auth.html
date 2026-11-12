@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BigVic Fun</title>
+</head>
+
+<body>
+
+<h1>BigVic Fun</h1>
+
+<p id="message">Page loaded successfully.</p>
+
+<button id="testButton">TEST BUTTON</button>
+
+<script>
+document.getElementById("testButton").onclick = function () {
+    document.getElementById("message").textContent =
+        "YES! THE BUTTON IS WORKING!";
+};
+</script>
+
+</body>
+</html>
