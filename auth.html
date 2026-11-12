@@ -1,152 +1,189 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>BigVic Fun - Login</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BigVic Fun</title>
 <style>
+* { box-sizing: border-box; }
 body {
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #111827;
-    color: white;
-    font-family: Arial, sans-serif;
+  margin: 0; min-height: 100vh; padding: 20px;
+  display: flex; align-items: center; justify-content: center;
+  background: #111827; color: white;
+  font-family: Arial, sans-serif;
 }
-
-.box {
-    width: 90%;
-    max-width: 400px;
-    text-align: center;
-}
-
-h1 {
-    font-size: 34px;
-    margin-bottom: 5px;
-}
-
-.subtitle {
-    color: #aaa;
-    margin-bottom: 25px;
-}
-
+.container { width: 100%; max-width: 400px; text-align: center; }
 input {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 14px;
-    margin: 7px 0;
-    border: 1px solid #444;
-    border-radius: 8px;
-    background: #1f2937;
-    color: white;
-    font-size: 16px;
+  width: 100%; padding: 14px; margin: 8px 0;
+  border: 1px solid #444; border-radius: 8px;
+  background: #1f2937; color: white; font-size: 16px;
 }
-
 button {
-    width: 100%;
-    padding: 14px;
-    margin: 7px 0;
-    border: 0;
-    border-radius: 8px;
-    background: #2563eb;
-    color: white;
-    font-size: 16px;
+  width: 100%; padding: 14px; margin: 7px 0;
+  border: 0; border-radius: 8px;
+  background: #2563eb; color: white;
+  font-size: 16px; cursor: pointer;
 }
-
-button:active {
-    transform: scale(.98);
-}
-
-.link {
-    background: transparent;
-    color: #60a5fa;
-}
-
-#message {
-    margin-top: 15px;
-    min-height: 25px;
-    color: #60a5fa;
-}
-
-#resetBox {
-    display: none;
-}
+.link { background: transparent; color: #60a5fa; }
+#message { min-height: 25px; color: #60a5fa; overflow-wrap: anywhere; }
+#resetBox { display: none; }
 </style>
 </head>
-
 <body>
 
-<div class="box">
+<div class="container">
+  <h1>BigVic Fun</h1>
+  <p>Chat • Games • Fun</p>
 
-<h1>BigVic Fun</h1>
+  <div id="loginBox">
+    <input id="email" type="email" placeholder="Email address">
+    <input id="password" type="password" placeholder="Password">
+    <button id="loginButton">Login</button>
+    <button id="createButton">Create Account</button>
+    <button id="forgotButton" class="link">Forgot password?</button>
+  </div>
 
-<div class="subtitle">
-Chat • Games • Fun
+  <div id="resetBox">
+    <h3>Reset Password</h3>
+    <input id="resetEmail" type="email" placeholder="Enter your email">
+    <button id="resetButton">Send Reset Email</button>
+    <button id="backButton" class="link">Back to Login</button>
+  </div>
+
+  <div id="message"></div>
 </div>
 
-<div id="loginBox">
-
-<input
-id="email"
-type="email"
-placeholder="Email address">
-
-<input
-id="password"
-type="password"
-placeholder="Password">
-
-<button onclick="login()">
-Login
-</button>
-
-<button onclick="createAccount()">
-Create Account
-</button>
-
-<button class="link" onclick="showReset()">
-Forgot password?
-</button>
-
-</div>
-
-
-<div id="resetBox">
-
-<input
-id="resetEmail"
-type="email"
-placeholder="Enter your email">
-
-<button onclick="sendReset()">
-Send Reset Email
-</button>
-
-<button class="link" onclick="showLogin()">
-Back to Login
-</button>
-
-</div>
-
-<div id="message"></div>
-
-</div>
-
-
-<!-- Supabase library -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- BigVic configuration -->
 <script src="/config.js"></script>
 
-
 <script>
+(function () {
+  const message = document.getElementById("message");
+  let client = null;
 
-let client = null;
+  function showMessage(text) {
+    message.textContent = text;
+  }
 
+  function getClient() {
+    if (client) return client;
 
-/*
+    if (!window.supabase) {
+      throw new Error("Supabase library did not load. Check your internet.");
+    }
+
+    if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+      throw new Error("Supabase configuration is missing. Check config.js.");
+    }
+
+    client = window.supabase.createClient(
+      window.SUPABASE_URL,
+      window.SUPABASE_ANON_KEY
+    );
+
+    return client;
+  }
+
+  // LOGIN
+  document.getElementById("loginButton").onclick = async function () {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!email || !password) {
+      showMessage("Enter your email and password.");
+      return;
+    }
+
+    try {
+      showMessage("Logging in...");
+      const { error } = await getClient().auth.signInWithPassword({
+        email, password
+      });
+
+      if (error) throw error;
+
+      showMessage("Login successful!");
+      setTimeout(() => location.href = "/", 1000);
+    } catch (error) {
+      showMessage("Login error: " + error.message);
+    }
+  };
+
+  // CREATE ACCOUNT
+  document.getElementById("createButton").onclick = async function () {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!email || !password) {
+      showMessage("Enter your email and password.");
+      return;
+    }
+
+    if (password.length < 6) {
+      showMessage("Password must contain at least 6 characters.");
+      return;
+    }
+
+    try {
+      showMessage("Creating account...");
+      const { data, error } = await getClient().auth.signUp({
+        email, password
+      });
+
+      if (error) throw error;
+
+      if (data.session) {
+        showMessage("Account created successfully!");
+        setTimeout(() => location.href = "/", 1000);
+      } else {
+        showMessage("Account created! Check your email to confirm it.");
+      }
+    } catch (error) {
+      showMessage("Signup error: " + error.message);
+    }
+  };
+
+  // SHOW RESET FORM
+  document.getElementById("forgotButton").onclick = function () {
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("resetBox").style.display = "block";
+    showMessage("");
+  };
+
+  // SEND RESET EMAIL
+  document.getElementById("resetButton").onclick = async function () {
+    const email = document.getElementById("resetEmail").value.trim();
+
+    if (!email) {
+      showMessage("Enter your email address.");
+      return;
+    }
+
+    try {
+      showMessage("Sending reset email...");
+
+      const { error } = await getClient().auth.resetPasswordForEmail(email, {
+        redirectTo: location.origin + "/auth.html"
+      });
+
+      if (error) throw error;
+
+      showMessage("Reset email sent. Please check your inbox.");
+    } catch (error) {
+      showMessage("Reset error: " + error.message);
+    }
+  };
+
+  // BACK TO LOGIN
+  document.getElementById("backButton").onclick = function () {
+    document.getElementById("resetBox").style.display = "none";
+    document.getElementById("loginBox").style.display = "block";
+    showMessage("");
+  };
+
+})();
+</script>
+
+</body>
+</html>
