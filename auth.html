@@ -3,21 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>BigVic Fun - Login</title>
 
 <style>
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #111827;
-    color: white;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    background: #111827;
+    color: white;
+    font-family: Arial, sans-serif;
 }
 
-.container {
+.box {
     width: 90%;
     max-width: 400px;
     text-align: center;
@@ -25,18 +26,19 @@ body {
 
 h1 {
     font-size: 34px;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
 }
 
-p {
+.subtitle {
     color: #aaa;
+    margin-bottom: 25px;
 }
 
 input {
     width: 100%;
     box-sizing: border-box;
     padding: 14px;
-    margin: 8px 0;
+    margin: 7px 0;
     border: 1px solid #444;
     border-radius: 8px;
     background: #1f2937;
@@ -56,73 +58,76 @@ button {
 }
 
 button:active {
-    transform: scale(0.98);
+    transform: scale(.98);
 }
 
 .link {
-    background: none;
+    background: transparent;
     color: #60a5fa;
-    margin-top: 5px;
 }
 
 #message {
-    min-height: 24px;
-    margin: 15px 0;
+    margin-top: 15px;
+    min-height: 25px;
     color: #60a5fa;
 }
 
 #resetBox {
     display: none;
-    margin-top: 15px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="box">
 
 <h1>BigVic Fun</h1>
 
-<p>Chat • Games • Fun</p>
+<div class="subtitle">
+Chat • Games • Fun
+</div>
 
 <div id="loginBox">
 
 <input
-    type="email"
-    id="email"
-    placeholder="Email address"
-    autocomplete="email">
+id="email"
+type="email"
+placeholder="Email address">
 
 <input
-    type="password"
-    id="password"
-    placeholder="Password"
-    autocomplete="current-password">
+id="password"
+type="password"
+placeholder="Password">
 
-<button id="loginButton">Login</button>
+<button onclick="login()">
+Login
+</button>
 
-<button id="createButton">Create Account</button>
+<button onclick="createAccount()">
+Create Account
+</button>
 
-<button id="forgotButton" class="link">
-    Forgot password?
+<button class="link" onclick="showReset()">
+Forgot password?
 </button>
 
 </div>
 
+
 <div id="resetBox">
 
 <input
-    type="email"
-    id="resetEmail"
-    placeholder="Enter your email">
+id="resetEmail"
+type="email"
+placeholder="Enter your email">
 
-<button id="resetButton">
-    Send Reset Email
+<button onclick="sendReset()">
+Send Reset Email
 </button>
 
-<button id="backButton" class="link">
-    Back to Login
+<button class="link" onclick="showLogin()">
+Back to Login
 </button>
 
 </div>
@@ -131,200 +136,17 @@ button:active {
 
 </div>
 
+
+<!-- Supabase library -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- BigVic configuration -->
 <script src="/config.js"></script>
+
 
 <script>
 
-let supabaseClient;
+let client = null;
 
-try {
 
-    supabaseClient = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
-
-} catch (error) {
-
-    document.getElementById("message").textContent =
-        "Supabase configuration error.";
-
-}
-
-/* LOGIN */
-
-document.getElementById("loginButton").onclick = async function () {
-
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-
-    const message = document.getElementById("message");
-
-    if (!email || !password) {
-        message.textContent = "Enter your email and password.";
-        return;
-    }
-
-    message.textContent = "Logging in...";
-
-    try {
-
-        const { error } =
-            await supabaseClient.auth.signInWithPassword({
-                email: email,
-                password: password
-            });
-
-        if (error) {
-            message.textContent = error.message;
-            return;
-        }
-
-        message.textContent = "Login successful!";
-
-        setTimeout(function () {
-            window.location.href = "/";
-        }, 800);
-
-    } catch (error) {
-
-        message.textContent = "Login error: " + error.message;
-
-    }
-};
-
-
-/* CREATE ACCOUNT */
-
-document.getElementById("createButton").onclick = async function () {
-
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-
-    const message = document.getElementById("message");
-
-    if (!email || !password) {
-        message.textContent = "Enter an email and password.";
-        return;
-    }
-
-    if (password.length < 6) {
-        message.textContent =
-            "Password must be at least 6 characters.";
-        return;
-    }
-
-    message.textContent = "Creating account...";
-
-    try {
-
-        const { data, error } =
-            await supabaseClient.auth.signUp({
-                email: email,
-                password: password
-            });
-
-        if (error) {
-            message.textContent = error.message;
-            return;
-        }
-
-        if (data.session) {
-
-            message.textContent = "Account created!";
-
-            setTimeout(function () {
-                window.location.href = "/";
-            }, 800);
-
-        } else {
-
-            message.textContent =
-                "Account created. Check your email to confirm your account.";
-
-        }
-
-    } catch (error) {
-
-        message.textContent =
-            "Signup error: " + error.message;
-
-    }
-};
-
-
-/* FORGOT PASSWORD */
-
-document.getElementById("forgotButton").onclick = function () {
-
-    document.getElementById("loginBox").style.display = "none";
-
-    document.getElementById("resetBox").style.display = "block";
-
-    document.getElementById("message").textContent = "";
-
-};
-
-
-/* SEND RESET EMAIL */
-
-document.getElementById("resetButton").onclick = async function () {
-
-    const email =
-        document.getElementById("resetEmail").value.trim();
-
-    const message =
-        document.getElementById("message");
-
-    if (!email) {
-        message.textContent = "Enter your email address.";
-        return;
-    }
-
-    message.textContent = "Sending reset email...";
-
-    try {
-
-        const { error } =
-            await supabaseClient.auth.resetPasswordForEmail(
-                email,
-                {
-                    redirectTo:
-                        window.location.origin + "/auth.html"
-                }
-            );
-
-        if (error) {
-            message.textContent = error.message;
-            return;
-        }
-
-        message.textContent =
-            "Password reset email sent. Check your inbox.";
-
-    } catch (error) {
-
-        message.textContent =
-            "Reset error: " + error.message;
-
-    }
-};
-
-
-/* BACK TO LOGIN */
-
-document.getElementById("backButton").onclick = function () {
-
-    document.getElementById("resetBox").style.display = "none";
-
-    document.getElementById("loginBox").style.display = "block";
-
-    document.getElementById("message").textContent = "";
-
-};
-
-</script>
-
-</body>
-</html>
+/*
