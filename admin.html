@@ -87,6 +87,7 @@ button {
   background: white;
   color: #111827;
   margin-top: 15px;
+  margin-right: 8px;
 }
 
 .logout {
@@ -217,13 +218,11 @@ Loading users...
 <table id="usersTable" class="hidden">
 
 <thead>
-
 <tr>
 <th>Username</th>
 <th>Email</th>
 <th>Last Seen</th>
 </tr>
-
 </thead>
 
 <tbody id="usersBody"></tbody>
@@ -247,14 +246,12 @@ Loading reports...
 <table id="reportsTable" class="hidden">
 
 <thead>
-
 <tr>
 <th>Reported User</th>
 <th>Reason</th>
 <th>Details</th>
 <th>Date</th>
 </tr>
-
 </thead>
 
 <tbody id="reportsBody"></tbody>
@@ -271,333 +268,4 @@ Loading reports...
 
 <p id="adminEmail">
 Checking account...
-</p>
-
-<p>
-<strong>Status:</strong>
-Administrator access active
-</p>
-
-</div>
-
-</div>
-
-</main>
-
-<script>
-
-const supabaseClient =
-window.supabase.createClient(
-window.SUPABASE_URL,
-window.SUPABASE_ANON_KEY
-);
-
-
-/*
-IMPORTANT:
-
-The first account that successfully opens this
-dashboard becomes the administrator.
-
-After you open this page successfully once,
-we will lock it to your account.
-*/
-
-async function checkAdmin() {
-
-const {
-data: {
-session
-}
-} =
-await supabaseClient.auth.getSession();
-
-
-if (!session || !session.user) {
-
-document.getElementById("status").textContent =
-"You are not logged in. Please log in first.";
-
-document.getElementById("status").className =
-"status error";
-
-setTimeout(function() {
-
-location.href = "/auth.html";
-
-}, 1500);
-
-return;
-
-}
-
-
-document.getElementById("dashboard")
-.classList.remove("hidden");
-
-
-document.getElementById("status").textContent =
-"Administrator access verified.";
-
-document.getElementById("status").className =
-"status success";
-
-
-document.getElementById("adminEmail").textContent =
-"Admin account: " +
-(session.user.email || "Email unavailable");
-
-
-loadUsers();
-loadPosts();
-loadReports();
-
-}
-
-
-async function loadUsers() {
-
-try {
-
-const result =
-await supabaseClient
-.from("profiles")
-.select("username,email,last_seen", {
-count: "exact"
-})
-.order("username", {
-ascending: true
-});
-
-
-if (result.error) {
-
-throw result.error;
-
-}
-
-
-document.getElementById("usersNumber")
-.textContent =
-result.count || result.data.length;
-
-
-const body =
-document.getElementById("usersBody");
-
-
-body.innerHTML = "";
-
-
-result.data.forEach(function(user) {
-
-const row =
-document.createElement("tr");
-
-
-row.innerHTML = `
-<td>${escapeHtml(user.username || "Unknown")}</td>
-<td>${escapeHtml(user.email || "—")}</td>
-<td>${formatDate(user.last_seen)}</td>
-`;
-
-
-body.appendChild(row);
-
-});
-
-
-document.getElementById("usersLoading")
-.classList.add("hidden");
-
-
-document.getElementById("usersTable")
-.classList.remove("hidden");
-
-
-}
-
-catch(error) {
-
-document.getElementById("usersLoading")
-.textContent =
-"Could not load users: " +
-error.message;
-
-document.getElementById("usersLoading")
-.className =
-"loading error";
-
-}
-
-}
-
-
-async function loadPosts() {
-
-try {
-
-const result =
-await supabaseClient
-.from("posts")
-.select("id", {
-count: "exact",
-head: true
-});
-
-
-if (result.error) {
-
-throw result.error;
-
-}
-
-
-document.getElementById("postsNumber")
-.textContent =
-result.count || 0;
-
-}
-
-catch(error) {
-
-document.getElementById("postsNumber")
-.textContent =
-"—";
-
-}
-
-}
-
-
-async function loadReports() {
-
-try {
-
-const result =
-await supabaseClient
-.from("user_reports")
-.select(
-"id,reported_id,reason,details,created_at"
-)
-.order("created_at", {
-ascending: false
-});
-
-
-if (result.error) {
-
-throw result.error;
-
-}
-
-
-document.getElementById("reportsNumber")
-.textContent =
-result.data.length;
-
-
-const body =
-document.getElementById("reportsBody");
-
-
-body.innerHTML = "";
-
-
-if (result.data.length === 0) {
-
-body.innerHTML = `
-<tr>
-<td colspan="4">
-No reports yet.
-</td>
-</tr>
-`;
-
-} else {
-
-result.data.forEach(function(report) {
-
-const row =
-document.createElement("tr");
-
-
-row.innerHTML = `
-<td>${escapeHtml(report.reported_id || "—")}</td>
-<td>${escapeHtml(report.reason || "—")}</td>
-<td>${escapeHtml(report.details || "—")}</td>
-<td>${formatDate(report.created_at)}</td>
-`;
-
-
-body.appendChild(row);
-
-});
-
-}
-
-
-document.getElementById("reportsLoading")
-.classList.add("hidden");
-
-
-document.getElementById("reportsTable")
-.classList.remove("hidden");
-
-}
-
-catch(error) {
-
-document.getElementById("reportsLoading")
-.textContent =
-"Could not load reports: " +
-error.message;
-
-document.getElementById("reportsLoading")
-.className =
-"loading error";
-
-}
-
-}
-
-
-function formatDate(date) {
-
-if (!date) {
-return "Never";
-}
-
-return new Date(date).toLocaleString();
-
-}
-
-
-function escapeHtml(value) {
-
-return String(value)
-.replaceAll("&", "&amp;")
-.replaceAll("<", "&lt;")
-.replaceAll(">", "&gt;")
-.replaceAll('"', "&quot;")
-.replaceAll("'", "&#039;");
-
-}
-
-
-async function logout() {
-
-await supabaseClient.auth.signOut();
-
-location.href =
-"/auth.html";
-
-}
-
-
-checkAdmin();
-
-</script>
-
-</body>
-</html>
+</p
