@@ -3,107 +3,79 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>BigVic Fun - Login</title>
+<title>BigVic Fun</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
-
 body {
   margin: 0;
-  min-height: 100vh;
   font-family: Arial, sans-serif;
   background: linear-gradient(135deg, #6a11cb, #2575fc);
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
 }
 
 .card {
-  width: 100%;
-  max-width: 420px;
+  width: 90%;
+  max-width: 400px;
   background: white;
+  padding: 30px;
   border-radius: 18px;
-  padding: 30px 25px;
-  box-shadow: 0 10px 35px rgba(0,0,0,0.25);
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
 }
 
 h1 {
   text-align: center;
   color: #6a11cb;
-  margin-bottom: 5px;
 }
 
-.subtitle {
+p {
   text-align: center;
   color: #777;
-  margin-bottom: 25px;
 }
 
 input {
   width: 100%;
   padding: 14px;
-  margin-bottom: 14px;
+  margin: 8px 0;
+  box-sizing: border-box;
   border: 1px solid #ddd;
   border-radius: 10px;
   font-size: 16px;
-  outline: none;
-}
-
-input:focus {
-  border-color: #6a11cb;
 }
 
 button {
   width: 100%;
   padding: 14px;
-  border: 0;
+  margin-top: 10px;
+  border: none;
   border-radius: 10px;
+  color: white;
+  background: #6a11cb;
   font-size: 16px;
   font-weight: bold;
-  cursor: pointer;
-  margin-top: 8px;
 }
 
-.login-btn {
-  background: #6a11cb;
-  color: white;
+button:active {
+  transform: scale(.98);
 }
 
-.register-btn {
-  background: #2575fc;
-  color: white;
-}
-
-.forgot {
-  display: block;
+#forgot {
   text-align: right;
   color: #6a11cb;
-  margin: 2px 0 15px;
+  margin: 10px 0;
   cursor: pointer;
-  font-size: 14px;
 }
 
-.message {
-  margin-top: 15px;
-  text-align: center;
-  font-size: 14px;
-  color: #555;
-}
-
-.hidden {
+#reset {
   display: none;
 }
 
-.back {
-  display: block;
+#message {
   text-align: center;
   margin-top: 15px;
-  color: #6a11cb;
-  cursor: pointer;
+  color: #444;
 }
 </style>
 </head>
@@ -112,128 +84,26 @@ button {
 
 <div class="card">
 
-  <h1>BigVic Fun</h1>
-  <div class="subtitle">Chat • Games • Fun</div>
+<h1>BigVic Fun</h1>
 
-  <!-- LOGIN -->
-  <div id="loginSection">
+<p>Chat • Games • Fun</p>
 
-    <input
-      type="email"
-      id="email"
-      placeholder="Email address"
-      autocomplete="email"
-    >
+<div id="login">
 
-    <input
-      type="password"
-      id="password"
-      placeholder="Password"
-      autocomplete="current-password"
-    >
+<input id="email" type="email" placeholder="Email address">
 
-    <span class="forgot" onclick="showForgot()">
-      Forgot password?
-    </span>
+<input id="password" type="password" placeholder="Password">
 
-    <button class="login-btn" onclick="login()">
-      Login
-    </button>
+<div id="forgot">Forgot password?</div>
 
-    <button class="register-btn" onclick="register()">
-      Create Account
-    </button>
+<button id="loginBtn">Login</button>
 
-  </div>
-
-  <!-- FORGOT PASSWORD -->
-  <div id="forgotSection" class="hidden">
-
-    <h2 style="text-align:center;">Reset Password</h2>
-
-    <p style="text-align:center;color:#777;">
-      Enter your email and we'll send you a password reset link.
-    </p>
-
-    <input
-      type="email"
-      id="resetEmail"
-      placeholder="Enter your email"
-      autocomplete="email"
-    >
-
-    <button class="login-btn" onclick="sendReset()">
-      Send Reset Link
-    </button>
-
-    <span class="back" onclick="backToLogin()">
-      ← Back to Login
-    </span>
-
-  </div>
-
-  <div id="message" class="message"></div>
+<button id="registerBtn">Create Account</button>
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/config.js"></script>
+<div id="reset">
 
-<script>
+<h2>Reset Password</h2>
 
-const client = window.supabaseClient;
-
-if (!client) {
-  document.getElementById("message").textContent =
-    "Supabase connection is not available.";
-}
-
-function showForgot() {
-  document.getElementById("loginSection").classList.add("hidden");
-  document.getElementById("forgotSection").classList.remove("hidden");
-  document.getElementById("message").textContent = "";
-}
-
-function backToLogin() {
-  document.getElementById("forgotSection").classList.add("hidden");
-  document.getElementById("loginSection").classList.remove("hidden");
-  document.getElementById("message").textContent = "";
-}
-
-async function login() {
-
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-
-  if (!email || !password) {
-    document.getElementById("message").textContent =
-      "Please enter your email and password.";
-    return;
-  }
-
-  document.getElementById("message").textContent = "Logging in...";
-
-  const { error } = await client.auth.signInWithPassword({
-    email: email,
-    password: password
-  });
-
-  if (error) {
-    document.getElementById("message").textContent =
-      error.message;
-    return;
-  }
-
-  window.location.href = "/chat/";
-}
-
-async function register() {
-
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-
-  if (!email || !password) {
-    document.getElementById("message").textContent =
-      "Please enter an email and password.";
-    return;
-  }
+<input
