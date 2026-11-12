@@ -15,7 +15,7 @@ body {
   margin: 0;
   min-height: 100vh;
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -26,20 +26,15 @@ body {
   width: 100%;
   max-width: 420px;
   background: white;
-  padding: 30px 22px;
-  border-radius: 20px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
-}
-
-.logo {
-  text-align: center;
-  font-size: 45px;
+  border-radius: 18px;
+  padding: 30px 25px;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.25);
 }
 
 h1 {
   text-align: center;
-  margin: 5px 0;
-  color: #222;
+  color: #6a11cb;
+  margin-bottom: 5px;
 }
 
 .subtitle {
@@ -51,7 +46,7 @@ h1 {
 input {
   width: 100%;
   padding: 14px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   border: 1px solid #ddd;
   border-radius: 10px;
   font-size: 16px;
@@ -59,7 +54,7 @@ input {
 }
 
 input:focus {
-  border-color: #667eea;
+  border-color: #6a11cb;
 }
 
 button {
@@ -68,61 +63,47 @@ button {
   border: 0;
   border-radius: 10px;
   font-size: 16px;
+  font-weight: bold;
   cursor: pointer;
-  margin-top: 5px;
+  margin-top: 8px;
 }
 
-.login {
-  background: #667eea;
+.login-btn {
+  background: #6a11cb;
   color: white;
 }
 
-.register {
-  background: #eee;
-  color: #333;
+.register-btn {
+  background: #2575fc;
+  color: white;
 }
 
 .forgot {
   display: block;
   text-align: right;
-  margin: 0 0 14px;
-  color: #667eea;
-  font-size: 14px;
+  color: #6a11cb;
+  margin: 2px 0 15px;
   cursor: pointer;
-}
-
-.forgot:hover {
-  text-decoration: underline;
-}
-
-.back {
-  background: #eee;
-  color: #333;
+  font-size: 14px;
 }
 
 .message {
   margin-top: 15px;
-  padding: 12px;
-  border-radius: 10px;
   text-align: center;
-  display: none;
   font-size: 14px;
-}
-
-.success {
-  display: block;
-  background: #e8f8ee;
-  color: #18733b;
-}
-
-.error {
-  display: block;
-  background: #fdeaea;
-  color: #a52828;
+  color: #555;
 }
 
 .hidden {
-  display: none !important;
+  display: none;
+}
+
+.back {
+  display: block;
+  text-align: center;
+  margin-top: 15px;
+  color: #6a11cb;
+  cursor: pointer;
 }
 </style>
 </head>
@@ -131,18 +112,11 @@ button {
 
 <div class="card">
 
-  <div class="logo">🎉</div>
-
   <h1>BigVic Fun</h1>
+  <div class="subtitle">Chat • Games • Fun</div>
 
-  <div class="subtitle">
-    Chat • Games • Fun
-  </div>
-
-
-  <!-- LOGIN AREA -->
-
-  <div id="loginArea">
+  <!-- LOGIN -->
+  <div id="loginSection">
 
     <input
       type="email"
@@ -158,74 +132,49 @@ button {
       autocomplete="current-password"
     >
 
-    <div
-      class="forgot"
-      onclick="showForgot()">
+    <span class="forgot" onclick="showForgot()">
       Forgot password?
-    </div>
+    </span>
 
-    <button
-      class="login"
-      onclick="login()">
+    <button class="login-btn" onclick="login()">
       Login
     </button>
 
-    <button
-      class="register"
-      onclick="register()">
+    <button class="register-btn" onclick="register()">
       Create Account
     </button>
 
   </div>
 
+  <!-- FORGOT PASSWORD -->
+  <div id="forgotSection" class="hidden">
 
-  <!-- FORGOT PASSWORD AREA -->
+    <h2 style="text-align:center;">Reset Password</h2>
 
-  <div
-    id="forgotArea"
-    class="hidden">
-
-    <h2 style="text-align:center;">
-      Reset Password
-    </h2>
-
-    <p style="text-align:center;color:#777;font-size:14px;">
-      Enter your email address and we'll send you a password reset link.
+    <p style="text-align:center;color:#777;">
+      Enter your email and we'll send you a password reset link.
     </p>
 
     <input
       type="email"
       id="resetEmail"
-      placeholder="Email address"
+      placeholder="Enter your email"
       autocomplete="email"
     >
 
-    <button
-      class="login"
-      onclick="sendReset()">
+    <button class="login-btn" onclick="sendReset()">
       Send Reset Link
     </button>
 
-    <button
-      class="back"
-      onclick="backToLogin()">
-      Back to Login
-    </button>
+    <span class="back" onclick="backToLogin()">
+      ← Back to Login
+    </span>
 
   </div>
 
-
-  <!-- MESSAGE -->
-
-  <div
-    id="message"
-    class="message">
-  </div>
+  <div id="message" class="message"></div>
 
 </div>
-
-
-<!-- SUPABASE -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/config.js"></script>
@@ -234,36 +183,57 @@ button {
 
 const client = window.supabaseClient;
 
-
-/* ==========================
-   MESSAGE
-========================== */
-
-function showMessage(text, type) {
-
-  const box =
-    document.getElementById("message");
-
-  box.textContent = text;
-
-  box.className =
-    "message " + type;
+if (!client) {
+  document.getElementById("message").textContent =
+    "Supabase connection is not available.";
 }
 
+function showForgot() {
+  document.getElementById("loginSection").classList.add("hidden");
+  document.getElementById("forgotSection").classList.remove("hidden");
+  document.getElementById("message").textContent = "";
+}
 
-/* ==========================
-   LOGIN
-========================== */
+function backToLogin() {
+  document.getElementById("forgotSection").classList.add("hidden");
+  document.getElementById("loginSection").classList.remove("hidden");
+  document.getElementById("message").textContent = "";
+}
 
 async function login() {
 
-  const email =
-    document.getElementById("email")
-      .value
-      .trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
 
-  const password =
-    document.getElementById("password")
-      .value;
+  if (!email || !password) {
+    document.getElementById("message").textContent =
+      "Please enter your email and password.";
+    return;
+  }
 
- 
+  document.getElementById("message").textContent = "Logging in...";
+
+  const { error } = await client.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    document.getElementById("message").textContent =
+      error.message;
+    return;
+  }
+
+  window.location.href = "/chat/";
+}
+
+async function register() {
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  if (!email || !password) {
+    document.getElementById("message").textContent =
+      "Please enter an email and password.";
+    return;
+  }
