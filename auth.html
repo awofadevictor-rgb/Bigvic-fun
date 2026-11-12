@@ -17,29 +17,28 @@ body {
   font-family: Arial, sans-serif;
   background: linear-gradient(135deg, #667eea, #764ba2);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   padding: 20px;
 }
 
 .card {
   width: 100%;
-  max-width: 430px;
+  max-width: 420px;
   background: white;
+  padding: 30px 22px;
   border-radius: 20px;
-  padding: 28px 22px;
   box-shadow: 0 15px 40px rgba(0,0,0,0.25);
 }
 
 .logo {
   text-align: center;
-  font-size: 42px;
-  margin-bottom: 5px;
+  font-size: 45px;
 }
 
 h1 {
   text-align: center;
-  margin: 0 0 8px;
+  margin: 5px 0;
   color: #222;
 }
 
@@ -49,27 +48,6 @@ h1 {
   margin-bottom: 25px;
 }
 
-.tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-}
-
-.tab {
-  flex: 1;
-  padding: 11px;
-  border: none;
-  border-radius: 10px;
-  background: #eee;
-  cursor: pointer;
-  font-size: 15px;
-}
-
-.tab.active {
-  background: #667eea;
-  color: white;
-}
-
 input {
   width: 100%;
   padding: 14px;
@@ -77,55 +55,122 @@ input {
   border: 1px solid #ddd;
   border-radius: 10px;
   font-size: 16px;
-  outline: none;
-}
-
-input:focus {
-  border-color: #667eea;
 }
 
 button {
   width: 100%;
   padding: 14px;
-  border: none;
+  border: 0;
   border-radius: 10px;
   font-size: 16px;
   cursor: pointer;
+  margin-top: 5px;
 }
 
-.primary {
+.login {
   background: #667eea;
   color: white;
-  margin-top: 4px;
 }
 
-.primary:hover {
-  opacity: 0.92;
-}
-
-.secondary {
+.register {
   background: #eee;
   color: #333;
-  margin-top: 10px;
-}
-
-.forgot {
-  display: block;
-  text-align: right;
-  margin: 2px 0 15px;
-  color: #667eea;
-  font-size: 14px;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.forgot:hover {
-  text-decoration: underline;
-}
-
-.hidden {
-  display: none !important;
 }
 
 .message {
-  margin
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+  display: none;
+}
+
+.success {
+  display: block;
+  background: #e8f8ee;
+  color: #18733b;
+}
+
+.error {
+  display: block;
+  background: #fdeaea;
+  color: #a52828;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <div class="logo">🎉</div>
+
+  <h1>BigVic Fun</h1>
+
+  <div class="subtitle">
+    Chat • Games • Fun
+  </div>
+
+  <input
+    type="email"
+    id="email"
+    placeholder="Email address"
+    autocomplete="email"
+  >
+
+  <input
+    type="password"
+    id="password"
+    placeholder="Password"
+    autocomplete="current-password"
+  >
+
+  <button
+    class="login"
+    onclick="login()">
+    Login
+  </button>
+
+  <button
+    class="register"
+    onclick="register()">
+    Create Account
+  </button>
+
+  <div
+    id="message"
+    class="message">
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
+
+<script>
+
+const client = window.supabaseClient;
+
+function message(text, type) {
+
+  const box =
+    document.getElementById("message");
+
+  box.textContent = text;
+
+  box.className =
+    "message " + type;
+}
+
+async function login() {
+
+  const email =
+    document.getElementById("email").value.trim();
+
+  const password =
+    document.getElementById("password").value;
+
+  if (!email || !password) {
+
+    message(
+     
