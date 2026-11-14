@@ -18,7 +18,6 @@ button{cursor:pointer}
   --navy:#101322;
   --navy2:#19233b;
   --gold:#ffca28;
-  --border:#303957;
 }
 
 .topbar{
@@ -115,9 +114,7 @@ button{cursor:pointer}
   border:0;border-radius:8px;padding:7px 10px;
   background:#eee;margin-left:8px
 }
-.composer{
-  display:flex;align-items:center;gap:9px
-}
+.composer{display:flex;align-items:center;gap:9px}
 .composer input[type=text]{
   flex:1;min-width:0;border:0;outline:none;
   background:#f0f2f5;border-radius:25px;padding:13px 16px
@@ -136,6 +133,7 @@ button{cursor:pointer}
   min-height:28px
 }
 .mobile-back{display:none;border:0;background:none;font-size:22px}
+
 @media(max-width:700px){
   .layout{display:block;height:calc(100vh - 58px)}
   .sidebar{height:100%;width:100%}
@@ -205,6 +203,7 @@ button{cursor:pointer}
         <label class="tool-button" for="mediaInput"
           title="Send photo or video"
           style="display:flex;align-items:center;justify-content:center">📎</label>
+
         <input id="mediaInput" type="file"
           accept="image/*,video/*" hidden>
 
@@ -218,6 +217,7 @@ button{cursor:pointer}
         <button id="sendButton" class="send-button"
           type="button">Send</button>
       </div>
+
       <div id="status" class="status">Welcome to BigVic Fun.</div>
     </div>
 
@@ -261,9 +261,19 @@ function status(message) {
 }
 
 function avatarUrl(person) {
-  return person.avatar_url ||
+  return person.avatar ||
     "https://ui-avatars.com/api/?name=" +
     encodeURIComponent(person.username || "User");
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
 }
 
 function showWelcome() {
@@ -317,6 +327,10 @@ function renderFriends() {
     const button = document.createElement("button");
     button.className = "friend";
     button.dataset.friendId = friend.id;
+
+    if (currentFriend && currentFriend.id === friend.id) {
+      button.classList.add("active");
+    }
 
     const img = document.createElement("img");
     img.className = "avatar";
@@ -376,6 +390,7 @@ async function loadFriends() {
 
   if (!acceptedIds.size) {
     friends = [];
+    currentFriend = null;
     renderFriends();
     status("You don't have accepted friends yet.");
     return;
@@ -383,7 +398,7 @@ async function loadFriends() {
 
   const { data: profiles, error: profileError } = await supabaseClient
     .from("profiles")
-    .select("id,username,avatar_url")
+    .select("id,username,avatar")
     .in("id", Array.from(acceptedIds))
     .order("username");
 
@@ -398,10 +413,20 @@ async function loadFriends() {
 
   if (currentFriend) {
     const stillFriend = friends.find(f => f.id === currentFriend.id);
+
     if (!stillFriend) {
       currentFriend = null;
       showWelcome();
       $("chatName").textContent = "Choose a friend";
+      $("chatAvatar").src =
+        "https://ui-avatars.com/api/?name=BigVic";
+      $("chatSubtitle").textContent =
+        "Your BigVic Fun conversations";
+      $("layout").classList.remove("chat-open");
+    } else {
+      currentFriend = stillFriend;
+      $("chatAvatar").src = avatarUrl(stillFriend);
+      $("chatName").textContent = stillFriend.username || "Friend";
     }
   }
 }
@@ -441,7 +466,6 @@ async function loadMessages() {
     return;
   }
 
-  // Do not display results for a friend you have switched away from.
   if (!currentFriend || currentFriend.id !== friendId) return;
 
   const box = $("messages");
@@ -458,18 +482,7 @@ async function loadMessages() {
   }
 
   data.forEach(message => displayMessage(message));
-
   box.scrollTop = box.scrollHeight;
-}
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  })[char]);
 }
 
 function displayMessage(message) {
@@ -729,6 +742,7 @@ $("recordButton").addEventListener("click", async () => {
       );
 
       $("preview").innerHTML = "";
+
       const audio = document.createElement("audio");
       previewURL = URL.createObjectURL(blob);
       audio.src = previewURL;
