@@ -1671,7 +1671,6 @@ if(recordingStream)recordingStream.getTracks().forEach(track=>track.stop());
   let friendView = "people";
   let friendRequests = [];
 
-  const oldRenderContacts = renderContacts;
 
   async function getFriendRequests() {
     const { data, error } = await supabaseClient
