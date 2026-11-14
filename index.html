@@ -12,232 +12,115 @@
 <style>
 *{box-sizing:border-box}
 :root{
-  --bg:#f0f2f5;
-  --card:#fff;
-  --gold:#ffca28;
-  --gold2:#e7ad16;
-  --navy:#101322;
-  --navy2:#19233b;
-  --text:#1c1e21;
-  --muted:#65676b;
-  --line:#e4e6eb;
+  --bg:#f0f2f5;--card:#fff;--gold:#ffca28;
+  --gold2:#e7ad16;--navy:#101322;--navy2:#19233b;
+  --text:#1c1e21;--muted:#65676b;--line:#e4e6eb;
 }
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Arial,sans-serif;
-}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
 header{
-  background:var(--navy);
-  padding:12px 20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  position:sticky;
-  top:0;
-  z-index:30;
-  border-bottom:2px solid var(--gold);
+  background:var(--navy);padding:12px 20px;display:flex;
+  justify-content:space-between;align-items:center;position:sticky;
+  top:0;z-index:30;border-bottom:2px solid var(--gold);
   box-shadow:0 2px 8px #0002;
 }
 header h2{margin:0;color:var(--gold);font-size:23px}
 button{
-  border:0;
-  border-radius:9px;
-  padding:11px 15px;
-  background:var(--gold);
-  color:#171717;
-  font-weight:bold;
-  cursor:pointer;
+  border:0;border-radius:9px;padding:11px 15px;
+  background:var(--gold);color:#171717;font-weight:bold;cursor:pointer;
 }
 button:disabled{opacity:.5;cursor:not-allowed}
 nav{
-  display:flex;
-  gap:5px;
-  overflow-x:auto;
-  padding:7px 12px;
-  background:#fff;
-  position:sticky;
-  top:49px;
-  z-index:25;
-  border-bottom:1px solid var(--line);
-  box-shadow:0 2px 5px #00000008;
+  display:flex;gap:5px;overflow-x:auto;padding:7px 12px;
+  background:#fff;position:sticky;top:49px;z-index:25;
+  border-bottom:1px solid var(--line);box-shadow:0 2px 5px #00000008;
 }
 nav button{
-  white-space:nowrap;
-  background:transparent;
-  color:#65676b;
-  flex:1;
-  border-radius:8px;
-  padding:12px 8px;
+  white-space:nowrap;background:transparent;color:#65676b;
+  flex:1;border-radius:8px;padding:12px 8px;
 }
 nav button.active{
-  background:#fff7d9;
-  color:#806000;
-  box-shadow:inset 0 -3px var(--gold);
+  background:#fff7d9;color:#806000;box-shadow:inset 0 -3px var(--gold);
 }
-main{
-  max-width:760px;
-  margin:18px auto;
-  padding:0 14px;
-}
+main{max-width:760px;margin:18px auto;padding:0 14px}
 .page{display:none}
 .page.active{display:block}
 .card{
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:18px;
-  margin:14px 0;
-  box-shadow:0 1px 2px #0000000b;
+  background:#fff;border:1px solid var(--line);border-radius:12px;
+  padding:18px;margin:14px 0;box-shadow:0 1px 2px #0000000b;
 }
 h1,h2,h3{margin-top:8px;color:#1c1e21}
 input,textarea{
-  width:100%;
-  padding:13px;
-  border:1px solid #ccd0d5;
-  border-radius:9px;
-  background:#f0f2f5;
-  color:#1c1e21;
-  margin:8px 0;
-  font-family:Arial,sans-serif;
+  width:100%;padding:13px;border:1px solid #ccd0d5;
+  border-radius:9px;background:#f0f2f5;color:#1c1e21;
+  margin:8px 0;font-family:Arial,sans-serif;
 }
 textarea{min-height:90px;resize:vertical}
-input:focus,textarea:focus{
-  outline:2px solid var(--gold);
-  border-color:var(--gold);
-}
+input:focus,textarea:focus{outline:2px solid var(--gold);border-color:var(--gold)}
 .game-buttons{display:flex;gap:8px;flex-wrap:wrap}
 .small{color:var(--muted);font-size:13px}
 footer{text-align:center;color:#65676b;padding:25px}
 .score-row{
-  display:flex;
-  justify-content:space-between;
-  padding:12px;
-  border-bottom:1px solid var(--line);
-  gap:10px;
+  display:flex;justify-content:space-between;padding:12px;
+  border-bottom:1px solid var(--line);gap:10px;
 }
 .post{
-  background:#fff;
-  border:1px solid var(--line);
-  padding:16px;
-  border-radius:12px;
-  margin:14px 0;
-  overflow-wrap:anywhere;
+  background:#fff;border:1px solid var(--line);padding:16px;
+  border-radius:12px;margin:14px 0;overflow-wrap:anywhere;
   box-shadow:0 1px 2px #0000000b;
 }
 .post-actions{
-  display:flex;
-  gap:9px;
-  flex-wrap:wrap;
-  margin:12px 0;
-  border-top:1px solid var(--line);
-  padding-top:10px;
+  display:flex;gap:9px;flex-wrap:wrap;margin:12px 0;
+  border-top:1px solid var(--line);padding-top:10px;
 }
-.post-actions button{
-  background:#f0f2f5;
-  color:#4b4f56;
-  flex:1;
-}
-.post-actions button.liked{
-  background:#fff1c2;
-  color:#765500;
-}
+.post-actions button{background:#f0f2f5;color:#4b4f56;flex:1}
+.post-actions button.liked{background:#fff1c2;color:#765500}
 .post-media{
-  width:100%;
-  max-height:520px;
-  object-fit:contain;
-  border-radius:8px;
-  margin-top:12px;
-  background:#f0f2f5;
+  width:100%;max-height:520px;object-fit:contain;
+  border-radius:8px;margin-top:12px;background:#f0f2f5;
 }
-.comment-box{
-  border-top:1px solid var(--line);
-  margin-top:14px;
-  padding-top:10px;
-}
-.comment{
-  background:#f0f2f5;
-  padding:10px;
-  border-radius:12px;
-  margin:7px 0;
-}
+.comment-box{border-top:1px solid var(--line);margin-top:14px;padding-top:10px}
+.comment{background:#f0f2f5;padding:10px;border-radius:12px;margin:7px 0}
 .comment-form{display:flex;gap:7px;align-items:center}
 .comment-form textarea{min-height:45px;flex:1;margin:5px 0}
 .comment-form button{padding:10px}
 #mediaPreview img,#mediaPreview video{
-  width:100%;
-  max-height:300px;
-  object-fit:contain;
-  border-radius:10px;
+  width:100%;max-height:300px;object-fit:contain;border-radius:10px;
 }
 .file-label{
-  display:inline-block;
-  background:#fff5d6;
-  color:#806000;
-  padding:12px 16px;
-  border-radius:9px;
-  margin:8px 0;
-  cursor:pointer;
-  font-weight:bold;
+  display:inline-block;background:#fff5d6;color:#806000;
+  padding:12px 16px;border-radius:9px;margin:8px 0;
+  cursor:pointer;font-weight:bold;
 }
 .welcome-card{
   background:linear-gradient(135deg,#19233b,#303957);
-  border:1px solid #6e5928;
-  padding:24px;
-  border-radius:14px;
-  margin-bottom:18px;
-  color:#fff;
+  border:1px solid #6e5928;padding:24px;border-radius:14px;
+  margin-bottom:18px;color:#fff;
 }
 .welcome-card h1,.welcome-card h3,.welcome-card p{color:#fff}
 .welcome-card h1{color:var(--gold)}
 .quick-grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:12px;
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;
 }
 .quick-card{
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:16px;
-  box-shadow:0 1px 2px #0000000b;
+  background:#fff;border:1px solid var(--line);border-radius:12px;
+  padding:16px;box-shadow:0 1px 2px #0000000b;
 }
 .quick-card h3{color:#806000}
-.section-heading{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-}
+.section-heading{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .brand-mark{color:var(--gold);font-size:28px}
 .setting-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:15px;
-  padding:14px 0;
-  border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;
+  gap:15px;padding:14px 0;border-bottom:1px solid var(--line);
 }
 .setting-row:last-child{border-bottom:0}
 .setting-row p{margin:5px 0 0}
-.setting-row input[type=checkbox]{
-  width:22px;
-  height:22px;
-  accent-color:var(--gold);
-  margin:0;
-}
+.setting-row input[type=checkbox]{width:22px;height:22px;accent-color:var(--gold);margin:0}
 .setting-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
 .danger-button{background:#b42318;color:white}
 .secondary-button{background:#e4e6eb;color:#1c1e21}
 .settings-note{
-  background:#f0f2f5;
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:12px;
-  color:var(--muted);
-  font-size:13px;
-  line-height:1.5;
+  background:#f0f2f5;border:1px solid var(--line);border-radius:10px;
+  padding:12px;color:var(--muted);font-size:13px;line-height:1.5;
 }
 .feed-heading{color:#806000}
 @media(max-width:600px){
@@ -340,7 +223,6 @@ footer{text-align:center;color:#65676b;padding:25px}
 
 <section id="games" class="page">
   <h2>🎮 Games Zone</h2>
-
   <div class="card">
     <h3>🔢 Guess the Number</h3>
     <p>Guess a number between 1 and 10.</p>
@@ -367,26 +249,19 @@ footer{text-align:center;color:#65676b;padding:25px}
   <div class="card">
     <h3>Share something with everyone</h3>
     <textarea id="postText" placeholder="What's happening?"></textarea>
-
     <label class="file-label" for="mediaFile">📸 Choose Photo or Video</label>
     <input id="mediaFile" type="file" accept="image/*,video/*" hidden onchange="previewMedia()">
-
     <div id="mediaPreview"></div>
-
     <p class="small">Maximum file size: 50 MB. You can post text, a photo, a video, or combine text with media.</p>
-
     <button id="publishButton" onclick="addPost()">Publish Post</button>
     <p id="postMessage" class="small"></p>
   </div>
 
-  <div id="posts">
-    Loading community posts...
-  </div>
+  <div id="posts">Loading community posts...</div>
 </section>
 
 <section id="scores" class="page">
   <h2>🏆 BigVic Leaderboard</h2>
-
   <div class="card">
     <p class="small">Players are ranked by their total game wins.</p>
     <div id="leaderboard">Loading scores...</div>
@@ -400,77 +275,47 @@ footer{text-align:center;color:#65676b;padding:25px}
 
   <div class="card">
     <h3>👤 Account</h3>
-
     <div class="setting-row">
-      <div>
-        <strong>Username</strong>
-        <p class="small" id="settingsUsername">Loading...</p>
-      </div>
+      <div><strong>Username</strong><p class="small" id="settingsUsername">Loading...</p></div>
     </div>
-
     <div class="setting-row">
-      <div>
-        <strong>Email address</strong>
-        <p class="small" id="settingsEmail">Loading...</p>
-      </div>
+      <div><strong>Email address</strong><p class="small" id="settingsEmail">Loading...</p></div>
     </div>
-
     <div class="setting-actions">
       <button class="secondary-button" onclick="openProfile()">Edit Profile</button>
       <button onclick="sendPasswordReset()">Change Password</button>
     </div>
-
     <p id="settingsMessage" class="small" aria-live="polite"></p>
   </div>
 
   <div class="card">
     <h3>🔒 Privacy</h3>
-
     <div class="setting-row">
-      <div>
-        <strong>Private account preference</strong>
-        <p class="small">Saves your preference on this device. It does not yet change who can see your posts.</p>
-      </div>
+      <div><strong>Private account preference</strong><p class="small">Saves your preference on this device. It does not yet change who can see your posts.</p></div>
       <input id="privateAccountSetting" type="checkbox" onchange="saveSettingPreference('bigvic_private_account',this.checked)">
     </div>
-
     <div class="setting-row">
-      <div>
-        <strong>Show online status preference</strong>
-        <p class="small">Saves your preference on this device. Chat presence must be connected separately.</p>
-      </div>
+      <div><strong>Show online status preference</strong><p class="small">Saves your preference on this device. Chat presence must be connected separately.</p></div>
       <input id="onlineStatusSetting" type="checkbox" checked onchange="saveSettingPreference('bigvic_show_online',this.checked)">
     </div>
   </div>
 
   <div class="card">
     <h3>🔔 Notifications</h3>
-
     <div class="setting-row">
-      <div>
-        <strong>Notifications preference</strong>
-        <p class="small">Controls this app's saved preference only; push notifications are not configured yet.</p>
-      </div>
+      <div><strong>Notifications preference</strong><p class="small">Controls this app's saved preference only; push notifications are not configured yet.</p></div>
       <input id="notificationsSetting" type="checkbox" checked onchange="saveSettingPreference('bigvic_notifications',this.checked)">
     </div>
   </div>
 
   <div class="card">
     <h3>🎨 App Preferences</h3>
-
     <div class="setting-row">
-      <div>
-        <strong>Dark appearance</strong>
-        <p class="small">BigVic Fun currently uses its dark navy and gold appearance.</p>
-      </div>
+      <div><strong>Dark appearance</strong><p class="small">BigVic Fun currently uses its dark navy and gold appearance.</p></div>
       <input type="checkbox" checked disabled aria-label="Dark appearance enabled">
     </div>
-
     <div class="setting-row">
-      <div>
-        <strong>Reduce animations</strong>
-        <p class="small">Remember your preference for reduced motion on this device.</p>
-      </div>
+      <div><strong>Reduce animations</strong><p class="small">Remember your preference for reduced motion on this device.</p></div>
       <input id="reduceMotionSetting" type="checkbox" onchange="saveSettingPreference('bigvic_reduce_motion',this.checked)">
     </div>
   </div>
@@ -478,7 +323,6 @@ footer{text-align:center;color:#65676b;padding:25px}
   <div class="card">
     <h3>🛡️ Security</h3>
     <p class="small">Keep your password private. BigVic Fun uses your Supabase account for sign-in.</p>
-
     <div class="setting-actions">
       <button onclick="sendPasswordReset()">Send Password Reset Email</button>
       <button class="danger-button" onclick="logout()">Log Out</button>
@@ -489,7 +333,6 @@ footer{text-align:center;color:#65676b;padding:25px}
     <h3>ℹ️ About BigVic Fun</h3>
     <p>BigVic Fun — Connect • Chat • Play • Share</p>
     <p class="small">Version 1.1 · © 2026 BigVic Fun</p>
-
     <div class="settings-note">
       Some privacy, online-status and notification switches currently save preferences on this device only. They do not change server-side privacy, chat presence or push-notification permissions. Those features need their own backend setup before they can take effect.
     </div>
@@ -517,10 +360,8 @@ try{
 
 function showPage(page,button){
   document.querySelectorAll(".page").forEach(s=>s.classList.remove("active"));
-
   const selected=document.getElementById(page);
   if(selected)selected.classList.add("active");
-
   document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
 
   if(button){
@@ -534,7 +375,6 @@ function showPage(page,button){
   if(page==="trending")loadPosts();
   if(page==="scores")loadLeaderboard();
   if(page==="settings")loadSettings();
-
   window.scrollTo(0,0);
 }
 
@@ -542,8 +382,9 @@ function openChat(){
   window.location.href="/chat/";
 }
 
+/* FRIENDS NOW OPENS THE SEPARATE FRIENDS PAGE */
 function openFriends(){
-  window.location.href="/chat/";
+  window.location.href="/friends/";
 }
 
 function openProfile(){
@@ -558,14 +399,12 @@ async function checkLogin(){
 
   try{
     const {data,error}=await db.auth.getSession();
-
     if(error||!data.session){
       window.location.href="/auth.html";
       return;
     }
 
     currentUser=data.session.user;
-
     username=localStorage.getItem("bigvic_username")||
       currentUser.user_metadata?.username||
       currentUser.email?.split("@")[0]||
@@ -573,10 +412,8 @@ async function checkLogin(){
 
     document.getElementById("welcomeName").textContent="Welcome, "+username+"! 👋";
     document.getElementById("accountStatus").textContent="You are logged in.";
-
     await loadPlayerScore();
     loadSettings();
-
   }catch(error){
     document.getElementById("accountStatus").textContent="Could not check your login. Please refresh.";
   }
@@ -589,10 +426,8 @@ async function logout(){
 
 function loadSettings(){
   if(!currentUser)return;
-
   const nameEl=document.getElementById("settingsUsername");
   const emailEl=document.getElementById("settingsEmail");
-
   if(nameEl)nameEl.textContent=username;
   if(emailEl)emailEl.textContent=currentUser.email||"No email available";
 
@@ -605,24 +440,17 @@ function loadSettings(){
 
   mappings.forEach(([id,key,defaultValue])=>{
     const el=document.getElementById(id);
-
     if(el){
       el.checked=localStorage.getItem(key)===null?
-        defaultValue:
-        localStorage.getItem(key)==="true";
+        defaultValue:localStorage.getItem(key)==="true";
     }
   });
 }
 
 function saveSettingPreference(key,value){
   localStorage.setItem(key,String(value));
-
   const message=document.getElementById("settingsMessage");
-
-  if(message){
-    message.textContent="Your preference has been saved on this device.";
-  }
-
+  if(message)message.textContent="Your preference has been saved on this device.";
   if(key==="bigvic_reduce_motion"){
     document.documentElement.style.scrollBehavior=value?"auto":"smooth";
   }
@@ -630,18 +458,14 @@ function saveSettingPreference(key,value){
 
 async function sendPasswordReset(){
   const message=document.getElementById("settingsMessage");
-
   if(!db||!currentUser||!currentUser.email){
     if(message)message.textContent="Your account email could not be found.";
     return;
   }
-
   if(message)message.textContent="Sending password reset email...";
-
   const {error}=await db.auth.resetPasswordForEmail(currentUser.email,{
     redirectTo:window.location.origin+"/auth.html"
   });
-
   if(message){
     message.textContent=error?
       "Could not send reset email: "+error.message:
@@ -651,12 +475,7 @@ async function sendPasswordReset(){
 
 async function loadPlayerScore(){
   if(!db||!currentUser)return;
-
-  const {data}=await db.from("leaderboard")
-    .select("*")
-    .eq("user_id",currentUser.id)
-    .maybeSingle();
-
+  const {data}=await db.from("leaderboard").select("*").eq("user_id",currentUser.id).maybeSingle();
   if(data){
     numberWins=data.number_wins||0;
     rpsWins=data.rps_wins||0;
@@ -665,57 +484,39 @@ async function loadPlayerScore(){
 
 async function saveScore(){
   if(!db||!currentUser)return;
-
   const {error}=await db.from("leaderboard").upsert({
-    user_id:currentUser.id,
-    username:username,
-    number_wins:numberWins,
-    rps_wins:rpsWins,
+    user_id:currentUser.id,username:username,
+    number_wins:numberWins,rps_wins:rpsWins,
     updated_at:new Date().toISOString()
   });
-
   if(error)console.log("Score could not be saved:",error.message);
 }
 
 async function loadLeaderboard(){
   const container=document.getElementById("leaderboard");
-
-  if(!db){
-    container.textContent="Leaderboard is unavailable.";
-    return;
-  }
-
+  if(!db){container.textContent="Leaderboard is unavailable.";return;}
   container.textContent="Loading scores...";
 
   const {data,error}=await db.from("leaderboard")
     .select("username,number_wins,rps_wins")
-    .order("number_wins",{ascending:false})
-    .limit(30);
+    .order("number_wins",{ascending:false}).limit(30);
 
-  if(error){
-    container.textContent="Could not load scores.";
-    return;
-  }
-
+  if(error){container.textContent="Could not load scores.";return;}
   if(!data||!data.length){
     container.textContent="No scores yet. Play a game to get started!";
     return;
   }
 
   container.innerHTML="";
-
   data.sort((a,b)=>(b.number_wins+b.rps_wins)-(a.number_wins+a.rps_wins));
 
   data.forEach((player,index)=>{
     const row=document.createElement("div");
     row.className="score-row";
-
     const name=document.createElement("span");
     name.textContent=(index+1)+". "+player.username;
-
     const score=document.createElement("strong");
     score.textContent=(player.number_wins+player.rps_wins)+" wins";
-
     row.append(name,score);
     container.appendChild(row);
   });
@@ -727,21 +528,17 @@ async function guessNumber(){
   const input=document.getElementById("guessInput");
   const result=document.getElementById("guessResult");
   const guess=Number(input.value);
-
   if(!guess||guess<1||guess>10){
     result.textContent="Enter a number from 1 to 10.";
     return;
   }
-
   if(guess===secretNumber){
     result.textContent="Correct! You won! 🎉";
     numberWins++;
     await saveScore();
     secretNumber=Math.floor(Math.random()*10)+1;
   }else{
-    result.textContent=guess<secretNumber?
-      "Too low! Try again.":
-      "Too high! Try again.";
+    result.textContent=guess<secretNumber?"Too low! Try again.":"Too high! Try again.";
   }
 }
 
@@ -755,8 +552,7 @@ async function playRPS(player){
     return;
   }
 
-  const won=
-    (player==="Rock"&&computer==="Scissors")||
+  const won=(player==="Rock"&&computer==="Scissors")||
     (player==="Paper"&&computer==="Rock")||
     (player==="Scissors"&&computer==="Paper");
 
@@ -769,61 +565,44 @@ async function playRPS(player){
   }
 }
 
-/* PHOTO AND VIDEO PREVIEW */
 function previewMedia(){
   const input=document.getElementById("mediaFile");
   const preview=document.getElementById("mediaPreview");
   const message=document.getElementById("postMessage");
-
   preview.innerHTML="";
   selectedFile=input.files[0]||null;
-
   if(!selectedFile)return;
 
   if(!selectedFile.type.startsWith("image/")&&!selectedFile.type.startsWith("video/")){
     message.textContent="Please choose an image or video.";
-    input.value="";
-    selectedFile=null;
-    return;
+    input.value="";selectedFile=null;return;
   }
-
   if(selectedFile.size>50*1024*1024){
     message.textContent="File is too large. Maximum size is 50 MB.";
-    input.value="";
-    selectedFile=null;
-    return;
+    input.value="";selectedFile=null;return;
   }
 
   const url=URL.createObjectURL(selectedFile);
   let element;
-
   if(selectedFile.type.startsWith("image/")){
     element=document.createElement("img");
   }else{
     element=document.createElement("video");
     element.controls=true;
   }
-
   element.src=url;
   preview.appendChild(element);
-
   message.textContent="Media selected. Ready to publish!";
 }
 
 async function uploadMedia(file){
   const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
   const filePath=currentUser.id+"/"+Date.now()+"_"+safeName;
-
-  const {error}=await db.storage.from("bigvic-media")
-    .upload(filePath,file,{
-      upsert:false,
-      contentType:file.type
-    });
-
+  const {error}=await db.storage.from("bigvic-media").upload(filePath,file,{
+    upsert:false,contentType:file.type
+  });
   if(error)throw error;
-
   const {data}=db.storage.from("bigvic-media").getPublicUrl(filePath);
-
   return{
     url:data.publicUrl,
     type:file.type.startsWith("image/")?"image":"video"
@@ -840,7 +619,6 @@ async function addPost(){
     message.textContent="Write something or choose a photo/video first.";
     return;
   }
-
   if(!db||!currentUser){
     message.textContent="Please log in before publishing.";
     return;
@@ -852,30 +630,21 @@ async function addPost(){
 
   try{
     let media=null;
-
-    if(selectedFile){
-      media=await uploadMedia(selectedFile);
-    }
+    if(selectedFile)media=await uploadMedia(selectedFile);
 
     const {error}=await db.from("posts").insert({
-      user_id:currentUser.id,
-      username:username,
-      content:text||"",
-      media_url:media?media.url:null,
+      user_id:currentUser.id,username:username,
+      content:text||"",media_url:media?media.url:null,
       media_type:media?media.type:null
     });
-
     if(error)throw error;
 
     input.value="";
     document.getElementById("mediaFile").value="";
     document.getElementById("mediaPreview").innerHTML="";
     selectedFile=null;
-
     message.textContent="Posted successfully! 🎉";
-
     await loadPosts();
-
   }catch(error){
     console.log("Publishing error:",error);
     message.textContent="Could not publish: "+error.message;
@@ -887,42 +656,29 @@ async function addPost(){
 
 async function loadPosts(){
   const container=document.getElementById("posts");
-
   if(!db||!currentUser){
     container.textContent="Please wait while your account loads...";
     return;
   }
 
   container.textContent="Loading community posts...";
-
   const {data:posts,error}=await db.from("posts")
     .select("id,username,content,created_at,media_url,media_type")
-    .order("created_at",{ascending:false})
-    .limit(100);
+    .order("created_at",{ascending:false}).limit(100);
 
-  if(error){
-    container.textContent="Could not load posts: "+error.message;
-    return;
-  }
-
+  if(error){container.textContent="Could not load posts: "+error.message;return;}
   container.innerHTML="";
-
   if(!posts||!posts.length){
     container.textContent="No posts yet. Be the first to post! 🔥";
     return;
   }
 
   const ids=posts.map(p=>p.id);
-
   const [likesResult,commentsResult]=await Promise.all([
-    db.from("post_likes")
-      .select("post_id,user_id")
-      .in("post_id",ids),
-
+    db.from("post_likes").select("post_id,user_id").in("post_id",ids),
     db.from("post_comments")
       .select("id,post_id,user_id,username,content,created_at")
-      .in("post_id",ids)
-      .order("created_at",{ascending:true})
+      .in("post_id",ids).order("created_at",{ascending:true})
   ]);
 
   if(likesResult.error||commentsResult.error){
@@ -937,21 +693,17 @@ async function loadPosts(){
     const postLikes=likes.filter(l=>l.post_id===post.id);
     const liked=postLikes.some(l=>l.user_id===currentUser.id);
     const postComments=comments.filter(c=>c.post_id===post.id);
-
     const box=document.createElement("div");
     box.className="post";
 
     const name=document.createElement("strong");
     name.textContent="👤 "+(post.username||"Player");
-
     const content=document.createElement("p");
     content.textContent=post.content||"";
-
     box.append(name,content);
 
     if(post.media_url){
       let media;
-
       if(post.media_type==="video"){
         media=document.createElement("video");
         media.controls=true;
@@ -960,7 +712,6 @@ async function loadPosts(){
         media=document.createElement("img");
         media.alt="Trending photo";
       }
-
       media.className="post-media";
       media.src=post.media_url;
       box.appendChild(media);
@@ -973,18 +724,15 @@ async function loadPosts(){
 
     const actions=document.createElement("div");
     actions.className="post-actions";
-
     const likeButton=document.createElement("button");
     likeButton.className=liked?"liked":"";
     likeButton.textContent=(liked?"❤️ Liked":"🤍 Like")+" ("+postLikes.length+")";
     likeButton.onclick=()=>toggleLike(post.id,liked);
-
     actions.appendChild(likeButton);
     box.appendChild(actions);
 
     const commentBox=document.createElement("div");
     commentBox.className="comment-box";
-
     const title=document.createElement("strong");
     title.textContent="💬 Comments ("+postComments.length+")";
     commentBox.appendChild(title);
@@ -992,35 +740,27 @@ async function loadPosts(){
     postComments.forEach(comment=>{
       const item=document.createElement("div");
       item.className="comment";
-
       const commentName=document.createElement("strong");
       commentName.textContent=comment.username||"Player";
-
       const commentText=document.createElement("p");
       commentText.textContent=comment.content;
-
       const commentTime=document.createElement("small");
       commentTime.className="small";
       commentTime.textContent=new Date(comment.created_at).toLocaleString();
-
       item.append(commentName,commentText,commentTime);
       commentBox.appendChild(item);
     });
 
     const form=document.createElement("div");
     form.className="comment-form";
-
     const commentInput=document.createElement("textarea");
     commentInput.placeholder="Write a comment...";
     commentInput.maxLength=1000;
-
     const sendButton=document.createElement("button");
     sendButton.textContent="Send";
     sendButton.onclick=()=>addComment(post.id,commentInput.value);
-
     form.append(commentInput,sendButton);
     commentBox.appendChild(form);
-
     box.appendChild(commentBox);
     container.appendChild(box);
   });
@@ -1028,57 +768,40 @@ async function loadPosts(){
 
 async function toggleLike(postId,alreadyLiked){
   if(!db||!currentUser)return;
-
   let result;
-
   if(alreadyLiked){
-    result=await db.from("post_likes")
-      .delete()
-      .eq("post_id",postId)
-      .eq("user_id",currentUser.id);
+    result=await db.from("post_likes").delete()
+      .eq("post_id",postId).eq("user_id",currentUser.id);
   }else{
     result=await db.from("post_likes").insert({
-      post_id:postId,
-      user_id:currentUser.id
+      post_id:postId,user_id:currentUser.id
     });
   }
-
   if(result.error){
     alert("Could not update like: "+result.error.message);
     return;
   }
-
   await loadPosts();
 }
 
 async function addComment(postId,text){
   const content=text.trim();
-
-  if(!content){
-    alert("Write a comment first.");
-    return;
-  }
+  if(!content){alert("Write a comment first.");return;}
 
   const {error}=await db.from("post_comments").insert({
-    post_id:postId,
-    user_id:currentUser.id,
-    username:username,
-    content:content
+    post_id:postId,user_id:currentUser.id,
+    username:username,content:content
   });
-
   if(error){
     alert("Could not send comment: "+error.message);
     return;
   }
-
   await loadPosts();
 }
 
 /* START WITH THE FEED AFTER LOGIN */
 checkLogin().then(()=>{
-  if(currentUser){
-    loadPosts();
-  }
+  if(currentUser)loadPosts();
 });
 </script>
 
