@@ -84,9 +84,28 @@ button:disabled{opacity:.5;cursor:not-allowed}
 #messageInput::placeholder{color:#aeb8d0}
 .attach-button,#startRecordButton,#stopRecordButton,#sendButton{border:0;border-radius:50%;min-width:39px;height:39px;display:flex;align-items:center;justify-content:center;font-weight:bold}
 .attach-button{background:#ffca28;color:#101322}
-#startRecordButton{background:#ffca28;color:#101322}
+#startRecordButton{background:#ffca28;color:#101322;touch-action:none;user-select:none;-webkit-user-select:none}
+#startRecordButton.recording{background:#dc2626;color:white;transform:scale(1.08)}
 #stopRecordButton{background:#dc2626;color:white}
 #sendButton{border-radius:20px;background:#ffca28;color:#101322;padding:0 13px}
+
+#voiceRecordingPanel,#voicePreviewPanel{
+  padding:12px;
+  background:#19233b;
+  border-top:1px solid #46506d;
+  align-items:center;
+  gap:10px;
+}
+#voiceRecordingPanel{justify-content:space-between}
+#recordingTime{color:#ffca28;font-weight:bold;min-width:45px}
+#voiceWaveform{flex:1;display:flex;align-items:center;justify-content:center;gap:3px;height:35px}
+.wave-bar{width:4px;height:8px;border-radius:5px;background:#ffca28;animation:voiceWave .7s infinite ease-in-out alternate}
+.wave-bar:nth-child(2n){animation-delay:.15s}
+.wave-bar:nth-child(3n){animation-delay:.3s}
+@keyframes voiceWave{from{height:5px}to{height:30px}}
+#voiceRecordingPanel button,#voicePreviewPanel button{border:0;padding:9px 12px;border-radius:8px;font-weight:bold;background:#ffca28;color:#101322}
+#cancelRecordingButton,#cancelVoiceButton{background:#dc2626!important;color:white!important}
+#voicePreviewAudio{width:100%;max-width:230px}
 
 #callBar,#incomingCallPanel,#activeCallPanel{display:none;padding:13px;background:#19233b;border-bottom:1px solid #46506d;text-align:center}
 #callBar button,#incomingCallPanel button,#activeCallPanel button{border:0;border-radius:8px;padding:10px 13px;margin:4px;background:#ffca28;color:#101322;font-weight:bold}
@@ -166,7 +185,6 @@ button:disabled{opacity:.5;cursor:not-allowed}
 </div>
 </div>
 
-<!-- FRIENDS IS A SEPARATE PAGE -->
 <div id="friendsPage" hidden>
 <h2>👥 BigVic Friends</h2>
 <p style="color:#aeb8d0;font-size:13px">Find people, manage your friends and respond to requests.</p>
@@ -178,7 +196,6 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <div id="friendsList">Loading Friends...</div>
 </div>
 
-<!-- ALL CHAT CONTENT IS INSIDE THIS WORKSPACE -->
 <div id="chatWorkspace">
 
 <div class="chat-switch">
@@ -234,14 +251,25 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <div id="mediaPreview"></div>
 <div id="mediaStatus"></div>
 
-<!-- ONE COMBINED SEND BAR -->
+<div id="voiceRecordingPanel" hidden>
+<span id="recordingTime">00:00</span>
+<div id="voiceWaveform"></div>
+<button id="cancelRecordingButton" type="button">Cancel</button>
+<button id="finishRecordingButton" type="button">Done</button>
+</div>
+
+<div id="voicePreviewPanel" hidden>
+<audio id="voicePreviewAudio" controls></audio>
+<button id="cancelVoiceButton" type="button">Delete</button>
+</div>
+
 <div class="send-box">
 <label for="chatMediaInput" class="attach-button" title="Choose photo or video">📎</label>
 <input id="chatMediaInput" type="file" accept="image/*,video/*" hidden>
 
 <input id="messageInput" type="text" placeholder="Type a message..." maxlength="3000">
 
-<button id="startRecordButton" type="button" title="Record voice">🎤</button>
+<button id="startRecordButton" type="button" title="Press and hold to record">🎤</button>
 <button id="stopRecordButton" type="button" title="Stop recording" disabled>⏹</button>
 <button id="sendButton" type="button">Send</button>
 </div>
@@ -264,6 +292,13 @@ let selectedMedia = null;
 let mediaRecorder = null;
 let recordedChunks = [];
 let refreshTimer = null;
+
+let recordingStream = null;
+let recordingTimer = null;
+let recordingSeconds = 0;
+let voicePreviewURL = null;
+let recordingCancelled = false;
+let releaseRequested = false;
 
 const SUPABASE_URL = window.SUPABASE_URL;
 const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
@@ -538,7 +573,7 @@ async function displayMessage(message){
   box.appendChild(item);
 }
 
-/* ONE SEND BUTTON FOR TEXT, PHOTO, VIDEO AND VOICE */
+/* SEND TEXT, PHOTO, VIDEO AND VOICE */
 
 async function sendMessage(){
   if(!currentUser)return;
@@ -623,6 +658,16 @@ async function sendMessage(){
   $("mediaPreview").innerHTML="";
   $("mediaStatus").textContent="";
 
+  $("voicePreviewAudio").pause();
+  $("voicePreviewAudio").removeAttribute("src");
+  $("voicePreviewPanel").hidden=true;
+  $("voicePreviewPanel").style.display="none";
+
+  if(voicePreviewURL){
+    URL.revokeObjectURL(voicePreviewURL);
+    voicePreviewURL=null;
+  }
+
   showStatus("Message sent!");
   await loadMessages();
 }
@@ -637,6 +682,10 @@ $("chatMediaInput").addEventListener("change",event=>{
     showStatus("Choose an image or video.");
     event.target.value="";
     return;
+  }
+
+  if(selectedMedia && selectedMedia.type.startsWith("audio/")){
+    cancelVoicePreview();
   }
 
   selectedMedia=file;
@@ -659,24 +708,67 @@ $("chatMediaInput").addEventListener("change",event=>{
   $("mediaStatus").textContent="Ready to send: "+file.name;
 });
 
-/* VOICE RECORDING */
+/* WHATSAPP-STYLE VOICE RECORDING */
+
+function updateRecordingTime(){
+  const minutes=String(Math.floor(recordingSeconds/60)).padStart(2,"0");
+  const seconds=String(recordingSeconds%60).padStart(2,"0");
+  $("recordingTime").textContent=minutes+":"+seconds;
+}
+
+function showWaveform(){
+  const wave=$("voiceWaveform");
+  wave.innerHTML="";
+
+  for(let i=0;i<24;i++){
+    const bar=document.createElement("span");
+    bar.className="wave-bar";
+    wave.appendChild(bar);
+  }
+}
 
 async function startRecording(){
+  if(mediaRecorder && mediaRecorder.state==="recording")return;
+
   if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    showStatus("Voice recording requires a secure HTTPS connection.");
+    showStatus("Voice recording requires HTTPS and microphone permission.");
     return;
   }
 
-  try{
-    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-    recordedChunks=[];
+  if(!window.MediaRecorder){
+    showStatus("Voice recording is not supported by this browser.");
+    return;
+  }
 
-    let options={};
-    if(MediaRecorder.isTypeSupported("audio/webm")){
-      options.mimeType="audio/webm";
+  releaseRequested=false;
+  recordingCancelled=false;
+
+  try{
+    recordingStream=await navigator.mediaDevices.getUserMedia({audio:true});
+
+    if(releaseRequested){
+      recordingStream.getTracks().forEach(track=>track.stop());
+      recordingStream=null;
+      return;
     }
 
-    mediaRecorder=new MediaRecorder(stream,options);
+    recordedChunks=[];
+    recordingSeconds=0;
+
+    let mimeType="";
+
+    if(MediaRecorder.isTypeSupported("audio/webm;codecs=opus")){
+      mimeType="audio/webm;codecs=opus";
+    }else if(MediaRecorder.isTypeSupported("audio/webm")){
+      mimeType="audio/webm";
+    }else if(MediaRecorder.isTypeSupported("audio/mp4")){
+      mimeType="audio/mp4";
+    }
+
+    mediaRecorder=new MediaRecorder(
+      recordingStream,
+      mimeType?{mimeType}:{}
+    );
 
     mediaRecorder.ondataavailable=event=>{
       if(event.data && event.data.size>0){
@@ -685,39 +777,172 @@ async function startRecording(){
     };
 
     mediaRecorder.onstop=()=>{
-      const type=mediaRecorder.mimeType||"audio/webm";
-      const blob=new Blob(recordedChunks,{type});
-      selectedMedia=new File(
-        [blob],
-        "voice-note-"+Date.now()+".webm",
-        {type}
-      );
+      if(recordingStream){
+        recordingStream.getTracks().forEach(track=>track.stop());
+        recordingStream=null;
+      }
 
-      $("mediaPreview").innerHTML="";
-      $("mediaStatus").textContent="Voice note ready. Press Send to send it.";
-
-      stream.getTracks().forEach(track=>track.stop());
+      clearInterval(recordingTimer);
 
       $("startRecordButton").disabled=false;
       $("stopRecordButton").disabled=true;
+      $("startRecordButton").classList.remove("recording");
+
+      $("voiceRecordingPanel").hidden=true;
+      $("voiceRecordingPanel").style.display="none";
+
+      if(recordingCancelled){
+        recordedChunks=[];
+        selectedMedia=null;
+        $("mediaStatus").textContent="Recording cancelled.";
+        showStatus("Recording cancelled.");
+        return;
+      }
+
+      const type=mediaRecorder.mimeType||"audio/webm";
+      const blob=new Blob(recordedChunks,{type});
+
+      if(!blob.size){
+        showStatus("No audio was recorded. Please try again.");
+        return;
+      }
+
+      const extension=type.includes("mp4")?"mp4":"webm";
+
+      selectedMedia=new File(
+        [blob],
+        "voice-note-"+Date.now()+"."+extension,
+        {type}
+      );
+
+      if(voicePreviewURL){
+        URL.revokeObjectURL(voicePreviewURL);
+      }
+
+      voicePreviewURL=URL.createObjectURL(blob);
+
+      $("voicePreviewAudio").src=voicePreviewURL;
+      $("voicePreviewPanel").hidden=false;
+      $("voicePreviewPanel").style.display="flex";
+
+      $("mediaPreview").innerHTML="";
+      $("mediaStatus").textContent="Voice note ready. Play it back or press Send.";
+
+      showStatus("Voice note recorded successfully.");
     };
 
     mediaRecorder.start();
 
+    $("voiceRecordingPanel").hidden=false;
+    $("voiceRecordingPanel").style.display="flex";
+    $("voicePreviewPanel").hidden=true;
+    $("voicePreviewPanel").style.display="none";
+
+    $("startRecordButton").classList.add("recording");
     $("startRecordButton").disabled=true;
     $("stopRecordButton").disabled=false;
-    showStatus("Recording voice note...");
+
+    showWaveform();
+    updateRecordingTime();
+
+    recordingTimer=setInterval(()=>{
+      recordingSeconds++;
+      updateRecordingTime();
+    },1000);
+
+    showStatus("Recording... Release the microphone button when finished.");
+
   }catch(error){
     showStatus("Microphone error: "+error.message);
+
+    if(recordingStream){
+      recordingStream.getTracks().forEach(track=>track.stop());
+      recordingStream=null;
+    }
+
+    $("startRecordButton").disabled=false;
+    $("stopRecordButton").disabled=true;
+    $("startRecordButton").classList.remove("recording");
   }
 }
 
 function stopRecording(){
   if(mediaRecorder && mediaRecorder.state==="recording"){
     mediaRecorder.stop();
-    showStatus("Recording stopped. Press Send to send your voice note.");
+    clearInterval(recordingTimer);
   }
 }
+
+function cancelRecording(){
+  recordingCancelled=true;
+
+  if(mediaRecorder && mediaRecorder.state==="recording"){
+    mediaRecorder.stop();
+    clearInterval(recordingTimer);
+  }else if(recordingStream){
+    recordingStream.getTracks().forEach(track=>track.stop());
+    recordingStream=null;
+  }
+
+  $("voiceRecordingPanel").hidden=true;
+  $("voiceRecordingPanel").style.display="none";
+  $("startRecordButton").disabled=false;
+  $("stopRecordButton").disabled=true;
+  $("startRecordButton").classList.remove("recording");
+}
+
+function cancelVoicePreview(){
+  selectedMedia=null;
+
+  $("voicePreviewAudio").pause();
+  $("voicePreviewAudio").removeAttribute("src");
+
+  if(voicePreviewURL){
+    URL.revokeObjectURL(voicePreviewURL);
+    voicePreviewURL=null;
+  }
+
+  $("voicePreviewPanel").hidden=true;
+  $("voicePreviewPanel").style.display="none";
+  $("mediaStatus").textContent="";
+  showStatus("Voice note deleted.");
+}
+
+/* PRESS AND HOLD TO RECORD */
+
+const microphoneButton=$("startRecordButton");
+
+microphoneButton.addEventListener("pointerdown",event=>{
+  event.preventDefault();
+
+  if(event.button!==undefined && event.button!==0)return;
+
+  releaseRequested=false;
+  startRecording();
+});
+
+function releaseMicrophone(){
+  if(!microphoneButton.classList.contains("recording") &&
+     !(mediaRecorder && mediaRecorder.state==="recording")){
+    releaseRequested=true;
+    return;
+  }
+
+  stopRecording();
+}
+
+microphoneButton.addEventListener("pointerup",releaseMicrophone);
+microphoneButton.addEventListener("pointerleave",releaseMicrophone);
+microphoneButton.addEventListener("pointercancel",releaseMicrophone);
+
+microphoneButton.addEventListener("contextmenu",event=>{
+  event.preventDefault();
+});
+
+$("stopRecordButton").addEventListener("click",stopRecording);
+$("finishRecordingButton").addEventListener("click",stopRecording);
+$("cancelRecordingButton").addEventListener("click",cancelRecording);
+$("cancelVoiceButton").addEventListener("click",cancelVoicePreview);
 
 /* FRIENDS SYSTEM */
 
@@ -895,15 +1120,14 @@ $("messageInput").addEventListener("keydown",event=>{
   if(event.key==="Enter")sendMessage();
 });
 
-$("startRecordButton").addEventListener("click",startRecording);
-$("stopRecordButton").addEventListener("click",stopRecording);
-
 $("logoutButton").addEventListener("click",async()=>{
   const {error}=await supabaseClient.auth.signOut();
+
   if(error){
     showStatus(error.message);
     return;
   }
+
   window.location.href="/auth.html";
 });
 
@@ -938,7 +1162,7 @@ async function startChat(){
   if(refreshTimer)clearInterval(refreshTimer);
 
   refreshTimer=setInterval(()=>{
-    if(!document.hidden && currentUser && !$("friendsPage").hidden===false){
+    if(!document.hidden && currentUser && $("friendsPage").hidden){
       loadMessages();
     }
   },10000);
