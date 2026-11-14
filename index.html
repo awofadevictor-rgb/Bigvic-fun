@@ -11,68 +11,248 @@
 
 <style>
 *{box-sizing:border-box}
-:root{--bg:#101322;--panel:#191f38;--card:#1b223b;--gold:#ffca28;--gold2:#e7ad16;--text:#fff;--muted:#b9c2d8;--line:#39415c}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
-header{background:var(--panel);padding:13px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:20;border-bottom:1px solid var(--line)}
+:root{
+  --bg:#f0f2f5;
+  --card:#fff;
+  --gold:#ffca28;
+  --gold2:#e7ad16;
+  --navy:#101322;
+  --navy2:#19233b;
+  --text:#1c1e21;
+  --muted:#65676b;
+  --line:#e4e6eb;
+}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,sans-serif;
+}
+header{
+  background:var(--navy);
+  padding:12px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  position:sticky;
+  top:0;
+  z-index:30;
+  border-bottom:2px solid var(--gold);
+  box-shadow:0 2px 8px #0002;
+}
 header h2{margin:0;color:var(--gold);font-size:23px}
-button{border:0;border-radius:9px;padding:11px 15px;background:var(--gold);color:#171717;font-weight:bold;cursor:pointer}
+button{
+  border:0;
+  border-radius:9px;
+  padding:11px 15px;
+  background:var(--gold);
+  color:#171717;
+  font-weight:bold;
+  cursor:pointer;
+}
 button:disabled{opacity:.5;cursor:not-allowed}
-nav{display:flex;gap:7px;overflow-x:auto;padding:11px 14px;background:var(--panel);position:sticky;top:52px;z-index:15;border-bottom:1px solid var(--line)}
-nav button{white-space:nowrap;background:#303957;color:white;flex:1}
-nav button.active{background:var(--gold);color:#171717}
-main{max-width:1000px;margin:auto;padding:16px}
+nav{
+  display:flex;
+  gap:5px;
+  overflow-x:auto;
+  padding:7px 12px;
+  background:#fff;
+  position:sticky;
+  top:49px;
+  z-index:25;
+  border-bottom:1px solid var(--line);
+  box-shadow:0 2px 5px #00000008;
+}
+nav button{
+  white-space:nowrap;
+  background:transparent;
+  color:#65676b;
+  flex:1;
+  border-radius:8px;
+  padding:12px 8px;
+}
+nav button.active{
+  background:#fff7d9;
+  color:#806000;
+  box-shadow:inset 0 -3px var(--gold);
+}
+main{
+  max-width:760px;
+  margin:18px auto;
+  padding:0 14px;
+}
 .page{display:none}
 .page.active{display:block}
-.card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:18px;margin:14px 0}
-h1,h2,h3{margin-top:8px}
-input,textarea{width:100%;padding:13px;border:1px solid #46506d;border-radius:9px;background:#10182c;color:white;margin:8px 0;font-family:Arial,sans-serif}
+.card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:18px;
+  margin:14px 0;
+  box-shadow:0 1px 2px #0000000b;
+}
+h1,h2,h3{margin-top:8px;color:#1c1e21}
+input,textarea{
+  width:100%;
+  padding:13px;
+  border:1px solid #ccd0d5;
+  border-radius:9px;
+  background:#f0f2f5;
+  color:#1c1e21;
+  margin:8px 0;
+  font-family:Arial,sans-serif;
+}
 textarea{min-height:90px;resize:vertical}
-input:focus,textarea:focus{outline:2px solid var(--gold);border-color:var(--gold)}
+input:focus,textarea:focus{
+  outline:2px solid var(--gold);
+  border-color:var(--gold);
+}
 .game-buttons{display:flex;gap:8px;flex-wrap:wrap}
 .small{color:var(--muted);font-size:13px}
-footer{text-align:center;color:#929bb2;padding:25px}
-.score-row{display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid var(--line);gap:10px}
-.post{background:#1b223b;border:1px solid var(--line);padding:16px;border-radius:14px;margin:14px 0;overflow-wrap:anywhere}
-.post-actions{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0}
-.post-actions button{background:#414d70;color:white}
-.post-actions button.liked{background:var(--gold);color:#171717}
-.post-media{width:100%;max-height:450px;object-fit:contain;border-radius:10px;margin-top:12px;background:#101322}
-.comment-box{border-top:1px solid var(--line);margin-top:14px;padding-top:10px}
-.comment{background:#202944;padding:10px;border-radius:8px;margin:7px 0}
+footer{text-align:center;color:#65676b;padding:25px}
+.score-row{
+  display:flex;
+  justify-content:space-between;
+  padding:12px;
+  border-bottom:1px solid var(--line);
+  gap:10px;
+}
+.post{
+  background:#fff;
+  border:1px solid var(--line);
+  padding:16px;
+  border-radius:12px;
+  margin:14px 0;
+  overflow-wrap:anywhere;
+  box-shadow:0 1px 2px #0000000b;
+}
+.post-actions{
+  display:flex;
+  gap:9px;
+  flex-wrap:wrap;
+  margin:12px 0;
+  border-top:1px solid var(--line);
+  padding-top:10px;
+}
+.post-actions button{
+  background:#f0f2f5;
+  color:#4b4f56;
+  flex:1;
+}
+.post-actions button.liked{
+  background:#fff1c2;
+  color:#765500;
+}
+.post-media{
+  width:100%;
+  max-height:520px;
+  object-fit:contain;
+  border-radius:8px;
+  margin-top:12px;
+  background:#f0f2f5;
+}
+.comment-box{
+  border-top:1px solid var(--line);
+  margin-top:14px;
+  padding-top:10px;
+}
+.comment{
+  background:#f0f2f5;
+  padding:10px;
+  border-radius:12px;
+  margin:7px 0;
+}
 .comment-form{display:flex;gap:7px;align-items:center}
 .comment-form textarea{min-height:45px;flex:1;margin:5px 0}
 .comment-form button{padding:10px}
-#mediaPreview img,#mediaPreview video{width:100%;max-height:300px;object-fit:contain;border-radius:10px}
-.file-label{display:inline-block;background:#303957;color:white;padding:12px 16px;border-radius:9px;margin:8px 0;cursor:pointer}
-.welcome-card{background:linear-gradient(135deg,#252e50,#171d34);border:1px solid #6e5928;padding:24px;border-radius:17px;margin-bottom:18px}
+#mediaPreview img,#mediaPreview video{
+  width:100%;
+  max-height:300px;
+  object-fit:contain;
+  border-radius:10px;
+}
+.file-label{
+  display:inline-block;
+  background:#fff5d6;
+  color:#806000;
+  padding:12px 16px;
+  border-radius:9px;
+  margin:8px 0;
+  cursor:pointer;
+  font-weight:bold;
+}
+.welcome-card{
+  background:linear-gradient(135deg,#19233b,#303957);
+  border:1px solid #6e5928;
+  padding:24px;
+  border-radius:14px;
+  margin-bottom:18px;
+  color:#fff;
+}
+.welcome-card h1,.welcome-card h3,.welcome-card p{color:#fff}
 .welcome-card h1{color:var(--gold)}
-.quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.quick-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
-.quick-card h3{color:var(--gold)}
-.section-heading{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.quick-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.quick-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:16px;
+  box-shadow:0 1px 2px #0000000b;
+}
+.quick-card h3{color:#806000}
+.section-heading{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
 .brand-mark{color:var(--gold);font-size:28px}
-.setting-row{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:14px 0;border-bottom:1px solid var(--line)}
+.setting-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  padding:14px 0;
+  border-bottom:1px solid var(--line);
+}
 .setting-row:last-child{border-bottom:0}
 .setting-row p{margin:5px 0 0}
-.setting-row input[type=checkbox]{width:22px;height:22px;accent-color:var(--gold);margin:0}
+.setting-row input[type=checkbox]{
+  width:22px;
+  height:22px;
+  accent-color:var(--gold);
+  margin:0;
+}
 .setting-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
-.danger-button{background:#a83232;color:white}
-.secondary-button{background:#303957;color:white}
-.settings-note{background:#10182c;border:1px solid var(--line);border-radius:10px;padding:12px;color:var(--muted);font-size:13px;line-height:1.5}
-.feed-heading{color:var(--gold)}
+.danger-button{background:#b42318;color:white}
+.secondary-button{background:#e4e6eb;color:#1c1e21}
+.settings-note{
+  background:#f0f2f5;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:12px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.5;
+}
+.feed-heading{color:#806000}
 @media(max-width:600px){
- header h2{font-size:19px}
- header{padding:12px}
- nav{top:48px}
- nav button{padding:10px;font-size:12px}
- main{padding:11px}
- .quick-grid{grid-template-columns:1fr 1fr}
- .card{padding:14px}
- .setting-row{align-items:flex-start}
+  header h2{font-size:19px}
+  header{padding:12px}
+  nav{top:45px}
+  nav button{padding:10px 6px;font-size:12px}
+  main{padding:0 10px;margin:12px auto}
+  .quick-grid{grid-template-columns:1fr 1fr}
+  .card{padding:14px}
+  .setting-row{align-items:flex-start}
 }
 @media(prefers-reduced-motion:no-preference){
- button{transition:background .2s,transform .2s}
- button:active{transform:scale(.97)}
+  button{transition:background .2s,transform .2s}
+  button:active{transform:scale(.97)}
 }
 </style>
 </head>
@@ -96,7 +276,6 @@ footer{text-align:center;color:#929bb2;padding:25px}
 
 <main>
 
-<!-- HOME PAGE -->
 <section id="home" class="page">
   <div class="welcome-card">
     <div class="brand-mark">👑</div>
@@ -159,7 +338,6 @@ footer{text-align:center;color:#929bb2;padding:25px}
   </div>
 </section>
 
-<!-- GAMES PAGE -->
 <section id="games" class="page">
   <h2>🎮 Games Zone</h2>
 
@@ -183,7 +361,6 @@ footer{text-align:center;color:#929bb2;padding:25px}
   </div>
 </section>
 
-<!-- COMMUNITY FEED - OPENS FIRST -->
 <section id="trending" class="page active">
   <h2 class="feed-heading">🔥 BigVic Community Feed</h2>
 
@@ -207,7 +384,6 @@ footer{text-align:center;color:#929bb2;padding:25px}
   </div>
 </section>
 
-<!-- LEADERBOARD -->
 <section id="scores" class="page">
   <h2>🏆 BigVic Leaderboard</h2>
 
@@ -218,7 +394,6 @@ footer{text-align:center;color:#929bb2;padding:25px}
   </div>
 </section>
 
-<!-- SETTINGS -->
 <section id="settings" class="page">
   <h2>⚙️ Settings & Privacy</h2>
   <p class="small">Manage your BigVic Fun account and preferences.</p>
