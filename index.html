@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +8,7 @@
 <title>BigVic Fun - Connect & Have Fun</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/config.js"></script>
+
 <style>
 *{box-sizing:border-box}
 :root{--bg:#101322;--panel:#191f38;--card:#1b223b;--gold:#ffca28;--gold2:#e7ad16;--text:#fff;--muted:#b9c2d8;--line:#39415c}
@@ -19,7 +21,8 @@ nav{display:flex;gap:7px;overflow-x:auto;padding:11px 14px;background:var(--pane
 nav button{white-space:nowrap;background:#303957;color:white;flex:1}
 nav button.active{background:var(--gold);color:#171717}
 main{max-width:1000px;margin:auto;padding:16px}
-.page{display:none}.page.active{display:block}
+.page{display:none}
+.page.active{display:block}
 .card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:18px;margin:14px 0}
 h1,h2,h3{margin-top:8px}
 input,textarea{width:100%;padding:13px;border:1px solid #46506d;border-radius:9px;background:#10182c;color:white;margin:8px 0;font-family:Arial,sans-serif}
@@ -56,26 +59,45 @@ footer{text-align:center;color:#929bb2;padding:25px}
 .danger-button{background:#a83232;color:white}
 .secondary-button{background:#303957;color:white}
 .settings-note{background:#10182c;border:1px solid var(--line);border-radius:10px;padding:12px;color:var(--muted);font-size:13px;line-height:1.5}
-@media(max-width:600px){header h2{font-size:19px}header{padding:12px}nav{top:48px}nav button{padding:10px;font-size:12px}main{padding:11px}.quick-grid{grid-template-columns:1fr 1fr}.card{padding:14px}.setting-row{align-items:flex-start}}
-@media(prefers-reduced-motion:no-preference){button{transition:background .2s,transform .2s}button:active{transform:scale(.97)}}
+.feed-heading{color:var(--gold)}
+@media(max-width:600px){
+ header h2{font-size:19px}
+ header{padding:12px}
+ nav{top:48px}
+ nav button{padding:10px;font-size:12px}
+ main{padding:11px}
+ .quick-grid{grid-template-columns:1fr 1fr}
+ .card{padding:14px}
+ .setting-row{align-items:flex-start}
+}
+@media(prefers-reduced-motion:no-preference){
+ button{transition:background .2s,transform .2s}
+ button:active{transform:scale(.97)}
+}
 </style>
 </head>
+
 <body>
+
 <header>
   <h2>👑 BigVic Fun</h2>
   <button onclick="logout()">Logout</button>
 </header>
+
 <nav>
-  <button class="active" onclick="showPage('home',this)">🏠 Home</button>
+  <button class="active" onclick="showPage('trending',this)">🔥 Feed</button>
+  <button onclick="showPage('home',this)">🏠 Home</button>
   <button onclick="openFriends()">👥 Friends</button>
   <button onclick="openChat()">💬 Chat</button>
   <button onclick="showPage('games',this)">🎮 Games</button>
-  <button onclick="showPage('trending',this)">🔥 Feed</button>
   <button onclick="showPage('scores',this)">🏆 Scores</button>
   <button onclick="showPage('settings',this)">⚙️ Settings</button>
 </nav>
+
 <main>
-<section id="home" class="page active">
+
+<!-- HOME PAGE -->
+<section id="home" class="page">
   <div class="welcome-card">
     <div class="brand-mark">👑</div>
     <h1>Welcome to BigVic Fun!</h1>
@@ -83,57 +105,112 @@ footer{text-align:center;color:#929bb2;padding:25px}
     <p>Connect with people, share your moments, play games and enjoy the community.</p>
     <p class="small" id="accountStatus">Checking account...</p>
   </div>
+
   <div class="card">
     <h2>What's happening?</h2>
     <p>Share your thoughts, pictures and videos with the BigVic community.</p>
     <button onclick="showPage('trending')">Create a Post ✍️</button>
   </div>
+
   <h2>Explore BigVic</h2>
+
   <div class="quick-grid">
-    <div class="quick-card"><h3>👥 Friends</h3><p class="small">Find people and manage friend requests.</p><button onclick="openFriends()">Open Friends</button></div>
-    <div class="quick-card"><h3>💬 Messages</h3><p class="small">Talk with friends and other users.</p><button onclick="openChat()">Open Chat</button></div>
-    <div class="quick-card"><h3>🎮 Games</h3><p class="small">Play games and earn wins.</p><button onclick="showPage('games')">Play Games</button></div>
-    <div class="quick-card"><h3>🔥 Community Feed</h3><p class="small">See posts, photos and videos.</p><button onclick="showPage('trending')">View Feed</button></div>
-    <div class="quick-card"><h3>🏆 Leaderboard</h3><p class="small">See the top players.</p><button onclick="showPage('scores')">View Scores</button></div>
-    <div class="quick-card"><h3>👤 My Profile</h3><p class="small">View and manage your profile.</p><button onclick="openProfile()">My Profile</button></div>
-    <div class="quick-card"><h3>⚙️ Settings</h3><p class="small">Manage your account and app preferences.</p><button onclick="showPage('settings')">Open Settings</button></div>
+    <div class="quick-card">
+      <h3>👥 Friends</h3>
+      <p class="small">Find people and manage friend requests.</p>
+      <button onclick="openFriends()">Open Friends</button>
+    </div>
+
+    <div class="quick-card">
+      <h3>💬 Messages</h3>
+      <p class="small">Talk with friends and other users.</p>
+      <button onclick="openChat()">Open Chat</button>
+    </div>
+
+    <div class="quick-card">
+      <h3>🎮 Games</h3>
+      <p class="small">Play games and earn wins.</p>
+      <button onclick="showPage('games')">Play Games</button>
+    </div>
+
+    <div class="quick-card">
+      <h3>🔥 Community Feed</h3>
+      <p class="small">See posts, photos and videos.</p>
+      <button onclick="showPage('trending')">View Feed</button>
+    </div>
+
+    <div class="quick-card">
+      <h3>🏆 Leaderboard</h3>
+      <p class="small">See the top players.</p>
+      <button onclick="showPage('scores')">View Scores</button>
+    </div>
+
+    <div class="quick-card">
+      <h3>👤 My Profile</h3>
+      <p class="small">View and manage your profile.</p>
+      <button onclick="openProfile()">My Profile</button>
+    </div>
+
+    <div class="quick-card">
+      <h3>⚙️ Settings</h3>
+      <p class="small">Manage your account and app preferences.</p>
+      <button onclick="showPage('settings')">Open Settings</button>
+    </div>
   </div>
 </section>
 
+<!-- GAMES PAGE -->
 <section id="games" class="page">
   <h2>🎮 Games Zone</h2>
+
   <div class="card">
-    <h3>🔢 Guess the Number</h3><p>Guess a number between 1 and 10.</p>
+    <h3>🔢 Guess the Number</h3>
+    <p>Guess a number between 1 and 10.</p>
     <input id="guessInput" type="number" min="1" max="10" placeholder="Enter your guess">
-    <button onclick="guessNumber()">Check Answer</button><p id="guessResult"></p>
+    <button onclick="guessNumber()">Check Answer</button>
+    <p id="guessResult"></p>
   </div>
+
   <div class="card">
-    <h3>✊ Rock Paper Scissors</h3><p>Choose your move.</p>
+    <h3>✊ Rock Paper Scissors</h3>
+    <p>Choose your move.</p>
     <div class="game-buttons">
       <button onclick="playRPS('Rock')">✊ Rock</button>
       <button onclick="playRPS('Paper')">✋ Paper</button>
       <button onclick="playRPS('Scissors')">✌️ Scissors</button>
-    </div><p id="rpsResult"></p>
+    </div>
+    <p id="rpsResult"></p>
   </div>
 </section>
 
-<section id="trending" class="page">
-  <h2>🔥 BigVic Community Feed</h2>
+<!-- COMMUNITY FEED - OPENS FIRST -->
+<section id="trending" class="page active">
+  <h2 class="feed-heading">🔥 BigVic Community Feed</h2>
+
   <div class="card">
     <h3>Share something with everyone</h3>
     <textarea id="postText" placeholder="What's happening?"></textarea>
+
     <label class="file-label" for="mediaFile">📸 Choose Photo or Video</label>
     <input id="mediaFile" type="file" accept="image/*,video/*" hidden onchange="previewMedia()">
+
     <div id="mediaPreview"></div>
+
     <p class="small">Maximum file size: 50 MB. You can post text, a photo, a video, or combine text with media.</p>
+
     <button id="publishButton" onclick="addPost()">Publish Post</button>
     <p id="postMessage" class="small"></p>
   </div>
-  <div id="posts"></div>
+
+  <div id="posts">
+    Loading community posts...
+  </div>
 </section>
 
+<!-- LEADERBOARD -->
 <section id="scores" class="page">
   <h2>🏆 BigVic Leaderboard</h2>
+
   <div class="card">
     <p class="small">Players are ranked by their total game wins.</p>
     <div id="leaderboard">Loading scores...</div>
@@ -141,46 +218,84 @@ footer{text-align:center;color:#929bb2;padding:25px}
   </div>
 </section>
 
+<!-- SETTINGS -->
 <section id="settings" class="page">
   <h2>⚙️ Settings & Privacy</h2>
   <p class="small">Manage your BigVic Fun account and preferences.</p>
+
   <div class="card">
     <h3>👤 Account</h3>
-    <div class="setting-row"><div><strong>Username</strong><p class="small" id="settingsUsername">Loading...</p></div></div>
-    <div class="setting-row"><div><strong>Email address</strong><p class="small" id="settingsEmail">Loading...</p></div></div>
+
+    <div class="setting-row">
+      <div>
+        <strong>Username</strong>
+        <p class="small" id="settingsUsername">Loading...</p>
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <div>
+        <strong>Email address</strong>
+        <p class="small" id="settingsEmail">Loading...</p>
+      </div>
+    </div>
+
     <div class="setting-actions">
       <button class="secondary-button" onclick="openProfile()">Edit Profile</button>
       <button onclick="sendPasswordReset()">Change Password</button>
     </div>
+
     <p id="settingsMessage" class="small" aria-live="polite"></p>
   </div>
+
   <div class="card">
     <h3>🔒 Privacy</h3>
+
     <div class="setting-row">
-      <div><strong>Private account preference</strong><p class="small">Saves your preference on this device. It does not yet change who can see your posts.</p></div>
+      <div>
+        <strong>Private account preference</strong>
+        <p class="small">Saves your preference on this device. It does not yet change who can see your posts.</p>
+      </div>
       <input id="privateAccountSetting" type="checkbox" onchange="saveSettingPreference('bigvic_private_account',this.checked)">
     </div>
+
     <div class="setting-row">
-      <div><strong>Show online status preference</strong><p class="small">Saves your preference on this device. Chat presence must be connected separately.</p></div>
+      <div>
+        <strong>Show online status preference</strong>
+        <p class="small">Saves your preference on this device. Chat presence must be connected separately.</p>
+      </div>
       <input id="onlineStatusSetting" type="checkbox" checked onchange="saveSettingPreference('bigvic_show_online',this.checked)">
     </div>
   </div>
+
   <div class="card">
     <h3>🔔 Notifications</h3>
+
     <div class="setting-row">
-      <div><strong>Notifications preference</strong><p class="small">Controls this app's saved preference only; push notifications are not configured yet.</p></div>
+      <div>
+        <strong>Notifications preference</strong>
+        <p class="small">Controls this app's saved preference only; push notifications are not configured yet.</p>
+      </div>
       <input id="notificationsSetting" type="checkbox" checked onchange="saveSettingPreference('bigvic_notifications',this.checked)">
     </div>
   </div>
 
   <div class="card">
     <h3>🎨 App Preferences</h3>
+
     <div class="setting-row">
-      <div><strong>Dark appearance</strong><p class="small">BigVic Fun currently uses its dark navy and gold appearance.</p></div>
+      <div>
+        <strong>Dark appearance</strong>
+        <p class="small">BigVic Fun currently uses its dark navy and gold appearance.</p>
+      </div>
       <input type="checkbox" checked disabled aria-label="Dark appearance enabled">
     </div>
+
     <div class="setting-row">
-      <div><strong>Reduce animations</strong><p class="small">Remember your preference for reduced motion on this device.</p></div>
+      <div>
+        <strong>Reduce animations</strong>
+        <p class="small">Remember your preference for reduced motion on this device.</p>
+      </div>
       <input id="reduceMotionSetting" type="checkbox" onchange="saveSettingPreference('bigvic_reduce_motion',this.checked)">
     </div>
   </div>
@@ -188,6 +303,7 @@ footer{text-align:center;color:#929bb2;padding:25px}
   <div class="card">
     <h3>🛡️ Security</h3>
     <p class="small">Keep your password private. BigVic Fun uses your Supabase account for sign-in.</p>
+
     <div class="setting-actions">
       <button onclick="sendPasswordReset()">Send Password Reset Email</button>
       <button class="danger-button" onclick="logout()">Log Out</button>
@@ -198,222 +314,598 @@ footer{text-align:center;color:#929bb2;padding:25px}
     <h3>ℹ️ About BigVic Fun</h3>
     <p>BigVic Fun — Connect • Chat • Play • Share</p>
     <p class="small">Version 1.1 · © 2026 BigVic Fun</p>
-    <div class="settings-note">Some privacy, online-status and notification switches currently save preferences on this device only. They do not change server-side privacy, chat presence or push-notification permissions. Those features need their own backend setup before they can take effect.</div>
+
+    <div class="settings-note">
+      Some privacy, online-status and notification switches currently save preferences on this device only. They do not change server-side privacy, chat presence or push-notification permissions. Those features need their own backend setup before they can take effect.
+    </div>
   </div>
 </section>
+
 </main>
-<footer><strong>👑 BigVic Fun</strong><p>Connect • Chat • Play • Share</p>BigVic Fun © 2026</footer>
+
+<footer>
+  <strong>👑 BigVic Fun</strong>
+  <p>Connect • Chat • Play • Share</p>
+  BigVic Fun © 2026
+</footer>
 
 <script>
 let db=null,currentUser=null,username="Player",numberWins=0,rpsWins=0,selectedFile=null;
+
 try{
   if(window.supabase&&window.SUPABASE_URL&&window.SUPABASE_ANON_KEY){
     db=window.supabase.createClient(window.SUPABASE_URL,window.SUPABASE_ANON_KEY);
   }
-}catch(error){console.log("Supabase setup issue:",error);}
+}catch(error){
+  console.log("Supabase setup issue:",error);
+}
 
 function showPage(page,button){
   document.querySelectorAll(".page").forEach(s=>s.classList.remove("active"));
+
   const selected=document.getElementById(page);
   if(selected)selected.classList.add("active");
+
   document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
-  if(button)button.classList.add("active");
-  else{
+
+  if(button){
+    button.classList.add("active");
+  }else{
     const navButtons=[...document.querySelectorAll("nav button")];
     const matching=navButtons.find(b=>b.getAttribute("onclick")?.includes("'"+page+"'"));
     if(matching)matching.classList.add("active");
   }
+
   if(page==="trending")loadPosts();
   if(page==="scores")loadLeaderboard();
   if(page==="settings")loadSettings();
+
   window.scrollTo(0,0);
 }
-function openChat(){window.location.href="/chat/";}
-function openFriends(){window.location.href="/chat/";}
-function openProfile(){window.location.href="/profile.html";}
+
+function openChat(){
+  window.location.href="/chat/";
+}
+
+function openFriends(){
+  window.location.href="/chat/";
+}
+
+function openProfile(){
+  window.location.href="/profile.html";
+}
 
 async function checkLogin(){
-  if(!db){document.getElementById("accountStatus").textContent="Supabase configuration could not be loaded.";return;}
+  if(!db){
+    document.getElementById("accountStatus").textContent="Supabase configuration could not be loaded.";
+    return;
+  }
+
   try{
     const {data,error}=await db.auth.getSession();
-    if(error||!data.session){window.location.href="/auth.html";return;}
+
+    if(error||!data.session){
+      window.location.href="/auth.html";
+      return;
+    }
+
     currentUser=data.session.user;
-    username=localStorage.getItem("bigvic_username")||currentUser.user_metadata?.username||currentUser.email?.split("@")[0]||"Player";
+
+    username=localStorage.getItem("bigvic_username")||
+      currentUser.user_metadata?.username||
+      currentUser.email?.split("@")[0]||
+      "Player";
+
     document.getElementById("welcomeName").textContent="Welcome, "+username+"! 👋";
     document.getElementById("accountStatus").textContent="You are logged in.";
+
     await loadPlayerScore();
     loadSettings();
-  }catch(error){document.getElementById("accountStatus").textContent="Could not check your login. Please refresh.";}
+
+  }catch(error){
+    document.getElementById("accountStatus").textContent="Could not check your login. Please refresh.";
+  }
 }
-async function logout(){if(db)await db.auth.signOut();window.location.href="/auth.html";}
+
+async function logout(){
+  if(db)await db.auth.signOut();
+  window.location.href="/auth.html";
+}
 
 function loadSettings(){
   if(!currentUser)return;
+
   const nameEl=document.getElementById("settingsUsername");
   const emailEl=document.getElementById("settingsEmail");
+
   if(nameEl)nameEl.textContent=username;
   if(emailEl)emailEl.textContent=currentUser.email||"No email available";
+
   const mappings=[
     ["privateAccountSetting","bigvic_private_account",false],
     ["onlineStatusSetting","bigvic_show_online",true],
     ["notificationsSetting","bigvic_notifications",true],
     ["reduceMotionSetting","bigvic_reduce_motion",false]
   ];
+
   mappings.forEach(([id,key,defaultValue])=>{
     const el=document.getElementById(id);
-    if(el)el.checked=localStorage.getItem(key)===null?defaultValue:localStorage.getItem(key)==="true";
+
+    if(el){
+      el.checked=localStorage.getItem(key)===null?
+        defaultValue:
+        localStorage.getItem(key)==="true";
+    }
   });
 }
+
 function saveSettingPreference(key,value){
   localStorage.setItem(key,String(value));
+
   const message=document.getElementById("settingsMessage");
-  if(message)message.textContent="Your preference has been saved on this device.";
+
+  if(message){
+    message.textContent="Your preference has been saved on this device.";
+  }
+
   if(key==="bigvic_reduce_motion"){
     document.documentElement.style.scrollBehavior=value?"auto":"smooth";
   }
 }
+
 async function sendPasswordReset(){
   const message=document.getElementById("settingsMessage");
-  if(!db||!currentUser||!currentUser.email){if(message)message.textContent="Your account email could not be found.";return;}
+
+  if(!db||!currentUser||!currentUser.email){
+    if(message)message.textContent="Your account email could not be found.";
+    return;
+  }
+
   if(message)message.textContent="Sending password reset email...";
+
   const {error}=await db.auth.resetPasswordForEmail(currentUser.email,{
     redirectTo:window.location.origin+"/auth.html"
   });
-  if(message)message.textContent=error?"Could not send reset email: "+error.message:"Password reset email sent. Check your inbox.";
+
+  if(message){
+    message.textContent=error?
+      "Could not send reset email: "+error.message:
+      "Password reset email sent. Check your inbox.";
+  }
 }
 
 async function loadPlayerScore(){
   if(!db||!currentUser)return;
-  const {data}=await db.from("leaderboard").select("*").eq("user_id",currentUser.id).maybeSingle();
-  if(data){numberWins=data.number_wins||0;rpsWins=data.rps_wins||0;}
+
+  const {data}=await db.from("leaderboard")
+    .select("*")
+    .eq("user_id",currentUser.id)
+    .maybeSingle();
+
+  if(data){
+    numberWins=data.number_wins||0;
+    rpsWins=data.rps_wins||0;
+  }
 }
+
 async function saveScore(){
   if(!db||!currentUser)return;
-  const {error}=await db.from("leaderboard").upsert({user_id:currentUser.id,username:username,number_wins:numberWins,rps_wins:rpsWins,updated_at:new Date().toISOString()});
+
+  const {error}=await db.from("leaderboard").upsert({
+    user_id:currentUser.id,
+    username:username,
+    number_wins:numberWins,
+    rps_wins:rpsWins,
+    updated_at:new Date().toISOString()
+  });
+
   if(error)console.log("Score could not be saved:",error.message);
 }
+
 async function loadLeaderboard(){
   const container=document.getElementById("leaderboard");
-  if(!db){container.textContent="Leaderboard is unavailable.";return;}
+
+  if(!db){
+    container.textContent="Leaderboard is unavailable.";
+    return;
+  }
+
   container.textContent="Loading scores...";
-  const {data,error}=await db.from("leaderboard").select("username,number_wins,rps_wins").order("number_wins",{ascending:false}).limit(30);
-  if(error){container.textContent="Could not load scores.";return;}
-  if(!data||!data.length){container.textContent="No scores yet. Play a game to get started!";return;}
+
+  const {data,error}=await db.from("leaderboard")
+    .select("username,number_wins,rps_wins")
+    .order("number_wins",{ascending:false})
+    .limit(30);
+
+  if(error){
+    container.textContent="Could not load scores.";
+    return;
+  }
+
+  if(!data||!data.length){
+    container.textContent="No scores yet. Play a game to get started!";
+    return;
+  }
+
   container.innerHTML="";
+
   data.sort((a,b)=>(b.number_wins+b.rps_wins)-(a.number_wins+a.rps_wins));
+
   data.forEach((player,index)=>{
-    const row=document.createElement("div");row.className="score-row";
-    const name=document.createElement("span");name.textContent=(index+1)+". "+player.username;
-    const score=document.createElement("strong");score.textContent=(player.number_wins+player.rps_wins)+" wins";
-    row.append(name,score);container.appendChild(row);
+    const row=document.createElement("div");
+    row.className="score-row";
+
+    const name=document.createElement("span");
+    name.textContent=(index+1)+". "+player.username;
+
+    const score=document.createElement("strong");
+    score.textContent=(player.number_wins+player.rps_wins)+" wins";
+
+    row.append(name,score);
+    container.appendChild(row);
   });
 }
+
 let secretNumber=Math.floor(Math.random()*10)+1;
+
 async function guessNumber(){
-  const input=document.getElementById("guessInput"),result=document.getElementById("guessResult"),guess=Number(input.value);
-  if(!guess||guess<1||guess>10){result.textContent="Enter a number from 1 to 10.";return;}
-  if(guess===secretNumber){result.textContent="Correct! You won! 🎉";numberWins++;await saveScore();secretNumber=Math.floor(Math.random()*10)+1;}
-  else result.textContent=guess<secretNumber?"Too low! Try again.":"Too high! Try again.";
+  const input=document.getElementById("guessInput");
+  const result=document.getElementById("guessResult");
+  const guess=Number(input.value);
+
+  if(!guess||guess<1||guess>10){
+    result.textContent="Enter a number from 1 to 10.";
+    return;
+  }
+
+  if(guess===secretNumber){
+    result.textContent="Correct! You won! 🎉";
+    numberWins++;
+    await saveScore();
+    secretNumber=Math.floor(Math.random()*10)+1;
+  }else{
+    result.textContent=guess<secretNumber?
+      "Too low! Try again.":
+      "Too high! Try again.";
+  }
 }
+
 async function playRPS(player){
-  const choices=["Rock","Paper","Scissors"],computer=choices[Math.floor(Math.random()*3)],result=document.getElementById("rpsResult");
-  if(player===computer){result.textContent="You chose "+player+". Computer chose "+computer+". It's a draw!";return;}
-  const won=(player==="Rock"&&computer==="Scissors")||(player==="Paper"&&computer==="Rock")||(player==="Scissors"&&computer==="Paper");
-  if(won){result.textContent="You won! 🎉 Computer chose "+computer;rpsWins++;await saveScore();}
-  else result.textContent="You lost! Computer chose "+computer;
+  const choices=["Rock","Paper","Scissors"];
+  const computer=choices[Math.floor(Math.random()*3)];
+  const result=document.getElementById("rpsResult");
+
+  if(player===computer){
+    result.textContent="You chose "+player+". Computer chose "+computer+". It's a draw!";
+    return;
+  }
+
+  const won=
+    (player==="Rock"&&computer==="Scissors")||
+    (player==="Paper"&&computer==="Rock")||
+    (player==="Scissors"&&computer==="Paper");
+
+  if(won){
+    result.textContent="You won! 🎉 Computer chose "+computer;
+    rpsWins++;
+    await saveScore();
+  }else{
+    result.textContent="You lost! Computer chose "+computer;
+  }
 }
 
 /* PHOTO AND VIDEO PREVIEW */
 function previewMedia(){
-  const input=document.getElementById("mediaFile"),preview=document.getElementById("mediaPreview"),message=document.getElementById("postMessage");
-  preview.innerHTML="";selectedFile=input.files[0]||null;if(!selectedFile)return;
-  if(!selectedFile.type.startsWith("image/")&&!selectedFile.type.startsWith("video/")){message.textContent="Please choose an image or video.";input.value="";selectedFile=null;return;}
-  if(selectedFile.size>50*1024*1024){message.textContent="File is too large. Maximum size is 50 MB.";input.value="";selectedFile=null;return;}
-  const url=URL.createObjectURL(selectedFile);let element;
-  if(selectedFile.type.startsWith("image/"))element=document.createElement("img");
-  else{element=document.createElement("video");element.controls=true;}
-  element.src=url;preview.appendChild(element);message.textContent="Media selected. Ready to publish!";
+  const input=document.getElementById("mediaFile");
+  const preview=document.getElementById("mediaPreview");
+  const message=document.getElementById("postMessage");
+
+  preview.innerHTML="";
+  selectedFile=input.files[0]||null;
+
+  if(!selectedFile)return;
+
+  if(!selectedFile.type.startsWith("image/")&&!selectedFile.type.startsWith("video/")){
+    message.textContent="Please choose an image or video.";
+    input.value="";
+    selectedFile=null;
+    return;
+  }
+
+  if(selectedFile.size>50*1024*1024){
+    message.textContent="File is too large. Maximum size is 50 MB.";
+    input.value="";
+    selectedFile=null;
+    return;
+  }
+
+  const url=URL.createObjectURL(selectedFile);
+  let element;
+
+  if(selectedFile.type.startsWith("image/")){
+    element=document.createElement("img");
+  }else{
+    element=document.createElement("video");
+    element.controls=true;
+  }
+
+  element.src=url;
+  preview.appendChild(element);
+
+  message.textContent="Media selected. Ready to publish!";
 }
+
 async function uploadMedia(file){
-  const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_"),filePath=currentUser.id+"/"+Date.now()+"_"+safeName;
-  const {error}=await db.storage.from("bigvic-media").upload(filePath,file,{upsert:false,contentType:file.type});
+  const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+  const filePath=currentUser.id+"/"+Date.now()+"_"+safeName;
+
+  const {error}=await db.storage.from("bigvic-media")
+    .upload(filePath,file,{
+      upsert:false,
+      contentType:file.type
+    });
+
   if(error)throw error;
+
   const {data}=db.storage.from("bigvic-media").getPublicUrl(filePath);
-  return{url:data.publicUrl,type:file.type.startsWith("image/")?"image":"video"};
+
+  return{
+    url:data.publicUrl,
+    type:file.type.startsWith("image/")?"image":"video"
+  };
 }
+
 async function addPost(){
-  const input=document.getElementById("postText"),message=document.getElementById("postMessage"),publish=document.getElementById("publishButton"),text=input.value.trim();
-  if(!text&&!selectedFile){message.textContent="Write something or choose a photo/video first.";return;}
-  if(!db||!currentUser){message.textContent="Please log in before publishing.";return;}
-  publish.disabled=true;publish.textContent="Publishing...";message.textContent="Please wait while your post uploads...";
+  const input=document.getElementById("postText");
+  const message=document.getElementById("postMessage");
+  const publish=document.getElementById("publishButton");
+  const text=input.value.trim();
+
+  if(!text&&!selectedFile){
+    message.textContent="Write something or choose a photo/video first.";
+    return;
+  }
+
+  if(!db||!currentUser){
+    message.textContent="Please log in before publishing.";
+    return;
+  }
+
+  publish.disabled=true;
+  publish.textContent="Publishing...";
+  message.textContent="Please wait while your post uploads...";
+
   try{
-    let media=null;if(selectedFile)media=await uploadMedia(selectedFile);
-    const {error}=await db.from("posts").insert({user_id:currentUser.id,username:username,content:text||"",media_url:media?media.url:null,media_type:media?media.type:null});
+    let media=null;
+
+    if(selectedFile){
+      media=await uploadMedia(selectedFile);
+    }
+
+    const {error}=await db.from("posts").insert({
+      user_id:currentUser.id,
+      username:username,
+      content:text||"",
+      media_url:media?media.url:null,
+      media_type:media?media.type:null
+    });
+
     if(error)throw error;
-    input.value="";document.getElementById("mediaFile").value="";document.getElementById("mediaPreview").innerHTML="";selectedFile=null;
-    message.textContent="Posted successfully! 🎉";await loadPosts();
-  }catch(error){console.log("Publishing error:",error);message.textContent="Could not publish: "+error.message;}
-  finally{publish.disabled=false;publish.textContent="Publish Post";}
+
+    input.value="";
+    document.getElementById("mediaFile").value="";
+    document.getElementById("mediaPreview").innerHTML="";
+    selectedFile=null;
+
+    message.textContent="Posted successfully! 🎉";
+
+    await loadPosts();
+
+  }catch(error){
+    console.log("Publishing error:",error);
+    message.textContent="Could not publish: "+error.message;
+  }finally{
+    publish.disabled=false;
+    publish.textContent="Publish Post";
+  }
 }
+
 async function loadPosts(){
   const container=document.getElementById("posts");
-  if(!db||!currentUser){container.textContent="Please wait while your account loads...";return;}
+
+  if(!db||!currentUser){
+    container.textContent="Please wait while your account loads...";
+    return;
+  }
+
   container.textContent="Loading community posts...";
-  const {data:posts,error}=await db.from("posts").select("id,username,content,created_at,media_url,media_type").order("created_at",{ascending:false}).limit(100);
-  if(error){container.textContent="Could not load posts: "+error.message;return;}
+
+  const {data:posts,error}=await db.from("posts")
+    .select("id,username,content,created_at,media_url,media_type")
+    .order("created_at",{ascending:false})
+    .limit(100);
+
+  if(error){
+    container.textContent="Could not load posts: "+error.message;
+    return;
+  }
+
   container.innerHTML="";
-  if(!posts||!posts.length){container.textContent="No posts yet. Be the first to post! 🔥";return;}
+
+  if(!posts||!posts.length){
+    container.textContent="No posts yet. Be the first to post! 🔥";
+    return;
+  }
+
   const ids=posts.map(p=>p.id);
+
   const [likesResult,commentsResult]=await Promise.all([
-    db.from("post_likes").select("post_id,user_id").in("post_id",ids),
-    db.from("post_comments").select("id,post_id,user_id,username,content,created_at").in("post_id",ids).order("created_at",{ascending:true})
+    db.from("post_likes")
+      .select("post_id,user_id")
+      .in("post_id",ids),
+
+    db.from("post_comments")
+      .select("id,post_id,user_id,username,content,created_at")
+      .in("post_id",ids)
+      .order("created_at",{ascending:true})
   ]);
-  if(likesResult.error||commentsResult.error){container.textContent="Could not load likes or comments. Please refresh.";return;}
-  const likes=likesResult.data||[],comments=commentsResult.data||[];
+
+  if(likesResult.error||commentsResult.error){
+    container.textContent="Could not load likes or comments. Please refresh.";
+    return;
+  }
+
+  const likes=likesResult.data||[];
+  const comments=commentsResult.data||[];
+
   posts.forEach(post=>{
-    const postLikes=likes.filter(l=>l.post_id===post.id),liked=postLikes.some(l=>l.user_id===currentUser.id),postComments=comments.filter(c=>c.post_id===post.id);
-    const box=document.createElement("div");box.className="post";
-    const name=document.createElement("strong");name.textContent="👤 "+(post.username||"Player");
-    const content=document.createElement("p");content.textContent=post.content||"";box.append(name,content);
+    const postLikes=likes.filter(l=>l.post_id===post.id);
+    const liked=postLikes.some(l=>l.user_id===currentUser.id);
+    const postComments=comments.filter(c=>c.post_id===post.id);
+
+    const box=document.createElement("div");
+    box.className="post";
+
+    const name=document.createElement("strong");
+    name.textContent="👤 "+(post.username||"Player");
+
+    const content=document.createElement("p");
+    content.textContent=post.content||"";
+
+    box.append(name,content);
+
     if(post.media_url){
       let media;
-      if(post.media_type==="video"){media=document.createElement("video");media.controls=true;media.preload="metadata";}
-      else{media=document.createElement("img");media.alt="Trending photo";}
-      media.className="post-media";media.src=post.media_url;box.appendChild(media);
+
+      if(post.media_type==="video"){
+        media=document.createElement("video");
+        media.controls=true;
+        media.preload="metadata";
+      }else{
+        media=document.createElement("img");
+        media.alt="Trending photo";
+      }
+
+      media.className="post-media";
+      media.src=post.media_url;
+      box.appendChild(media);
     }
-    const time=document.createElement("small");time.className="small";time.textContent=new Date(post.created_at).toLocaleString();box.appendChild(time);
-    const actions=document.createElement("div");actions.className="post-actions";
-    const likeButton=document.createElement("button");likeButton.className=liked?"liked":"";likeButton.textContent=(liked?"❤️ Liked":"🤍 Like")+" ("+postLikes.length+")";
-    likeButton.onclick=()=>toggleLike(post.id,liked);actions.appendChild(likeButton);box.appendChild(actions);
-    const commentBox=document.createElement("div");commentBox.className="comment-box";
-    const title=document.createElement("strong");title.textContent="💬 Comments ("+postComments.length+")";commentBox.appendChild(title);
+
+    const time=document.createElement("small");
+    time.className="small";
+    time.textContent=new Date(post.created_at).toLocaleString();
+    box.appendChild(time);
+
+    const actions=document.createElement("div");
+    actions.className="post-actions";
+
+    const likeButton=document.createElement("button");
+    likeButton.className=liked?"liked":"";
+    likeButton.textContent=(liked?"❤️ Liked":"🤍 Like")+" ("+postLikes.length+")";
+    likeButton.onclick=()=>toggleLike(post.id,liked);
+
+    actions.appendChild(likeButton);
+    box.appendChild(actions);
+
+    const commentBox=document.createElement("div");
+    commentBox.className="comment-box";
+
+    const title=document.createElement("strong");
+    title.textContent="💬 Comments ("+postComments.length+")";
+    commentBox.appendChild(title);
+
     postComments.forEach(comment=>{
-      const item=document.createElement("div");item.className="comment";
-      const commentName=document.createElement("strong");commentName.textContent=comment.username||"Player";
-      const commentText=document.createElement("p");commentText.textContent=comment.content;
-      const commentTime=document.createElement("small");commentTime.className="small";commentTime.textContent=new Date(comment.created_at).toLocaleString();
-      item.append(commentName,commentText,commentTime);commentBox.appendChild(item);
+      const item=document.createElement("div");
+      item.className="comment";
+
+      const commentName=document.createElement("strong");
+      commentName.textContent=comment.username||"Player";
+
+      const commentText=document.createElement("p");
+      commentText.textContent=comment.content;
+
+      const commentTime=document.createElement("small");
+      commentTime.className="small";
+      commentTime.textContent=new Date(comment.created_at).toLocaleString();
+
+      item.append(commentName,commentText,commentTime);
+      commentBox.appendChild(item);
     });
-    const form=document.createElement("div");form.className="comment-form";
-    const commentInput=document.createElement("textarea");commentInput.placeholder="Write a comment...";commentInput.maxLength=1000;
-    const sendButton=document.createElement("button");sendButton.textContent="Send";sendButton.onclick=()=>addComment(post.id,commentInput.value);
-    form.append(commentInput,sendButton);commentBox.appendChild(form);box.appendChild(commentBox);container.appendChild(box);
+
+    const form=document.createElement("div");
+    form.className="comment-form";
+
+    const commentInput=document.createElement("textarea");
+    commentInput.placeholder="Write a comment...";
+    commentInput.maxLength=1000;
+
+    const sendButton=document.createElement("button");
+    sendButton.textContent="Send";
+    sendButton.onclick=()=>addComment(post.id,commentInput.value);
+
+    form.append(commentInput,sendButton);
+    commentBox.appendChild(form);
+
+    box.appendChild(commentBox);
+    container.appendChild(box);
   });
 }
+
 async function toggleLike(postId,alreadyLiked){
-  if(!db||!currentUser)return;let result;
-  if(alreadyLiked)result=await db.from("post_likes").delete().eq("post_id",postId).eq("user_id",currentUser.id);
-  else result=await db.from("post_likes").insert({post_id:postId,user_id:currentUser.id});
-  if(result.error){alert("Could not update like: "+result.error.message);return;}
+  if(!db||!currentUser)return;
+
+  let result;
+
+  if(alreadyLiked){
+    result=await db.from("post_likes")
+      .delete()
+      .eq("post_id",postId)
+      .eq("user_id",currentUser.id);
+  }else{
+    result=await db.from("post_likes").insert({
+      post_id:postId,
+      user_id:currentUser.id
+    });
+  }
+
+  if(result.error){
+    alert("Could not update like: "+result.error.message);
+    return;
+  }
+
   await loadPosts();
 }
+
 async function addComment(postId,text){
-  const content=text.trim();if(!content){alert("Write a comment first.");return;}
-  const {error}=await db.from("post_comments").insert({post_id:postId,user_id:currentUser.id,username:username,content:content});
-  if(error){alert("Could not send comment: "+error.message);return;}
+  const content=text.trim();
+
+  if(!content){
+    alert("Write a comment first.");
+    return;
+  }
+
+  const {error}=await db.from("post_comments").insert({
+    post_id:postId,
+    user_id:currentUser.id,
+    username:username,
+    content:content
+  });
+
+  if(error){
+    alert("Could not send comment: "+error.message);
+    return;
+  }
+
   await loadPosts();
 }
-checkLogin();
+
+/* START WITH THE FEED AFTER LOGIN */
+checkLogin().then(()=>{
+  if(currentUser){
+    loadPosts();
+  }
+});
 </script>
+
 </body>
 </html>
