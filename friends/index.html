@@ -1,0 +1,546 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Friends - BigVic Fun</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../config.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      color: #172033;
+    }
+    header {
+      background: #101b35;
+      color: white;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    header h2 { margin: 0; color: #f5c542; }
+    nav { display: flex; gap: 8px; flex-wrap: wrap; }
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 9px 12px;
+      border-radius: 8px;
+      background: #263653;
+      font-size: 14px;
+    }
+    nav a:hover { background: #405276; }
+    .container {
+      max-width: 850px;
+      margin: 24px auto;
+      padding: 0 14px;
+    }
+    .welcome, .panel {
+      background: white;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px #0000000d;
+    }
+    .welcome h2 { margin-top: 0; }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .tab {
+      border: 0;
+      padding: 12px 16px;
+      border-radius: 8px;
+      background: #dce2eb;
+      color: #172033;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .tab.active {
+      background: #172744;
+      color: #f5c542;
+    }
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ccd2dc;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+    .person {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 0;
+      border-bottom: 1px solid #edf0f4;
+    }
+    .person:last-child { border-bottom: 0; }
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #172744;
+      color: #f5c542;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 18px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .person-info { flex: 1; min-width: 0; }
+    .person-info strong { display: block; }
+    .person-info small { color: #687386; }
+    button.action {
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 13px;
+      cursor: pointer;
+      font-weight: bold;
+      background: #172744;
+      color: white;
+    }
+    button.gold {
+      background: #f5c542;
+      color: #172033;
+    }
+    button.danger {
+      background: #e5484d;
+      color: white;
+    }
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+    .empty, .message {
+      padding: 16px;
+      text-align: center;
+      color: #687386;
+    }
+    .hidden { display: none; }
+    #status {
+      margin: 10px 0;
+      color: #a33;
+      white-space: pre-wrap;
+    }
+    @media(max-width: 520px) {
+      header { align-items: flex-start; flex-direction: column; }
+      .person { flex-wrap: wrap; }
+      .person button { margin-left: 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h2>👑 BigVic Fun</h2>
+  <nav>
+    <a href="/">🏠 Home</a>
+    <a href="/chat/">💬 Chat</a>
+    <a href="/profile.html">👤 Profile</a>
+    <a href="#" id="logout">Logout</a>
+  </nav>
+</header>
+
+<main class="container">
+  <section class="welcome">
+    <h2>👥 Friends</h2>
+    <p>Find people, manage friend requests and connect with your friends.</p>
+  </section>
+
+  <div id="status"></div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="find">Find People</button>
+    <button class="tab" data-tab="requests">Requests</button>
+    <button class="tab" data-tab="friends">My Friends</button>
+  </div>
+
+  <section class="panel" id="findPanel">
+    <h3>Find People</h3>
+    <input id="searchInput" type="search" placeholder="Search by username...">
+    <div id="peopleList" class="empty">Enter a username to find people.</div>
+  </section>
+
+  <section class="panel hidden" id="requestsPanel">
+    <h3>Friend Requests</h3>
+    <div id="requestsList" class="empty">Loading requests...</div>
+  </section>
+
+  <section class="panel hidden" id="friendsPanel">
+    <h3>My Friends</h3>
+    <div id="friendsList" class="empty">Loading friends...</div>
+  </section>
+</main>
+
+<script>
+(function () {
+  const statusBox = document.getElementById("status");
+
+  function showError(message) {
+    statusBox.textContent = message;
+  }
+
+  function clearError() {
+    statusBox.textContent = "";
+  }
+
+  const url =
+    window.SUPABASE_URL ||
+    window.supabaseUrl ||
+    window.SUPABASE_CONFIG?.url;
+
+  const key =
+    window.SUPABASE_ANON_KEY ||
+    window.supabaseAnonKey ||
+    window.SUPABASE_CONFIG?.anonKey;
+
+  if (!url || !key || !window.supabase) {
+    showError("Supabase configuration was not found. Please check config.js.");
+    return;
+  }
+
+  const db = window.supabase.createClient(url, key);
+  let currentUser = null;
+  let profiles = [];
+
+  const peopleList = document.getElementById("peopleList");
+  const requestsList = document.getElementById("requestsList");
+  const friendsList = document.getElementById("friendsList");
+
+  function escapeHTML(value) {
+    return String(value || "").replace(/[&<>"']/g, function (char) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char];
+    });
+  }
+
+  function avatarHTML(person) {
+    const name = person.username || "User";
+    if (person.avatar) {
+      return '<div class="avatar"><img src="' +
+        escapeHTML(person.avatar) + '" alt=""></div>';
+    }
+    return '<div class="avatar">' +
+      escapeHTML(name.charAt(0).toUpperCase()) + '</div>';
+  }
+
+  function personHTML(person, buttonHTML) {
+    return '<div class="person">' +
+      avatarHTML(person) +
+      '<div class="person-info"><strong>' +
+      escapeHTML(person.username || "User") +
+      '</strong><small>BigVic Fun member</small></div>' +
+      (buttonHTML || "") +
+      '</div>';
+  }
+
+  function showTab(tab) {
+    document.querySelectorAll(".tab").forEach(function (button) {
+      button.classList.toggle("active", button.dataset.tab === tab);
+    });
+
+    document.getElementById("findPanel").classList.toggle("hidden", tab !== "find");
+    document.getElementById("requestsPanel").classList.toggle("hidden", tab !== "requests");
+    document.getElementById("friendsPanel").classList.toggle("hidden", tab !== "friends");
+
+    if (tab === "requests") loadRequests();
+    if (tab === "friends") loadFriends();
+  }
+
+  document.querySelectorAll(".tab").forEach(function (button) {
+    button.addEventListener("click", function () {
+      showTab(button.dataset.tab);
+    });
+  });
+
+  async function getRequests() {
+    const result = await db
+      .from("friend_requests")
+      .select("id,requester,recipient,status");
+
+    if (result.error) throw result.error;
+    return result.data || [];
+  }
+
+  async function searchPeople() {
+    clearError();
+    const term = document.getElementById("searchInput").value.trim();
+
+    if (term.length < 2) {
+      peopleList.textContent = "Type at least 2 characters to search.";
+      return;
+    }
+
+    peopleList.textContent = "Searching...";
+
+    const result = await db
+      .from("profiles")
+      .select("id,username,avatar")
+      .ilike("username", "%" + term + "%")
+      .neq("id", currentUser.id)
+      .limit(20);
+
+    if (result.error) {
+      peopleList.textContent = "Could not search people: " + result.error.message;
+      return;
+    }
+
+    const people = result.data || [];
+
+    if (!people.length) {
+      peopleList.textContent = "No people found.";
+      return;
+    }
+
+    let requests;
+    try {
+      requests = await getRequests();
+    } catch (error) {
+      peopleList.textContent = "Could not load friend requests: " + error.message;
+      return;
+    }
+
+    peopleList.innerHTML = "";
+
+    people.forEach(function (person) {
+      const existing = requests.find(function (request) {
+        return (
+          (request.requester === currentUser.id && request.recipient === person.id) ||
+          (request.requester === person.id && request.recipient === currentUser.id)
+        );
+      });
+
+      let button = "";
+
+      if (existing && existing.status === "accepted") {
+        button = '<button class="action" disabled>Friends</button>';
+      } else if (existing && existing.status === "pending") {
+        button = '<button class="action" disabled>Request pending</button>';
+      } else {
+        button = '<button class="action gold" data-send="' +
+          escapeHTML(person.id) + '">Add Friend</button>';
+      }
+
+      peopleList.insertAdjacentHTML("beforeend", personHTML(person, button));
+    });
+
+    peopleList.querySelectorAll("[data-send]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        sendRequest(button.dataset.send, button);
+      });
+    });
+  }
+
+  async function sendRequest(recipientId, button) {
+    clearError();
+    button.disabled = true;
+    button.textContent = "Sending...";
+
+    const result = await db.from("friend_requests").insert({
+      requester: currentUser.id,
+      recipient: recipientId,
+      status: "pending"
+    });
+
+    if (result.error) {
+      showError("Could not send request: " + result.error.message);
+      button.disabled = false;
+      button.textContent = "Add Friend";
+      return;
+    }
+
+    button.textContent = "Request sent";
+  }
+
+  async function loadRequests() {
+    clearError();
+    requestsList.textContent = "Loading requests...";
+
+    try {
+      const requests = await getRequests();
+      const incoming = requests.filter(function (request) {
+        return request.recipient === currentUser.id && request.status === "pending";
+      });
+      const outgoing = requests.filter(function (request) {
+        return request.requester === currentUser.id && request.status === "pending";
+      });
+
+      const ids = [...new Set(incoming.map(r => r.requester).concat(outgoing.map(r => r.recipient)))];
+
+      if (!ids.length) {
+        requestsList.textContent = "You have no friend requests.";
+        return;
+      }
+
+      const result = await db.from("profiles")
+        .select("id,username,avatar")
+        .in("id", ids);
+
+      if (result.error) throw result.error;
+
+      requestsList.innerHTML = "";
+
+      incoming.forEach(function (request) {
+        const person = result.data.find(p => p.id === request.requester);
+        if (!person) return;
+
+        const html = personHTML(person,
+          '<button class="action gold" data-accept="' + request.id + '">Accept</button> ' +
+          '<button class="action danger" data-decline="' + request.id + '">Decline</button>'
+        );
+        requestsList.insertAdjacentHTML("beforeend", html);
+      });
+
+      outgoing.forEach(function (request) {
+        const person = result.data.find(p => p.id === request.recipient);
+        if (!person) return;
+
+        requestsList.insertAdjacentHTML("beforeend",
+          personHTML(person, '<button class="action" disabled>Request sent</button>')
+        );
+      });
+
+      requestsList.querySelectorAll("[data-accept]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          updateRequest(button.dataset.accept, "accepted");
+        });
+      });
+
+      requestsList.querySelectorAll("[data-decline]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          updateRequest(button.dataset.decline, "declined");
+        });
+      });
+
+      if (!requestsList.innerHTML) {
+        requestsList.textContent = "You have no friend requests.";
+      }
+    } catch (error) {
+      requestsList.textContent = "Could not load requests: " + error.message;
+    }
+  }
+
+  async function updateRequest(id, status) {
+    clearError();
+
+    const result = await db.from("friend_requests")
+      .update({ status: status })
+      .eq("id", id);
+
+    if (result.error) {
+      showError("Could not update request: " + result.error.message);
+      return;
+    }
+
+    loadRequests();
+  }
+
+  async function loadFriends() {
+    clearError();
+    friendsList.textContent = "Loading friends...";
+
+    try {
+      const requests = await getRequests();
+      const accepted = requests.filter(function (request) {
+        return request.status === "accepted" &&
+          (request.requester === currentUser.id || request.recipient === currentUser.id);
+      });
+
+      const ids = accepted.map(function (request) {
+        return request.requester === currentUser.id
+          ? request.recipient
+          : request.requester;
+      });
+
+      if (!ids.length) {
+        friendsList.textContent = "No friends yet. Find people and send friend requests.";
+        return;
+      }
+
+      const result = await db.from("profiles")
+        .select("id,username,avatar")
+        .in("id", ids);
+
+      if (result.error) throw result.error;
+
+      friendsList.innerHTML = "";
+
+      (result.data || []).forEach(function (person) {
+        friendsList.insertAdjacentHTML("beforeend",
+          personHTML(person,
+            '<button class="action gold" data-chat="' +
+            escapeHTML(person.id) + '">Chat</button>'
+          )
+        );
+      });
+
+      friendsList.querySelectorAll("[data-chat]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          window.location.href = "/chat/";
+        });
+      });
+
+      if (!friendsList.innerHTML) {
+        friendsList.textContent = "No friends found.";
+      }
+    } catch (error) {
+      friendsList.textContent = "Could not load friends: " + error.message;
+    }
+  }
+
+  let searchTimer;
+  document.getElementById("searchInput").addEventListener("input", function () {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(searchPeople, 400);
+  });
+
+  document.getElementById("logout").addEventListener("click", async function (event) {
+    event.preventDefault();
+    await db.auth.signOut();
+    window.location.href = "/auth.html";
+  });
+
+  async function start() {
+    const result = await db.auth.getSession();
+
+    if (result.error) {
+      showError(result.error.message);
+      return;
+    }
+
+    currentUser = result.data.session && result.data.session.user;
+
+    if (!currentUser) {
+      window.location.href = "/auth.html";
+      return;
+    }
+
+    loadFriends();
+  }
+
+  start();
+})();
+</script>
+</body>
+</html>
