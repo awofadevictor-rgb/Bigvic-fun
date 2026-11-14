@@ -5,277 +5,224 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#101322">
-<title>BigVic Fun Chat</title>
+<title>BigVic Fun - Messages</title>
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#101322;color:white}
+body{margin:0;font-family:Arial,sans-serif;background:#f0f2f5;color:#1c1e21}
+button,input{font:inherit}
 button{cursor:pointer}
-button:disabled{opacity:.5;cursor:not-allowed}
 [hidden]{display:none!important}
 
-.app{max-width:600px;margin:auto;min-height:100vh;background:#101322;display:flex;flex-direction:column}
-
-.top-nav{display:flex;justify-content:space-around;gap:5px;padding:12px 5px;background:#19233b;border-bottom:1px solid #303957;overflow-x:auto}
-.top-nav button{border:0;background:transparent;color:#ffca28;font-weight:bold;font-size:14px;white-space:nowrap;padding:8px}
-
-.profile{padding:15px;background:#19233b;border-bottom:1px solid #303957;display:flex;align-items:center;gap:12px}
-.profile img{width:65px;height:65px;border-radius:50%;object-fit:cover}
-.profile-name{font-weight:bold;color:#ffca28}
-.photo-button{display:inline-block;margin-top:5px;background:#ffca28;color:#101322;padding:8px 10px;border-radius:6px;font-size:13px;font-weight:bold}
-
-.header{background:#19233b;color:#ffca28;padding:15px;text-align:center;border-bottom:1px solid #303957}
-.header h2{margin:0 0 10px}
-.header-actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
-.header-actions button,.small-button{border:0;background:#ffca28;color:#101322;padding:9px 12px;border-radius:7px;font-weight:bold}
-#notificationCount{background:#dc2626;color:white;border-radius:20px;padding:2px 6px;font-size:11px}
-
-.status{padding:10px;text-align:center;font-size:13px;color:#c0c8dc}
-#notificationsPanel,#securityPanel{padding:12px;background:#19233b;border-bottom:1px solid #303957}
-.notification-heading{display:flex;justify-content:space-between;align-items:center;color:#ffca28;font-weight:bold}
-.notification-item{padding:11px;margin-top:9px;background:#101322;border:1px solid #46506d;border-radius:9px}
-
-#securityPanel h3{color:#ffca28}
-#securityPanel select{width:100%;padding:12px;border-radius:8px;background:#101322;color:white;border:1px solid #46506d}
-
-#friendsPage{padding:15px;background:#19233b;border-bottom:1px solid #303957;min-height:250px}
-#friendsPage h2{color:#ffca28;margin-top:0}
-#friendsTabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
-#friendsList{display:flex;flex-direction:column;gap:9px}
-.friend-card{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px;background:#101322;border:1px solid #46506d;border-radius:10px}
-.friend-card img{width:45px;height:45px;border-radius:50%;object-fit:cover}
-.friend-details{flex:1;min-width:100px}
-.friend-details strong{color:#ffca28}
-.friend-details small{display:block;color:#aeb8d0;margin-top:4px}
-
-#chatWorkspace{display:flex;flex-direction:column;flex:1;min-height:65vh}
-.chat-switch{display:flex;gap:8px;padding:10px;background:#19233b}
-.chat-switch button{flex:1;padding:12px 5px;border:1px solid #46506d;border-radius:9px;background:#101322;color:#ffca28;font-weight:bold}
-.chat-switch button.active{background:#ffca28;color:#101322}
-
-#contactsPanel,#groupsPanel{padding:12px;background:#19233b;border-bottom:1px solid #303957}
-.panel-title{color:#ffca28;font-weight:bold;margin-bottom:10px}
-#contactsList,#groupsList{display:flex;gap:9px;overflow-x:auto;padding:8px 0}
-.contact,.group-item{min-width:90px;padding:9px 6px;border:1px solid #46506d;border-radius:10px;background:#101322;color:white;text-align:center}
-.contact img{width:42px;height:42px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 6px}
-.contact span{display:block;font-size:12px;overflow-wrap:anywhere}
-.group-controls{display:flex;gap:8px;flex-wrap:wrap}
-
-#conversationTitle{padding:11px;text-align:center;color:#ffca28;background:#19233b;font-weight:bold;border-bottom:1px solid #303957}
-#typingIndicator{min-height:22px;padding:4px 12px;text-align:center;color:#65aaff;font-size:12px;background:#19233b}
-#messages{flex:1;overflow-y:auto;padding:15px;min-height:250px;background:#101322}
-.message{margin-bottom:15px}
-.message.mine{text-align:right}
-.name{font-size:12px;color:#aeb8d0;margin-bottom:4px}
-.bubble{display:inline-block;max-width:85%;padding:10px 14px;border-radius:16px;background:#303957;color:white;word-break:break-word;text-align:left}
-.mine .bubble{background:#ffca28;color:#101322}
-.chat-media{display:block;max-width:85%;max-height:350px;border-radius:12px;margin-top:7px}
-.mine .chat-media{margin-left:auto}
-.chat-audio{display:block;width:85%;max-width:300px;margin-top:8px}
-.mine .chat-audio{margin-left:auto}
-.message-meta{font-size:11px;color:#aeb8d0;margin-top:5px}
-
-#mediaPreview{padding:0 10px;background:#101322}
-#mediaPreview img,#mediaPreview video{max-width:100%;max-height:160px;border-radius:10px}
-#mediaStatus{font-size:12px;color:#ffca28;padding:5px 10px}
-
-.send-box{display:flex;align-items:center;gap:5px;padding:9px;background:#19233b;border-top:1px solid #303957;position:sticky;bottom:0}
-#messageInput{flex:1;min-width:0;border:1px solid #46506d;border-radius:25px;padding:12px;font-size:15px;background:#101322;color:white}
-#messageInput::placeholder{color:#aeb8d0}
-.attach-button,#startRecordButton,#stopRecordButton,#sendButton{border:0;border-radius:50%;min-width:39px;height:39px;display:flex;align-items:center;justify-content:center;font-weight:bold}
-.attach-button{background:#ffca28;color:#101322}
-#startRecordButton{background:#ffca28;color:#101322;touch-action:none;user-select:none;-webkit-user-select:none}
-#startRecordButton.recording{background:#dc2626;color:white;transform:scale(1.08)}
-#stopRecordButton{background:#dc2626;color:white}
-#sendButton{border-radius:20px;background:#ffca28;color:#101322;padding:0 13px}
-
-#voiceRecordingPanel,#voicePreviewPanel{
-  padding:12px;
-  background:#19233b;
-  border-top:1px solid #46506d;
-  align-items:center;
-  gap:10px;
+:root{
+  --navy:#101322;
+  --navy2:#19233b;
+  --gold:#ffca28;
+  --border:#303957;
 }
-#voiceRecordingPanel{justify-content:space-between}
-#recordingTime{color:#ffca28;font-weight:bold;min-width:45px}
-#voiceWaveform{flex:1;display:flex;align-items:center;justify-content:center;gap:3px;height:35px}
-.wave-bar{width:4px;height:8px;border-radius:5px;background:#ffca28;animation:voiceWave .7s infinite ease-in-out alternate}
-.wave-bar:nth-child(2n){animation-delay:.15s}
-.wave-bar:nth-child(3n){animation-delay:.3s}
-@keyframes voiceWave{from{height:5px}to{height:30px}}
-#voiceRecordingPanel button,#voicePreviewPanel button{border:0;padding:9px 12px;border-radius:8px;font-weight:bold;background:#ffca28;color:#101322}
-#cancelRecordingButton,#cancelVoiceButton{background:#dc2626!important;color:white!important}
-#voicePreviewAudio{width:100%;max-width:230px}
 
-#callBar,#incomingCallPanel,#activeCallPanel{display:none;padding:13px;background:#19233b;border-bottom:1px solid #46506d;text-align:center}
-#callBar button,#incomingCallPanel button,#activeCallPanel button{border:0;border-radius:8px;padding:10px 13px;margin:4px;background:#ffca28;color:#101322;font-weight:bold}
-#incomingCallPanel{border:2px solid #ffca28}
-#callStatus{color:#ffca28;font-size:13px;margin:8px}
-#callVideos{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:10px 0}
-#callVideos video{width:46%;max-width:240px;min-width:120px;background:#000;border-radius:10px}
-#endCallButton,#rejectCallButton{background:#dc2626!important;color:white!important}
+.topbar{
+  height:58px;background:var(--navy);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;color:white;position:sticky;top:0;z-index:10;
+  box-shadow:0 2px 8px #0002
+}
+.brand{font-size:21px;font-weight:bold;color:var(--gold)}
+.navlinks{display:flex;gap:8px}
+.navlinks button{
+  border:0;background:transparent;color:white;
+  padding:9px;border-radius:7px;font-weight:bold
+}
+.navlinks button:hover{background:#303957}
 
-@media(max-width:400px){
- .top-nav button{font-size:12px;padding:7px 5px}
- .send-box{gap:4px;padding:7px}
- #messageInput{font-size:13px;padding:10px}
- .attach-button,#startRecordButton,#stopRecordButton,#sendButton{min-width:35px;height:35px}
+.layout{
+  display:grid;grid-template-columns:330px 1fr;
+  max-width:1250px;height:calc(100vh - 58px);
+  margin:auto;background:white
+}
+.sidebar{
+  border-right:1px solid #ddd;display:flex;flex-direction:column;
+  min-width:0;background:white
+}
+.sidebar-head{padding:20px 16px 12px}
+.sidebar-head h2{margin:0 0 15px;font-size:25px}
+.search{
+  width:100%;padding:12px 15px;border:0;
+  border-radius:25px;background:#f0f2f5;outline:none
+}
+.friend-heading{
+  padding:12px 16px;color:#65676b;font-weight:bold;font-size:13px
+}
+.friends-list{overflow-y:auto;flex:1}
+.friend{
+  display:flex;align-items:center;gap:12px;padding:11px 15px;
+  cursor:pointer;border:0;background:white;width:100%;text-align:left
+}
+.friend:hover{background:#f0f2f5}
+.friend.active{background:#e7f3ff}
+.avatar-wrap{position:relative;flex-shrink:0}
+.avatar{
+  width:52px;height:52px;border-radius:50%;object-fit:cover;
+  background:#ddd
+}
+.friend-info{min-width:0;flex:1}
+.friend-name{font-weight:bold;font-size:15px;color:#1c1e21}
+.friend-last{
+  color:#65676b;font-size:12px;margin-top:5px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
+.empty-friends{padding:20px;color:#65676b;line-height:1.6}
+
+.chat-area{
+  display:flex;flex-direction:column;min-width:0;
+  height:100%;background:#fff
+}
+.chat-header{
+  min-height:75px;padding:12px 18px;border-bottom:1px solid #ddd;
+  display:flex;align-items:center;gap:12px
+}
+.chat-header img{width:45px;height:45px;border-radius:50%;object-fit:cover}
+.chat-person{font-weight:bold;font-size:16px}
+.chat-subtitle{font-size:12px;color:#65676b;margin-top:4px}
+.messages{
+  flex:1;overflow-y:auto;padding:20px;
+  background:#fff;display:flex;flex-direction:column;gap:10px
+}
+.welcome{
+  margin:auto;text-align:center;color:#65676b;padding:25px
+}
+.welcome .big-icon{font-size:55px;margin-bottom:12px}
+.welcome h2{color:#1c1e21}
+.message-row{display:flex;align-items:flex-end;gap:7px}
+.message-row.mine{justify-content:flex-end}
+.message-avatar{width:28px;height:28px;border-radius:50%;object-fit:cover}
+.bubble{
+  max-width:min(70%,520px);padding:11px 15px;border-radius:18px;
+  background:#e4e6eb;color:#1c1e21;overflow-wrap:anywhere;
+  line-height:1.4
+}
+.mine .bubble{background:#0084ff;color:white}
+.message-time{font-size:10px;color:#8a8d91;margin:3px 8px}
+.shared-media{
+  max-width:min(70%,420px);max-height:350px;
+  display:block;border-radius:14px;margin-top:3px
+}
+.shared-audio{max-width:260px;width:100%;display:block;margin-top:5px}
+.composer-area{border-top:1px solid #ddd;padding:12px 15px;background:white}
+.preview{margin-bottom:10px}
+.preview img,.preview video{max-width:180px;max-height:120px;border-radius:10px}
+.preview button{
+  border:0;border-radius:8px;padding:7px 10px;
+  background:#eee;margin-left:8px
+}
+.composer{
+  display:flex;align-items:center;gap:9px
+}
+.composer input[type=text]{
+  flex:1;min-width:0;border:0;outline:none;
+  background:#f0f2f5;border-radius:25px;padding:13px 16px
+}
+.tool-button{
+  width:42px;height:42px;border:0;border-radius:50%;
+  background:#f0f2f5;color:#1877f2;font-size:20px
+}
+.send-button{
+  border:0;border-radius:22px;background:#1877f2;
+  color:white;padding:12px 20px;font-weight:bold
+}
+.send-button:disabled{opacity:.5}
+.status{
+  padding:8px 14px;font-size:12px;color:#65676b;
+  min-height:28px
+}
+.mobile-back{display:none;border:0;background:none;font-size:22px}
+@media(max-width:700px){
+  .layout{display:block;height:calc(100vh - 58px)}
+  .sidebar{height:100%;width:100%}
+  .chat-area{height:100%;display:none}
+  .layout.chat-open .sidebar{display:none}
+  .layout.chat-open .chat-area{display:flex}
+  .mobile-back{display:block}
+  .navlinks button{font-size:12px;padding:7px 5px}
+  .brand{font-size:18px}
+  .bubble{max-width:82%}
 }
 </style>
 </head>
 
 <body>
 
-<div class="top-nav">
-<button onclick="goHome()">🏠 Home</button>
-<button onclick="goChat()">💬 Chat</button>
-<button onclick="goFriends()">👥 Friends</button>
-<button onclick="goGames()">🎮 Games</button>
-<button onclick="goTrending()">🔥 Trending</button>
-<button onclick="goScores()">🏆 Scores</button>
-<button onclick="goProfile()">👤 Profile</button>
-</div>
+<header class="topbar">
+  <div class="brand">BigVic Fun</div>
+  <nav class="navlinks">
+    <button onclick="location.href='/'">🏠 Home</button>
+    <button onclick="location.href='/profile.html'">👤 Profile</button>
+    <button id="logoutButton">Logout</button>
+  </nav>
+</header>
 
-<div class="app">
+<main class="layout" id="layout">
 
-<div class="profile">
-<img id="profileAvatar" src="https://ui-avatars.com/api/?name=BigVic" alt="Profile">
-<div>
-<div id="profileName" class="profile-name">BigVic</div>
-<label for="photoInput" class="photo-button">Change photo</label>
-<input id="photoInput" type="file" accept="image/*" hidden>
-</div>
-</div>
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <h2>Chats</h2>
+      <input id="friendSearch" class="search" type="search"
+        placeholder="Search friends...">
+    </div>
 
-<div class="header">
-<h2>BigVic Fun 💬</h2>
-<div class="header-actions">
-<button id="notificationButton">🔔 Notifications <span id="notificationCount">0</span></button>
-<button id="logoutButton">Logout</button>
-</div>
-</div>
+    <div class="friend-heading">YOUR FRIENDS</div>
+    <div id="friendsList" class="friends-list">
+      <div class="empty-friends">Loading your friends...</div>
+    </div>
+  </aside>
 
-<div id="status" class="status">Starting BigVic Chat...</div>
+  <section class="chat-area">
 
-<div id="notificationsPanel" hidden>
-<div class="notification-heading">
-<span>🔔 My Notifications</span>
-<button id="markNotificationsRead" class="small-button">Close</button>
-</div>
-<div id="notificationsList">No notifications loaded.</div>
-</div>
+    <div class="chat-header">
+      <button class="mobile-back" id="backButton">←</button>
+      <img id="chatAvatar"
+        src="https://ui-avatars.com/api/?name=BigVic" alt="Friend">
+      <div>
+        <div class="chat-person" id="chatName">Choose a friend</div>
+        <div class="chat-subtitle" id="chatSubtitle">
+          Your BigVic Fun conversations
+        </div>
+      </div>
+    </div>
 
-<div style="padding:12px;background:#19233b">
-<button id="securityButton" class="small-button" style="width:100%">🛡️ Security & Privacy</button>
-<div id="securityPanel" hidden>
-<h3>🔐 Message Privacy</h3>
-<p>Choose who can send you private messages:</p>
-<select id="messagePrivacy">
-<option value="everyone">Everyone</option>
-<option value="existing_chats">Existing chats only</option>
-<option value="nobody">Nobody</option>
-</select>
-<p style="font-size:12px;color:#aeb8d0">Privacy preferences need a matching database setting to be saved.</p>
-<h3>🚫 Blocked Users</h3>
-<div id="blockedUsersList">No blocked users loaded.</div>
-<h3>🔑 Account Protection</h3>
-<p id="securityEmail"></p>
-<button id="resetPasswordButton" class="small-button" style="width:100%">Send Password Reset Email</button>
-<p id="securityStatus" style="font-size:12px;color:#ffca28"></p>
-</div>
-</div>
+    <div id="messages" class="messages">
+      <div class="welcome">
+        <div class="big-icon">💬</div>
+        <h2>Your messages</h2>
+        <p>Select a friend on the left to start chatting.</p>
+      </div>
+    </div>
 
-<div id="friendsPage" hidden>
-<h2>👥 BigVic Friends</h2>
-<p style="color:#aeb8d0;font-size:13px">Find people, manage your friends and respond to requests.</p>
-<div id="friendsTabs">
-<button class="small-button" onclick="showFriends('people')">🔎 Find People</button>
-<button class="small-button" onclick="showFriends('friends')">💛 My Friends</button>
-<button class="small-button" onclick="showFriends('requests')">📩 Requests</button>
-</div>
-<div id="friendsList">Loading Friends...</div>
-</div>
+    <div class="composer-area">
+      <div id="preview" class="preview"></div>
 
-<div id="chatWorkspace">
+      <div class="composer">
+        <label class="tool-button" for="mediaInput"
+          title="Send photo or video"
+          style="display:flex;align-items:center;justify-content:center">📎</label>
+        <input id="mediaInput" type="file"
+          accept="image/*,video/*" hidden>
 
-<div class="chat-switch">
-<button id="publicButton" class="active">🌍 Public Chat</button>
-<button id="privateButton">🔒 Private Chat</button>
-<button id="groupButton">👥 Group Chat</button>
-</div>
+        <button id="recordButton" class="tool-button"
+          type="button" title="Record voice message">🎤</button>
 
-<div id="contactsPanel" hidden>
-<div class="panel-title">👥 Choose someone to chat with</div>
-<div id="contactsList">Loading contacts...</div>
-</div>
+        <input id="messageInput" type="text"
+          maxlength="3000" placeholder="Write a message..."
+          autocomplete="off">
 
-<div id="groupsPanel" hidden>
-<div class="panel-title">👥 My Groups</div>
-<div class="group-controls">
-<button id="createGroupButton" class="small-button">＋ Create Group</button>
-</div>
-<div id="groupsList">Group feature needs its group database connection.</div>
-</div>
+        <button id="sendButton" class="send-button"
+          type="button">Send</button>
+      </div>
+      <div id="status" class="status">Welcome to BigVic Fun.</div>
+    </div>
 
-<div id="conversationTitle">🌍 Public Chat</div>
-
-<div id="callBar">
-<strong style="color:#ffca28">Private Calls</strong><br>
-<button id="voiceCallButton">📞 Voice Call</button>
-<button id="videoCallButton">📹 Video Call</button>
-</div>
-
-<div id="incomingCallPanel">
-<h3>📲 Incoming Call</h3>
-<p id="incomingCallText">Someone is calling you.</p>
-<button id="acceptCallButton">Accept</button>
-<button id="rejectCallButton">Reject</button>
-</div>
-
-<div id="activeCallPanel">
-<h3>📞 BigVic Call</h3>
-<div id="callStatus">Calling features need their existing WebRTC connection.</div>
-<div id="callVideos">
-<video id="localVideo" autoplay muted playsinline></video>
-<video id="remoteVideo" autoplay playsinline></video>
-</div>
-<audio id="remoteAudio" autoplay></audio>
-<button id="muteCallButton">🎤 Mute</button>
-<button id="cameraCallButton">📷 Camera Off</button>
-<button id="endCallButton">End Call</button>
-</div>
-
-<div id="typingIndicator"></div>
-<div id="messages"></div>
-
-<div id="mediaPreview"></div>
-<div id="mediaStatus"></div>
-
-<div id="voiceRecordingPanel" hidden>
-<span id="recordingTime">00:00</span>
-<div id="voiceWaveform"></div>
-<button id="cancelRecordingButton" type="button">Cancel</button>
-<button id="finishRecordingButton" type="button">Done</button>
-</div>
-
-<div id="voicePreviewPanel" hidden>
-<audio id="voicePreviewAudio" controls></audio>
-<button id="cancelVoiceButton" type="button">Delete</button>
-</div>
-
-<div class="send-box">
-<label for="chatMediaInput" class="attach-button" title="Choose photo or video">📎</label>
-<input id="chatMediaInput" type="file" accept="image/*,video/*" hidden>
-
-<input id="messageInput" type="text" placeholder="Type a message..." maxlength="3000">
-
-<button id="startRecordButton" type="button" title="Press and hold to record">🎤</button>
-<button id="stopRecordButton" type="button" title="Stop recording" disabled>⏹</button>
-<button id="sendButton" type="button">Send</button>
-</div>
-
-</div>
-</div>
+  </section>
+</main>
 
 <script src="../config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -285,896 +232,583 @@ const $ = id => document.getElementById(id);
 
 let supabaseClient = null;
 let currentUser = null;
-let currentContact = null;
-let currentMode = "public";
-let contacts = [];
+let currentFriend = null;
+let friends = [];
 let selectedMedia = null;
 let mediaRecorder = null;
-let recordedChunks = [];
-let refreshTimer = null;
-
 let recordingStream = null;
-let recordingTimer = null;
-let recordingSeconds = 0;
-let voicePreviewURL = null;
-let recordingCancelled = false;
-let releaseRequested = false;
+let recordedChunks = [];
+let isRecording = false;
+let refreshTimer = null;
+let previewURL = null;
 
-const SUPABASE_URL = window.SUPABASE_URL;
-const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
-const STORAGE_BUCKET = "chat-media";
+const STORAGE_BUCKET = "bigvic-media";
 
-if (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) {
+if (
+  window.supabase &&
+  window.SUPABASE_URL &&
+  window.SUPABASE_ANON_KEY
+) {
   supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
+    window.SUPABASE_URL,
+    window.SUPABASE_ANON_KEY
   );
 }
 
-function showStatus(message) {
-  if ($("status")) $("status").textContent = message;
+function status(message) {
+  $("status").textContent = message;
   console.log("BigVic Fun:", message);
 }
 
-function goHome(){window.location.href="/";}
-function goChat(){restoreChatWorkspace();}
-function goGames(){window.location.href="/games.html";}
-function goTrending(){window.location.href="/trending.html";}
-function goScores(){window.location.href="/scores.html";}
-function goProfile(){window.location.href="/profile.html";}
-
-/* WORKSPACE NAVIGATION */
-
-function restoreChatWorkspace(){
-  $("friendsPage").hidden = true;
-  $("chatWorkspace").hidden = false;
+function avatarUrl(person) {
+  return person.avatar_url ||
+    "https://ui-avatars.com/api/?name=" +
+    encodeURIComponent(person.username || "User");
 }
 
-async function goFriends(){
-  $("chatWorkspace").hidden = true;
-  $("friendsPage").hidden = false;
+function showWelcome() {
+  $("messages").innerHTML = `
+    <div class="welcome">
+      <div class="big-icon">💬</div>
+      <h2>Your messages</h2>
+      <p>Select a friend to start chatting.</p>
+    </div>`;
+}
 
-  if(!currentUser){
-    showStatus("Please log in first.");
+function openChat(friend) {
+  currentFriend = friend;
+
+  $("chatName").textContent = friend.username || "Friend";
+  $("chatAvatar").src = avatarUrl(friend);
+  $("chatSubtitle").textContent = "BigVic Fun chat";
+
+  document.querySelectorAll(".friend").forEach(button => {
+    button.classList.toggle(
+      "active",
+      button.dataset.friendId === friend.id
+    );
+  });
+
+  $("layout").classList.add("chat-open");
+  $("messageInput").focus();
+  loadMessages();
+}
+
+function renderFriends() {
+  const list = $("friendsList");
+  const search = $("friendSearch").value.toLowerCase().trim();
+
+  list.innerHTML = "";
+
+  const visibleFriends = friends.filter(friend =>
+    (friend.username || "Friend").toLowerCase().includes(search)
+  );
+
+  if (!visibleFriends.length) {
+    list.innerHTML = `
+      <div class="empty-friends">
+        No friends found yet.<br><br>
+        Add friends and accept their requests before chatting.
+      </div>`;
     return;
   }
 
-  await loadContacts();
-  await showFriends("people");
-}
+  visibleFriends.forEach(friend => {
+    const button = document.createElement("button");
+    button.className = "friend";
+    button.dataset.friendId = friend.id;
 
-/* PROFILE */
+    const img = document.createElement("img");
+    img.className = "avatar";
+    img.src = avatarUrl(friend);
+    img.alt = "";
 
-async function loadProfile(){
-  if(!currentUser)return;
+    const info = document.createElement("div");
+    info.className = "friend-info";
 
-  const {data,error}=await supabaseClient
-    .from("profiles")
-    .select("*")
-    .eq("id",currentUser.id)
-    .maybeSingle();
+    const name = document.createElement("div");
+    name.className = "friend-name";
+    name.textContent = friend.username || "Friend";
 
-  if(error)console.log(error.message);
+    const last = document.createElement("div");
+    last.className = "friend-last";
+    last.textContent = "Tap to open conversation";
 
-  const username=data?.username ||
-    currentUser.user_metadata?.username ||
-    currentUser.email?.split("@")[0] ||
-    "BigVic User";
+    info.append(name, last);
+    button.append(img, info);
 
-  $("profileName").textContent=username;
-  $("profileAvatar").src=data?.avatar_url ||
-    currentUser.user_metadata?.avatar_url ||
-    "https://ui-avatars.com/api/?name="+encodeURIComponent(username);
-
-  $("securityEmail").textContent=currentUser.email || "";
-}
-
-/* CONTACTS */
-
-async function loadContacts(){
-  if(!currentUser)return;
-
-  const {data,error}=await supabaseClient
-    .from("profiles")
-    .select("id,username,avatar_url")
-    .neq("id",currentUser.id)
-    .order("username");
-
-  if(error){
-    showStatus("Contacts: "+error.message);
-    return;
-  }
-
-  contacts=data||[];
-  renderContacts();
-}
-
-function renderContacts(){
-  const list=$("contactsList");
-  list.innerHTML="";
-
-  if(!contacts.length){
-    list.textContent="No other users found.";
-    return;
-  }
-
-  contacts.forEach(person=>{
-    const button=document.createElement("button");
-    button.className="contact";
-
-    const img=document.createElement("img");
-    img.src=person.avatar_url ||
-      "https://ui-avatars.com/api/?name="+encodeURIComponent(person.username||"User");
-
-    const name=document.createElement("span");
-    name.textContent=person.username||"User";
-
-    button.append(img,name);
-    button.onclick=()=>selectContact(person);
+    button.addEventListener("click", () => openChat(friend));
     list.appendChild(button);
   });
 }
 
-function selectContact(person){
-  currentContact=person;
-  currentMode="private";
+async function loadFriends() {
+  if (!currentUser) return;
 
-  $("conversationTitle").textContent="🔒 Private Chat - "+(person.username||"User");
-  $("contactsPanel").hidden=false;
-  $("groupsPanel").hidden=true;
+  status("Loading your friends...");
 
-  $("publicButton").classList.remove("active");
-  $("groupButton").classList.remove("active");
-  $("privateButton").classList.add("active");
+  const { data: requests, error } = await supabaseClient
+    .from("friend_requests")
+    .select("requester,recipient,status")
+    .or(
+      "requester.eq." + currentUser.id +
+      ",recipient.eq." + currentUser.id
+    );
 
-  $("callBar").style.display="block";
-  loadMessages();
-}
-
-/* CHAT MODE */
-
-function setChatMode(mode){
-  restoreChatWorkspace();
-  currentMode=mode;
-
-  $("publicButton").classList.toggle("active",mode==="public");
-  $("privateButton").classList.toggle("active",mode==="private");
-  $("groupButton").classList.toggle("active",mode==="group");
-
-  $("contactsPanel").hidden=mode!=="private";
-  $("groupsPanel").hidden=mode!=="group";
-  $("callBar").style.display=mode==="private"?"block":"none";
-
-  if(mode==="public"){
-    currentContact=null;
-    $("conversationTitle").textContent="🌍 Public Chat";
-    loadMessages();
+  if (error) {
+    status("Friends error: " + error.message);
+    $("friendsList").innerHTML =
+      '<div class="empty-friends">Could not load friends. Check your friend_requests table and permissions.</div>';
+    return;
   }
 
-  if(mode==="private"){
-    loadContacts();
-    $("conversationTitle").textContent=currentContact
-      ?"🔒 Private Chat - "+(currentContact.username||"User")
-      :"🔒 Choose a private chat";
-    if(currentContact)loadMessages();
+  const acceptedIds = new Set();
+
+  (requests || []).forEach(request => {
+    if (request.status !== "accepted") return;
+
+    const friendId = request.requester === currentUser.id
+      ? request.recipient
+      : request.requester;
+
+    if (friendId) acceptedIds.add(friendId);
+  });
+
+  if (!acceptedIds.size) {
+    friends = [];
+    renderFriends();
+    status("You don't have accepted friends yet.");
+    return;
   }
 
-  if(mode==="group"){
-    currentContact=null;
-    $("conversationTitle").textContent="👥 Group Chat";
-    $("groupsList").textContent="Group database connection is not configured in this version.";
+  const { data: profiles, error: profileError } = await supabaseClient
+    .from("profiles")
+    .select("id,username,avatar_url")
+    .in("id", Array.from(acceptedIds))
+    .order("username");
+
+  if (profileError) {
+    status("Could not load friend profiles: " + profileError.message);
+    return;
+  }
+
+  friends = profiles || [];
+  renderFriends();
+  status("Your friends are ready.");
+
+  if (currentFriend) {
+    const stillFriend = friends.find(f => f.id === currentFriend.id);
+    if (!stillFriend) {
+      currentFriend = null;
+      showWelcome();
+      $("chatName").textContent = "Choose a friend";
+    }
   }
 }
 
-/* MESSAGE DISPLAY */
-
-function parseMessageContent(raw){
-  if(raw.startsWith("[image] "))return {type:"image",url:raw.slice(8)};
-  if(raw.startsWith("[video] "))return {type:"video",url:raw.slice(8)};
-  if(raw.startsWith("[voice] "))return {type:"voice",url:raw.slice(8)};
-  return {type:"text",text:raw};
+function parseMessage(raw) {
+  if (raw.startsWith("[image] ")) {
+    return { type: "image", url: raw.slice(8) };
+  }
+  if (raw.startsWith("[video] ")) {
+    return { type: "video", url: raw.slice(8) };
+  }
+  if (raw.startsWith("[voice] ")) {
+    return { type: "voice", url: raw.slice(8) };
+  }
+  return { type: "text", text: raw };
 }
 
-async function loadMessages(){
-  if(!currentUser || currentMode==="group")return;
+async function loadMessages() {
+  if (!currentUser || !currentFriend) return;
 
-  let query=supabaseClient
+  const friendId = currentFriend.id;
+
+  const { data, error } = await supabaseClient
     .from("messages")
     .select("*")
-    .order("created_at",{ascending:true})
+    .or(
+      "and(sender.eq." + currentUser.id +
+      ",receiver.eq." + friendId +
+      "),and(sender.eq." + friendId +
+      ",receiver.eq." + currentUser.id + ")"
+    )
+    .order("created_at", { ascending: true })
     .limit(100);
 
-  if(currentMode==="public"){
-    query=query.eq("receiver","public");
-  }else{
-    if(!currentContact)return;
-
-    query=query.or(
-      "and(sender.eq."+currentUser.id+",receiver.eq."+currentContact.id+"),and(sender.eq."+currentContact.id+",receiver.eq."+currentUser.id+")"
-    );
-  }
-
-  const {data,error}=await query;
-
-  if(error){
-    showStatus("Messages: "+error.message);
+  if (error) {
+    status("Could not load messages: " + error.message);
     return;
   }
 
-  const box=$("messages");
-  box.innerHTML="";
+  // Do not display results for a friend you have switched away from.
+  if (!currentFriend || currentFriend.id !== friendId) return;
 
-  for(const message of data||[]){
-    await displayMessage(message);
-  }
+  const box = $("messages");
+  box.innerHTML = "";
 
-  box.scrollTop=box.scrollHeight;
-}
-
-async function getProfileName(userId){
-  const found=contacts.find(p=>p.id===userId);
-  if(found)return found.username||"User";
-
-  const {data}=await supabaseClient
-    .from("profiles")
-    .select("username")
-    .eq("id",userId)
-    .maybeSingle();
-
-  return data?.username||"User";
-}
-
-async function displayMessage(message){
-  const box=$("messages");
-  const mine=message.sender===currentUser.id;
-  const item=document.createElement("div");
-  item.className="message"+(mine?" mine":"");
-
-  const name=document.createElement("div");
-  name.className="name";
-  name.textContent=mine?"You":await getProfileName(message.sender);
-  item.appendChild(name);
-
-  const parsed=parseMessageContent(message.message||"");
-
-  if(parsed.type==="text"){
-    const bubble=document.createElement("div");
-    bubble.className="bubble";
-    bubble.textContent=parsed.text;
-    item.appendChild(bubble);
-  }else if(parsed.type==="image"){
-    const img=document.createElement("img");
-    img.src=parsed.url;
-    img.className="chat-media";
-    img.alt="Shared photo";
-    item.appendChild(img);
-  }else if(parsed.type==="video"){
-    const video=document.createElement("video");
-    video.src=parsed.url;
-    video.controls=true;
-    video.playsInline=true;
-    video.className="chat-media";
-    item.appendChild(video);
-  }else if(parsed.type==="voice"){
-    const audio=document.createElement("audio");
-    audio.src=parsed.url;
-    audio.controls=true;
-    audio.className="chat-audio";
-    item.appendChild(audio);
-  }
-
-  const meta=document.createElement("div");
-  meta.className="message-meta";
-  meta.textContent=message.created_at
-    ?new Date(message.created_at).toLocaleString()
-    :"";
-  item.appendChild(meta);
-
-  box.appendChild(item);
-}
-
-/* SEND TEXT, PHOTO, VIDEO AND VOICE */
-
-async function sendMessage(){
-  if(!currentUser)return;
-
-  let receiver="public";
-
-  if(currentMode==="private"){
-    if(!currentContact){
-      showStatus("Choose a person first.");
-      return;
-    }
-    receiver=currentContact.id;
-  }
-
-  let message="";
-  const input=$("messageInput");
-  const text=input.value.trim();
-
-  if(selectedMedia){
-    showStatus("Uploading media...");
-
-    const file=selectedMedia;
-    const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
-    const path=currentUser.id+"/"+Date.now()+"_"+safeName;
-
-    const {error:uploadError}=await supabaseClient.storage
-      .from(STORAGE_BUCKET)
-      .upload(path,file,{upsert:false,contentType:file.type});
-
-    if(uploadError){
-      showStatus("Upload failed: "+uploadError.message);
-      return;
-    }
-
-    const {data:urlData}=supabaseClient.storage
-      .from(STORAGE_BUCKET)
-      .getPublicUrl(path);
-
-    const url=urlData?.publicUrl;
-
-    if(!url){
-      showStatus("Could not get media URL.");
-      return;
-    }
-
-    if(file.type.startsWith("image/"))message="[image] "+url;
-    else if(file.type.startsWith("video/"))message="[video] "+url;
-    else if(file.type.startsWith("audio/"))message="[voice] "+url;
-    else{
-      showStatus("Unsupported media type.");
-      return;
-    }
-  }else{
-    message=text;
-  }
-
-  if(!message){
-    showStatus("Type a message or choose a photo/video.");
+  if (!data || !data.length) {
+    box.innerHTML = `
+      <div class="welcome">
+        <div class="big-icon">👋</div>
+        <h2>Say hello!</h2>
+        <p>Start your conversation with ${escapeHtml(currentFriend.username || "your friend")}.</p>
+      </div>`;
     return;
   }
 
-  $("sendButton").disabled=true;
+  data.forEach(message => displayMessage(message));
 
-  const {error}=await supabaseClient
-    .from("messages")
-    .insert({
-      sender:currentUser.id,
-      receiver:receiver,
-      message:message
+  box.scrollTop = box.scrollHeight;
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+function displayMessage(message) {
+  const mine = message.sender === currentUser.id;
+  const parsed = parseMessage(message.message || "");
+
+  const row = document.createElement("div");
+  row.className = "message-row" + (mine ? " mine" : "");
+
+  if (!mine) {
+    const img = document.createElement("img");
+    img.className = "message-avatar";
+    img.src = avatarUrl(currentFriend);
+    row.appendChild(img);
+  }
+
+  const content = document.createElement("div");
+
+  if (parsed.type === "text") {
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.textContent = parsed.text;
+    content.appendChild(bubble);
+  }
+
+  if (parsed.type === "image") {
+    const img = document.createElement("img");
+    img.src = parsed.url;
+    img.className = "shared-media";
+    img.alt = "Shared photo";
+    content.appendChild(img);
+  }
+
+  if (parsed.type === "video") {
+    const video = document.createElement("video");
+    video.src = parsed.url;
+    video.controls = true;
+    video.playsInline = true;
+    video.className = "shared-media";
+    content.appendChild(video);
+  }
+
+  if (parsed.type === "voice") {
+    const audio = document.createElement("audio");
+    audio.src = parsed.url;
+    audio.controls = true;
+    audio.className = "shared-audio";
+    content.appendChild(audio);
+  }
+
+  const time = document.createElement("div");
+  time.className = "message-time";
+  time.textContent = message.created_at
+    ? new Date(message.created_at).toLocaleString()
+    : "";
+
+  content.appendChild(time);
+  row.appendChild(content);
+  $("messages").appendChild(row);
+}
+
+async function uploadMedia(file) {
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const path = currentUser.id + "/" + Date.now() + "_" + safeName;
+
+  const { error } = await supabaseClient.storage
+    .from(STORAGE_BUCKET)
+    .upload(path, file, {
+      upsert: false,
+      contentType: file.type
     });
 
-  $("sendButton").disabled=false;
+  if (error) throw error;
 
-  if(error){
-    showStatus("Send failed: "+error.message);
+  const { data } = supabaseClient.storage
+    .from(STORAGE_BUCKET)
+    .getPublicUrl(path);
+
+  if (!data || !data.publicUrl) {
+    throw new Error("Could not get the uploaded file URL.");
+  }
+
+  return data.publicUrl;
+}
+
+async function sendMessage() {
+  if (!currentUser) {
+    status("Please log in first.");
     return;
   }
 
-  input.value="";
-  selectedMedia=null;
-  $("chatMediaInput").value="";
-  $("mediaPreview").innerHTML="";
-  $("mediaStatus").textContent="";
-
-  $("voicePreviewAudio").pause();
-  $("voicePreviewAudio").removeAttribute("src");
-  $("voicePreviewPanel").hidden=true;
-  $("voicePreviewPanel").style.display="none";
-
-  if(voicePreviewURL){
-    URL.revokeObjectURL(voicePreviewURL);
-    voicePreviewURL=null;
+  if (!currentFriend) {
+    status("Choose a friend before sending a message.");
+    return;
   }
 
-  showStatus("Message sent!");
+  const text = $("messageInput").value.trim();
+  let message = "";
+
+  if (selectedMedia) {
+    try {
+      status("Uploading your media...");
+      $("sendButton").disabled = true;
+
+      const url = await uploadMedia(selectedMedia);
+
+      if (selectedMedia.type.startsWith("image/")) {
+        message = "[image] " + url;
+      } else if (selectedMedia.type.startsWith("video/")) {
+        message = "[video] " + url;
+      } else if (selectedMedia.type.startsWith("audio/")) {
+        message = "[voice] " + url;
+      } else {
+        throw new Error("This file type is not supported.");
+      }
+    } catch (error) {
+      status("Upload failed: " + error.message);
+      $("sendButton").disabled = false;
+      return;
+    }
+  } else {
+    message = text;
+  }
+
+  if (!message) {
+    status("Type a message or choose a photo, video or voice note.");
+    $("sendButton").disabled = false;
+    return;
+  }
+
+  const receiverId = currentFriend.id;
+
+  const { error } = await supabaseClient
+    .from("messages")
+    .insert({
+      sender: currentUser.id,
+      receiver: receiverId,
+      message: message
+    });
+
+  $("sendButton").disabled = false;
+
+  if (error) {
+    status("Send failed: " + error.message);
+    return;
+  }
+
+  $("messageInput").value = "";
+  clearPreview();
+  status("Message sent!");
   await loadMessages();
 }
 
-/* MEDIA SELECTION AND PREVIEW */
+function clearPreview() {
+  selectedMedia = null;
+  $("mediaInput").value = "";
+  $("preview").innerHTML = "";
 
-$("chatMediaInput").addEventListener("change",event=>{
-  const file=event.target.files[0];
-  if(!file)return;
-
-  if(!file.type.startsWith("image/") && !file.type.startsWith("video/")){
-    showStatus("Choose an image or video.");
-    event.target.value="";
-    return;
+  if (previewURL) {
+    URL.revokeObjectURL(previewURL);
+    previewURL = null;
   }
+}
 
-  if(selectedMedia && selectedMedia.type.startsWith("audio/")){
-    cancelVoicePreview();
-  }
+$("sendButton").addEventListener("click", sendMessage);
 
-  selectedMedia=file;
-  const preview=$("mediaPreview");
-  preview.innerHTML="";
-
-  const url=URL.createObjectURL(file);
-
-  if(file.type.startsWith("image/")){
-    const img=document.createElement("img");
-    img.src=url;
-    preview.appendChild(img);
-  }else{
-    const video=document.createElement("video");
-    video.src=url;
-    video.controls=true;
-    preview.appendChild(video);
-  }
-
-  $("mediaStatus").textContent="Ready to send: "+file.name;
+$("messageInput").addEventListener("keydown", event => {
+  if (event.key === "Enter") sendMessage();
 });
 
-/* WHATSAPP-STYLE VOICE RECORDING */
+$("friendSearch").addEventListener("input", renderFriends);
 
-function updateRecordingTime(){
-  const minutes=String(Math.floor(recordingSeconds/60)).padStart(2,"0");
-  const seconds=String(recordingSeconds%60).padStart(2,"0");
-  $("recordingTime").textContent=minutes+":"+seconds;
-}
+$("mediaInput").addEventListener("change", event => {
+  const file = event.target.files[0];
+  if (!file) return;
 
-function showWaveform(){
-  const wave=$("voiceWaveform");
-  wave.innerHTML="";
-
-  for(let i=0;i<24;i++){
-    const bar=document.createElement("span");
-    bar.className="wave-bar";
-    wave.appendChild(bar);
-  }
-}
-
-async function startRecording(){
-  if(mediaRecorder && mediaRecorder.state==="recording")return;
-
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    showStatus("Voice recording requires HTTPS and microphone permission.");
+  if (
+    !file.type.startsWith("image/") &&
+    !file.type.startsWith("video/")
+  ) {
+    status("Choose an image or video.");
+    event.target.value = "";
     return;
   }
 
-  if(!window.MediaRecorder){
-    showStatus("Voice recording is not supported by this browser.");
+  clearPreview();
+  selectedMedia = file;
+  previewURL = URL.createObjectURL(file);
+
+  if (file.type.startsWith("image/")) {
+    $("preview").innerHTML =
+      '<img src="' + previewURL + '" alt="Preview">';
+  } else {
+    $("preview").innerHTML =
+      '<video src="' + previewURL + '" controls></video>';
+  }
+
+  const remove = document.createElement("button");
+  remove.textContent = "Remove";
+  remove.onclick = clearPreview;
+  $("preview").appendChild(remove);
+
+  status("Media ready to send.");
+});
+
+// Voice recording: tap once to start and tap again to stop.
+$("recordButton").addEventListener("click", async () => {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    status("Voice recording needs HTTPS and microphone permission.");
     return;
   }
 
-  releaseRequested=false;
-  recordingCancelled=false;
+  if (!window.MediaRecorder) {
+    status("Voice recording is not supported in this browser.");
+    return;
+  }
 
-  try{
-    recordingStream=await navigator.mediaDevices.getUserMedia({audio:true});
+  if (isRecording && mediaRecorder) {
+    mediaRecorder.stop();
+    return;
+  }
 
-    if(releaseRequested){
-      recordingStream.getTracks().forEach(track=>track.stop());
-      recordingStream=null;
-      return;
-    }
+  try {
+    recordingStream = await navigator.mediaDevices.getUserMedia({
+      audio: true
+    });
 
-    recordedChunks=[];
-    recordingSeconds=0;
+    recordedChunks = [];
+    mediaRecorder = new MediaRecorder(recordingStream);
 
-    let mimeType="";
-
-    if(MediaRecorder.isTypeSupported("audio/webm;codecs=opus")){
-      mimeType="audio/webm;codecs=opus";
-    }else if(MediaRecorder.isTypeSupported("audio/webm")){
-      mimeType="audio/webm";
-    }else if(MediaRecorder.isTypeSupported("audio/mp4")){
-      mimeType="audio/mp4";
-    }
-
-    mediaRecorder=new MediaRecorder(
-      recordingStream,
-      mimeType?{mimeType}:{}
-    );
-
-    mediaRecorder.ondataavailable=event=>{
-      if(event.data && event.data.size>0){
+    mediaRecorder.ondataavailable = event => {
+      if (event.data && event.data.size) {
         recordedChunks.push(event.data);
       }
     };
 
-    mediaRecorder.onstop=()=>{
-      if(recordingStream){
-        recordingStream.getTracks().forEach(track=>track.stop());
-        recordingStream=null;
-      }
+    mediaRecorder.onstop = () => {
+      recordingStream.getTracks().forEach(track => track.stop());
+      recordingStream = null;
+      isRecording = false;
+      $("recordButton").textContent = "🎤";
 
-      clearInterval(recordingTimer);
+      const type = mediaRecorder.mimeType || "audio/webm";
+      const blob = new Blob(recordedChunks, { type });
 
-      $("startRecordButton").disabled=false;
-      $("stopRecordButton").disabled=true;
-      $("startRecordButton").classList.remove("recording");
-
-      $("voiceRecordingPanel").hidden=true;
-      $("voiceRecordingPanel").style.display="none";
-
-      if(recordingCancelled){
-        recordedChunks=[];
-        selectedMedia=null;
-        $("mediaStatus").textContent="Recording cancelled.";
-        showStatus("Recording cancelled.");
+      if (!blob.size) {
+        status("No voice recording was captured.");
         return;
       }
 
-      const type=mediaRecorder.mimeType||"audio/webm";
-      const blob=new Blob(recordedChunks,{type});
+      const extension = type.includes("mp4") ? "mp4" : "webm";
 
-      if(!blob.size){
-        showStatus("No audio was recorded. Please try again.");
-        return;
-      }
-
-      const extension=type.includes("mp4")?"mp4":"webm";
-
-      selectedMedia=new File(
+      selectedMedia = new File(
         [blob],
-        "voice-note-"+Date.now()+"."+extension,
-        {type}
+        "voice-note-" + Date.now() + "." + extension,
+        { type }
       );
 
-      if(voicePreviewURL){
-        URL.revokeObjectURL(voicePreviewURL);
-      }
+      $("preview").innerHTML = "";
+      const audio = document.createElement("audio");
+      previewURL = URL.createObjectURL(blob);
+      audio.src = previewURL;
+      audio.controls = true;
+      $("preview").appendChild(audio);
 
-      voicePreviewURL=URL.createObjectURL(blob);
+      const remove = document.createElement("button");
+      remove.textContent = "Delete";
+      remove.onclick = clearPreview;
+      $("preview").appendChild(remove);
 
-      $("voicePreviewAudio").src=voicePreviewURL;
-      $("voicePreviewPanel").hidden=false;
-      $("voicePreviewPanel").style.display="flex";
-
-      $("mediaPreview").innerHTML="";
-      $("mediaStatus").textContent="Voice note ready. Play it back or press Send.";
-
-      showStatus("Voice note recorded successfully.");
+      status("Voice note ready. Press Send to share it.");
     };
 
     mediaRecorder.start();
+    isRecording = true;
+    $("recordButton").textContent = "⏹";
+    status("Recording voice message. Tap ⏹ to finish.");
 
-    $("voiceRecordingPanel").hidden=false;
-    $("voiceRecordingPanel").style.display="flex";
-    $("voicePreviewPanel").hidden=true;
-    $("voicePreviewPanel").style.display="none";
+  } catch (error) {
+    status("Microphone error: " + error.message);
 
-    $("startRecordButton").classList.add("recording");
-    $("startRecordButton").disabled=true;
-    $("stopRecordButton").disabled=false;
-
-    showWaveform();
-    updateRecordingTime();
-
-    recordingTimer=setInterval(()=>{
-      recordingSeconds++;
-      updateRecordingTime();
-    },1000);
-
-    showStatus("Recording... Release the microphone button when finished.");
-
-  }catch(error){
-    showStatus("Microphone error: "+error.message);
-
-    if(recordingStream){
-      recordingStream.getTracks().forEach(track=>track.stop());
-      recordingStream=null;
+    if (recordingStream) {
+      recordingStream.getTracks().forEach(track => track.stop());
+      recordingStream = null;
     }
-
-    $("startRecordButton").disabled=false;
-    $("stopRecordButton").disabled=true;
-    $("startRecordButton").classList.remove("recording");
   }
-}
-
-function stopRecording(){
-  if(mediaRecorder && mediaRecorder.state==="recording"){
-    mediaRecorder.stop();
-    clearInterval(recordingTimer);
-  }
-}
-
-function cancelRecording(){
-  recordingCancelled=true;
-
-  if(mediaRecorder && mediaRecorder.state==="recording"){
-    mediaRecorder.stop();
-    clearInterval(recordingTimer);
-  }else if(recordingStream){
-    recordingStream.getTracks().forEach(track=>track.stop());
-    recordingStream=null;
-  }
-
-  $("voiceRecordingPanel").hidden=true;
-  $("voiceRecordingPanel").style.display="none";
-  $("startRecordButton").disabled=false;
-  $("stopRecordButton").disabled=true;
-  $("startRecordButton").classList.remove("recording");
-}
-
-function cancelVoicePreview(){
-  selectedMedia=null;
-
-  $("voicePreviewAudio").pause();
-  $("voicePreviewAudio").removeAttribute("src");
-
-  if(voicePreviewURL){
-    URL.revokeObjectURL(voicePreviewURL);
-    voicePreviewURL=null;
-  }
-
-  $("voicePreviewPanel").hidden=true;
-  $("voicePreviewPanel").style.display="none";
-  $("mediaStatus").textContent="";
-  showStatus("Voice note deleted.");
-}
-
-/* PRESS AND HOLD TO RECORD */
-
-const microphoneButton=$("startRecordButton");
-
-microphoneButton.addEventListener("pointerdown",event=>{
-  event.preventDefault();
-
-  if(event.button!==undefined && event.button!==0)return;
-
-  releaseRequested=false;
-  startRecording();
 });
 
-function releaseMicrophone(){
-  if(!microphoneButton.classList.contains("recording") &&
-     !(mediaRecorder && mediaRecorder.state==="recording")){
-    releaseRequested=true;
+$("backButton").addEventListener("click", () => {
+  $("layout").classList.remove("chat-open");
+});
+
+$("logoutButton").addEventListener("click", async () => {
+  if (!supabaseClient) return;
+
+  const { error } = await supabaseClient.auth.signOut();
+
+  if (error) {
+    status("Logout failed: " + error.message);
     return;
   }
 
-  stopRecording();
-}
-
-microphoneButton.addEventListener("pointerup",releaseMicrophone);
-microphoneButton.addEventListener("pointerleave",releaseMicrophone);
-microphoneButton.addEventListener("pointercancel",releaseMicrophone);
-
-microphoneButton.addEventListener("contextmenu",event=>{
-  event.preventDefault();
+  location.href = "/auth.html";
 });
 
-$("stopRecordButton").addEventListener("click",stopRecording);
-$("finishRecordingButton").addEventListener("click",stopRecording);
-$("cancelRecordingButton").addEventListener("click",cancelRecording);
-$("cancelVoiceButton").addEventListener("click",cancelVoicePreview);
-
-/* FRIENDS SYSTEM */
-
-async function showFriends(view){
-  if(!currentUser)return;
-
-  const list=$("friendsList");
-  list.innerHTML="Loading...";
-
-  const {data:requests,error}=await supabaseClient
-    .from("friend_requests")
-    .select("*")
-    .or("requester.eq."+currentUser.id+",recipient.eq."+currentUser.id);
-
-  if(error){
-    list.textContent="Friends error: "+error.message;
+async function startChat() {
+  if (!supabaseClient) {
+    status("Supabase connection failed. Check config.js.");
     return;
   }
 
-  const rows=requests||[];
-  list.innerHTML="";
+  const { data, error } = await supabaseClient.auth.getSession();
 
-  if(view==="people"){
-    const existing=new Set();
-
-    rows.forEach(r=>{
-      existing.add(r.requester);
-      existing.add(r.recipient);
-    });
-
-    const people=contacts.filter(p=>!existing.has(p.id));
-
-    people.forEach(person=>{
-      addFriendCard(person,"Add Friend",()=>sendFriendRequest(person.id));
-    });
-
-    if(!people.length)list.textContent="No new people found.";
+  if (error) {
+    status(error.message);
+    return;
   }
 
-  if(view==="friends"){
-    const accepted=rows.filter(r=>r.status==="accepted");
-    let count=0;
+  currentUser = data.session?.user;
 
-    for(const request of accepted){
-      const friendId=request.requester===currentUser.id
-        ?request.recipient:request.requester;
+  if (!currentUser) {
+    location.href = "/auth.html";
+    return;
+  }
 
-      const person=contacts.find(p=>p.id===friendId);
-      if(!person)continue;
+  await loadFriends();
+  showWelcome();
 
-      count++;
-      addFriendCard(person,"Message",()=>{
-        restoreChatWorkspace();
-        setChatMode("private");
-        selectContact(person);
-      });
+  if (refreshTimer) clearInterval(refreshTimer);
+
+  refreshTimer = setInterval(() => {
+    if (currentUser && !document.hidden) {
+      loadFriends();
+      if (currentFriend) loadMessages();
     }
-
-    if(!count)list.textContent="You have no friends yet.";
-  }
-
-  if(view==="requests"){
-    const incoming=rows.filter(r=>
-      r.recipient===currentUser.id && r.status==="pending"
-    );
-
-    for(const request of incoming){
-      const person=contacts.find(p=>p.id===request.requester);
-      if(!person)continue;
-
-      addFriendCard(person,"Accept",()=>respondToFriendRequest(request.id,"accepted"));
-      addFriendCard(person,"Reject",()=>respondToFriendRequest(request.id,"rejected"));
-    }
-
-    if(!incoming.length)list.textContent="No pending friend requests.";
-  }
+  }, 10000);
 }
 
-function addFriendCard(person,actionText,action){
-  const card=document.createElement("div");
-  card.className="friend-card";
-
-  const img=document.createElement("img");
-  img.src=person.avatar_url ||
-    "https://ui-avatars.com/api/?name="+encodeURIComponent(person.username||"User");
-
-  const details=document.createElement("div");
-  details.className="friend-details";
-
-  const name=document.createElement("strong");
-  name.textContent=person.username||"User";
-  details.appendChild(name);
-
-  const button=document.createElement("button");
-  button.className="small-button";
-  button.textContent=actionText;
-  button.onclick=action;
-
-  card.append(img,details,button);
-  $("friendsList").appendChild(card);
-}
-
-async function sendFriendRequest(friendId){
-  const {error}=await supabaseClient
-    .from("friend_requests")
-    .insert({
-      requester:currentUser.id,
-      recipient:friendId,
-      status:"pending"
-    });
-
-  if(error){
-    showStatus("Friend request: "+error.message);
-    return;
-  }
-
-  showStatus("Friend request sent!");
-  await showFriends("people");
-}
-
-async function respondToFriendRequest(requestId,status){
-  const {error}=await supabaseClient
-    .from("friend_requests")
-    .update({status:status})
-    .eq("id",requestId)
-    .eq("recipient",currentUser.id);
-
-  if(error){
-    showStatus(error.message);
-    return;
-  }
-
-  showStatus("Friend request updated.");
-  await showFriends("requests");
-}
-
-/* NOTIFICATIONS PANEL */
-
-$("notificationButton").addEventListener("click",()=>{
-  $("notificationsPanel").hidden=!$("notificationsPanel").hidden;
-});
-
-$("markNotificationsRead").addEventListener("click",()=>{
-  $("notificationsPanel").hidden=true;
-});
-
-/* SECURITY PANEL */
-
-$("securityButton").addEventListener("click",()=>{
-  $("securityPanel").hidden=!$("securityPanel").hidden;
-});
-
-$("resetPasswordButton").addEventListener("click",async()=>{
-  if(!currentUser?.email)return;
-
-  const {error}=await supabaseClient.auth.resetPasswordForEmail(
-    currentUser.email,
-    {redirectTo:window.location.origin+"/auth.html"}
-  );
-
-  $("securityStatus").textContent=error
-    ?error.message
-    :"Password reset email sent.";
-});
-
-/* BUTTON EVENTS */
-
-$("publicButton").addEventListener("click",()=>setChatMode("public"));
-$("privateButton").addEventListener("click",()=>setChatMode("private"));
-$("groupButton").addEventListener("click",()=>setChatMode("group"));
-
-$("sendButton").addEventListener("click",sendMessage);
-
-$("messageInput").addEventListener("keydown",event=>{
-  if(event.key==="Enter")sendMessage();
-});
-
-$("logoutButton").addEventListener("click",async()=>{
-  const {error}=await supabaseClient.auth.signOut();
-
-  if(error){
-    showStatus(error.message);
-    return;
-  }
-
-  window.location.href="/auth.html";
-});
-
-/* AUTHENTICATION AND STARTUP */
-
-async function startChat(){
-  if(!supabaseClient){
-    showStatus("Connection error. Check config.js and Supabase settings.");
-    return;
-  }
-
-  const {data,error}=await supabaseClient.auth.getSession();
-
-  if(error){
-    showStatus(error.message);
-    return;
-  }
-
-  currentUser=data.session?.user;
-
-  if(!currentUser){
-    window.location.href="/auth.html";
-    return;
-  }
-
-  await loadProfile();
-  await loadContacts();
-  setChatMode("public");
-
-  showStatus("Welcome to BigVic Fun!");
-
-  if(refreshTimer)clearInterval(refreshTimer);
-
-  refreshTimer=setInterval(()=>{
-    if(!document.hidden && currentUser && $("friendsPage").hidden){
-      loadMessages();
-    }
-  },10000);
-}
-
-document.addEventListener("DOMContentLoaded",startChat);
-
-supabaseClient?.auth.onAuthStateChange((_event,session)=>{
-  if(session?.user){
-    currentUser=session.user;
-  }
-});
+document.addEventListener("DOMContentLoaded", startChat);
 </script>
 
 </body>
