@@ -1665,5 +1665,163 @@ if(callLocalStream)callLocalStream.getTracks().forEach(track=>track.stop());
 if(recordingStream)recordingStream.getTracks().forEach(track=>track.stop());
 });
 </script>
+<script>
+/* BIGVIC FRIENDS SYSTEM */
+(function () {
+  let friendView = "people";
+  let friendRequests = [];
+
+  const oldRenderContacts = renderContacts;
+
+  async function getFriendRequests() {
+    const { data, error } = await supabaseClient
+      .from("friend_requests")
+      .select("*")
+      .or(
+        `requester_id.eq.${currentUser.id},recipient_id.eq.${currentUser.id}`
+      );
+
+    if (error) throw error;
+    friendRequests = data || [];
+  }
+
+  function friendButton(text, action) {
+    const button = document.createElement("button");
+    button.textContent = text;
+    button.className = "small-button";
+    button.style.margin = "4px";
+    button.onclick = action;
+    return button;
+  }
+
+  async function showFriends(view) {
+    friendView = view;
+
+    const list = document.getElementById("contactsList");
+    if (!list) return;
+
+    list.innerHTML = "Loading...";
+
+    try {
+      await getFriendRequests();
+
+      list.innerHTML = "";
+
+      const title = document.createElement("h3");
+      title.textContent =
+        view === "friends" ? "My Friends" :
+        view === "requests" ? "Friend Requests" :
+        "Find People";
+
+      list.appendChild(title);
+
+      contacts.forEach(person => {
+        const request = friendRequests.find(r =>
+          (r.requester_id === currentUser.id &&
+           r.recipient_id === person.id) ||
+          (r.recipient_id === currentUser.id &&
+           r.requester_id === person.id)
+        );
+
+        const isFriend = request?.status === "accepted";
+        const incoming = request?.recipient_id === currentUser.id;
+        const outgoing = request?.requester_id === currentUser.id;
+
+        if (view === "friends" && !isFriend) return;
+        if (view === "requests" &&
+            !(request?.status === "pending" && incoming)) return;
+
+        const card = document.createElement("div");
+        card.style.padding = "12px";
+        card.style.margin = "8px 0";
+        card.style.border = "1px solid #b58b35";
+        card.style.borderRadius = "10px";
+
+        const name = document.createElement("strong");
+        name.textContent = person.username || "User";
+        card.appendChild(name);
+
+        if (view === "requests") {
+          card.appendChild(friendButton("Accept", async () => {
+            const { error } = await supabaseClient
+              .from("friend_requests")
+              .update({ status: "accepted" })
+              .eq("id", request.id);
+
+            if (error) alert(error.message);
+            else showFriends("requests");
+          }));
+
+          card.appendChild(friendButton("Reject", async () => {
+            const { error } = await supabaseClient
+              .from("friend_requests")
+              .update({ status: "rejected" })
+              .eq("id", request.id);
+
+            if (error) alert(error.message);
+            else showFriends("requests");
+          }));
+        } else if (view === "people" && !isFriend) {
+          if (request?.status === "pending") {
+            const status = document.createElement("span");
+            status.textContent = outgoing ? "Request sent" : "Request received";
+            card.appendChild(status);
+          } else if (!request) {
+            card.appendChild(friendButton("Add Friend", async () => {
+              const { error } = await supabaseClient
+                .from("friend_requests")
+                .insert({
+                  requester_id: currentUser.id,
+                  recipient_id: person.id,
+                  status: "pending"
+                });
+
+              if (error) alert(error.message);
+              else showFriends("people");
+            }));
+          } else {
+            const status = document.createElement("span");
+            status.textContent = "Request rejected";
+            card.appendChild(status);
+          }
+        }
+
+        card.appendChild(friendButton("Message", () => {
+          selectContact(person);
+        }));
+
+        list.appendChild(card);
+      });
+
+      if (!list.querySelector("div")) {
+        const empty = document.createElement("p");
+        empty.textContent = "No users to show here yet.";
+        list.appendChild(empty);
+      }
+    } catch (error) {
+      list.textContent = "Error loading friends: " + error.message;
+    }
+  }
+
+  const panel = document.getElementById("contactsPanel");
+
+  if (panel) {
+    const tabs = document.createElement("div");
+    tabs.style.display = "flex";
+    tabs.style.flexWrap = "wrap";
+    tabs.style.gap = "6px";
+    tabs.style.margin = "10px 0";
+
+    tabs.appendChild(friendButton("Find People", () => showFriends("people")));
+    tabs.appendChild(friendButton("My Friends", () => showFriends("friends")));
+    tabs.appendChild(friendButton("Requests", () => showFriends("requests")));
+
+    const list = document.getElementById("contactsList");
+    if (list) panel.insertBefore(tabs, list);
+
+    showFriends("people");
+  }
+})();
+</script>
 </body>
 </html>
